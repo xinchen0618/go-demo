@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/gohouse/gorose/v2"
-	"go-test/config"
+	"go-test/di"
 	"time"
 )
 
 func GetUsers(c *gin.Context) {
 	key := "redis:users"
 	var res []gorose.Data
-	resCache, err := config.Cache.Get(config.Ctx, key).Result()
+	resCache, err := di.Cache.Get(di.Ctx, key).Result()
 	if err == nil { // 缓存存在
 		err = json.Unmarshal([]byte(resCache), &res)
 		if err != nil {
@@ -19,7 +19,7 @@ func GetUsers(c *gin.Context) {
 		}
 
 	} else { // 缓存不存在
-		res, err = config.Db.Query("SELECT * FROM t_users LIMIT 12")
+		res, err = di.Db.Query("SELECT * FROM t_users LIMIT 12")
 		if err != nil {
 			panic(err)
 		}
@@ -28,7 +28,7 @@ func GetUsers(c *gin.Context) {
 		if err != nil {
 			panic(err)
 		}
-		err = config.Cache.Set(config.Ctx, key, data, 10*time.Second).Err()
+		err = di.Cache.Set(di.Ctx, key, data, 10*time.Second).Err()
 		if err != nil {
 			panic(err)
 		}
