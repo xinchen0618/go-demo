@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-test/routers"
 	"log"
+	"runtime"
 )
 
 /* Panic处理 */
@@ -11,7 +13,12 @@ func recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
-				log.Println(err)
+				// Log
+				buf := make([]byte, 2048)
+				n := runtime.Stack(buf, false)
+				stackInfo := fmt.Sprintf("%s", buf[:n])
+				log.Printf("%v\n%v\n", err, stackInfo)
+
 				c.JSON(500, gin.H{"status": "InternalError", "message": "服务异常, 请稍后重试"})
 			}
 		}()

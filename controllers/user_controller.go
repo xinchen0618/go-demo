@@ -19,7 +19,7 @@ func GetUsers(c *gin.Context) {
 		}
 
 	} else { // 缓存不存在
-		res, err = config.Db.Query("SELECT * FROM t_users2 LIMIT 12")
+		res, err = config.Db.Query("SELECT * FROM t_users LIMIT 12")
 		if err != nil {
 			panic(err)
 		}
