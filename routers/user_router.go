@@ -5,8 +5,7 @@ import (
 	"go-test/controllers"
 )
 
-func LoadUser(e *gin.Engine)  {
-
+func LoadUser(e *gin.Engine) {
 	userGroup := e.Group("/user")
 	{
 		userGroup.GET("/v1/users", controllers.GetUsers)
