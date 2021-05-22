@@ -14,6 +14,7 @@ import (
 var Db gorose.IOrm
 var Ctx = context.Background()
 var Cache *redis.Client
+var Sess *redis.Client
 
 func init() {
 	/* Log */
@@ -49,4 +50,10 @@ func init() {
 		Password: viper.GetString("redis.auth"),
 		DB:       viper.GetInt("redis.index.cache"),
 	})
+	Sess = redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%d", viper.Get("redis.host"), viper.Get("redis.port")),
+		Password: viper.GetString("redis.auth"),
+		DB:       viper.GetInt("redis.index.session"),
+	})
+
 }

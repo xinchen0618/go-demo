@@ -36,6 +36,7 @@ func main() {
 
 	// 加载路由
 	routers.LoadUser(r)
+	routers.LoadAccount(r)
 
 	if err := r.Run(); err != nil {
 		panic(err)
