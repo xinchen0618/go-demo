@@ -7,38 +7,28 @@ import (
 	"time"
 )
 
-// UserLogin 绑定为json
-type UserLogin struct {
-	UserName string `json:"user_name" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
 func PostUserLogin(c *gin.Context) {
-	var json UserLogin
-	if err := c.ShouldBindJSON(&json); err != nil {
-		c.JSON(500, gin.H{"status": "EmptyParam", "message": "用户名和密码不得为空"})
+	jsonBody, err := services.GetJsonBody(c, []string{"user_name:用户名:string:+", "password:密码:string:+"})
+	if err != nil {
 		return
 	}
 
-	sql := "SELECT user_id FROM t_users WHERE user_name = ? AND password = ? LIMIT 1"
-	res, err := di.Db.Query(sql, json.UserName, json.Password)
+	user, err := di.Db.Query("SELECT user_id FROM t_users WHERE user_name = ? AND password = ? LIMIT 1",
+		jsonBody["user_name"], jsonBody["password"])
 	if err != nil {
 		panic(err)
 	}
-	if 0 == len(res) {
-		c.JSON(500, gin.H{"status": "InvalidUser", "message": "用户名或密码不正确"})
+	if 0 == len(user) {
+		c.JSON(400, gin.H{"status": "InvalidUser", "message": "用户名或密码不正确"})
 		return
 	}
 
 	token := services.GenToken()
-	err = di.Sess.HSet(di.Ctx, token, "user_id", res[0]["user_id"]).Err()
-	if err != nil {
+	if err = di.Sess.HSet(di.Ctx, token, "user_id", user[0]["user_id"]).Err(); err != nil {
 		panic(err)
 	}
-	di.Sess.Expire(di.Ctx, token, 30*3600*time.Second)
-
-	c.JSON(201, gin.H{
-		"token":   token,
-		"user_id": res[0]["user_id"],
-	})
+	if err = di.Sess.Expire(di.Ctx, token, 30*3600*time.Second).Err(); err != nil {
+		panic(err)
+	}
+	c.JSON(200, gin.H{"token": token})
 }

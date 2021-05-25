@@ -17,9 +17,11 @@ func CheckAuth(c *gin.Context) error {
 
 	_, err := di.Sess.HGet(di.Ctx, token, "user_id").Result()
 	if err != nil {
-		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
-
-		return errors.New("UserUnauthorized")
+		if "redis: nil" == err.Error() {
+			c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
+			return errors.New("UserUnauthorized")
+		}
+		panic(err)
 	}
 
 	return nil
