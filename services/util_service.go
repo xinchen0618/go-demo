@@ -2,6 +2,7 @@ package services
 
 import (
 	"crypto/md5"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -21,8 +22,8 @@ func GenToken() string {
 
 // GetJsonBody 获取Json参数
 func GetJsonBody(c *gin.Context, patterns []string) (res map[string]interface{}, err error) {
-	json := make(map[string]interface{})
-	_ = c.ShouldBindJSON(&json)
+	jsonBody := make(map[string]interface{})
+	_ = c.ShouldBindJSON(&jsonBody) // 这里的error不要处理, 因为空body会报error
 	res = make(map[string]interface{})
 
 	for _, pattern := range patterns {
@@ -39,18 +40,21 @@ func GetJsonBody(c *gin.Context, patterns []string) (res map[string]interface{},
 			required = false
 			allowEmpty = false
 		}
-		if required {
-			paramValue, ok := json[patternAtoms[0]]
-			if !ok {
+
+		paramValue, ok := jsonBody[patternAtoms[0]]
+		if !ok {
+			if required {
 				c.JSON(400, gin.H{"status": "emptyParam", "message": fmt.Sprintf("%s不得为空", patternAtoms[1])})
 				err = errors.New("emptyParam")
 				return
+			} else {
+				continue
 			}
+		}
 
-			res[patternAtoms[0]], err = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
-			if err != nil {
-				return
-			}
+		res[patternAtoms[0]], err = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
+		if err != nil {
+			return
 		}
 	}
 
@@ -58,8 +62,9 @@ func GetJsonBody(c *gin.Context, patterns []string) (res map[string]interface{},
 }
 
 func FilterParam(c *gin.Context, paramName string, paramValue interface{}, paramType string, allowEmpty bool) (resValue interface{}, resErr error) {
-	if "int" == paramType {
-		valueType := reflect.TypeOf(paramValue).String()
+	valueType := reflect.TypeOf(paramValue).String()
+
+	if "int" == paramType { // 整型
 		if "string" == valueType {
 			paramValue = strings.TrimSpace(paramValue.(string))
 			if "" == paramValue && !allowEmpty {
@@ -74,7 +79,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 				return
 			}
 			resValue = intValue
-
+			return
 		} else if "float64" == valueType {
 			stringValue := fmt.Sprintf("%v", paramValue)
 			intValue, err := strconv.Atoi(stringValue)
@@ -84,13 +89,65 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 				return
 			}
 			resValue = intValue
-
+			return
 		} else {
 			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
 			resErr = errors.New("InvalidParam")
 			return
 		}
 
+	} else if "string" == paramType { // 字符串, 去首尾空格
+		if "string" == valueType {
+			paramValue = strings.TrimSpace(paramValue.(string))
+			if "" == paramValue && !allowEmpty {
+				c.JSON(400, gin.H{"status": "emptyParam", "message": fmt.Sprintf("%s不得为空", paramName)})
+				resErr = errors.New("emptyParam")
+				return
+			}
+			resValue = paramValue
+			return
+		} else if "float64" == valueType {
+			stringValue := fmt.Sprintf("%v", paramValue)
+			resValue = stringValue
+			return
+		} else {
+			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
+			resErr = errors.New("InvalidParam")
+			return
+		}
+
+	} else if EnumMark := paramType[0:1]; "[" == EnumMark { // 枚举
+		var enum []interface{}
+		if err := json.Unmarshal([]byte(paramType), &enum); err != nil {
+			panic(err)
+		}
+		for _, value := range enum {
+			enumType := reflect.TypeOf(enum[0]).String()
+			if enumType == valueType && paramValue == value {
+				resValue = value
+				return
+			}
+			if "float64" == valueType {
+				stringValue := fmt.Sprintf("%v", paramValue)
+				if stringValue == value {
+					resValue = value
+					return
+				}
+			} else if "string" == valueType {
+				floatValue, err := strconv.ParseFloat(paramValue.(string), 64)
+				if err != nil {
+					panic(err)
+				}
+				resValue = floatValue
+				return
+			} else {
+				c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
+				resErr = errors.New("InvalidParam")
+				return
+			}
+		}
+		c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
+		resErr = errors.New("InvalidParam")
 		return
 	}
 
