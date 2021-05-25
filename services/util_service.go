@@ -63,6 +63,8 @@ func GetJsonBody(c *gin.Context, patterns []string) (res map[string]interface{},
 	return
 }
 
+// FilterParam 校验参数类型
+// paramType int整型, +int正整型, !-int非负整型, string字符串, []枚举, array数组
 func FilterParam(c *gin.Context, paramName string, paramValue interface{}, paramType string, allowEmpty bool) (resValue interface{}, resErr error) {
 	valueType := reflect.TypeOf(paramValue).String()
 
