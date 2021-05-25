@@ -23,7 +23,7 @@ func GenToken() string {
 // GetJsonBody 获取Json参数
 // pattern paramKey:paramName:paramType:paramPattern
 // valuePattern +必填不可为空, *选填可以为空, ?选填不可为空
-func GetJsonBody(c *gin.Context, patterns []string) (res map[string]interface{}, err error) {
+func GetJsonBody(c *gin.Context, patterns []string) (res map[string]interface{}, resErr error) {
 	jsonBody := make(map[string]interface{})
 	_ = c.ShouldBindJSON(&jsonBody) // 这里的error不要处理, 因为空body会报error
 	res = make(map[string]interface{})
@@ -47,17 +47,46 @@ func GetJsonBody(c *gin.Context, patterns []string) (res map[string]interface{},
 		if !ok {
 			if required {
 				c.JSON(400, gin.H{"status": "emptyParam", "message": fmt.Sprintf("%s不得为空", patternAtoms[1])})
-				err = errors.New("emptyParam")
+				resErr = errors.New("emptyParam")
 				return
 			} else {
 				continue
 			}
 		}
 
-		res[patternAtoms[0]], err = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
-		if err != nil {
+		res[patternAtoms[0]], resErr = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
+		if resErr != nil {
 			return
 		}
+	}
+
+	return
+}
+
+// GetQueries 获取Query参数
+// pattern paramKey:paramName:paramType:defaultValue defaultValue为nil时参数必填
+func GetQueries(c *gin.Context, patterns []string) (res map[string]interface{}, resErr error) {
+	res = make(map[string]interface{})
+
+	for _, pattern := range patterns {
+		patternAtoms := strings.Split(pattern, ":")
+		allowEmpty := false
+		if `""` == patternAtoms[3] { // 默认值""表示空字符串
+			patternAtoms[3] = ""
+			allowEmpty = true
+		}
+		paramValue := c.Query(patternAtoms[0])
+		if "" == paramValue {
+			if "nil" == patternAtoms[3] { // 必填
+				c.JSON(400, gin.H{"status": "emptyParam", "message": fmt.Sprintf("%s不得为空", patternAtoms[1])})
+				resErr = errors.New("emptyParam")
+				return
+			} else {
+				paramValue = patternAtoms[3]
+			}
+		}
+
+		res[patternAtoms[0]], resErr = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
 	}
 
 	return
