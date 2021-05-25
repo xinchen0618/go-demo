@@ -87,6 +87,9 @@ func GetQueries(c *gin.Context, patterns []string) (res map[string]interface{}, 
 		}
 
 		res[patternAtoms[0]], resErr = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
+		if resErr != nil {
+			return
+		}
 	}
 
 	return
