@@ -28,8 +28,7 @@ func GenToken() string {
 }
 
 // GetJsonBody 获取Json参数
-// pattern paramKey:paramName:paramType:paramPattern
-// valuePattern +必填不可为空, *选填可以为空, ?选填不可为空
+// @param patterns ["paramKey:paramName:paramType:paramPattern"] paramPattern +必填不可为空, *选填可以为空, ?选填不可为空
 // 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 func GetJsonBody(c *gin.Context, patterns []string) (res map[string]interface{}, resErr error) {
 	jsonBody := make(map[string]interface{})
@@ -72,7 +71,7 @@ func GetJsonBody(c *gin.Context, patterns []string) (res map[string]interface{},
 }
 
 // GetQueries 获取Query参数
-// pattern paramKey:paramName:paramType:defaultValue defaultValue为nil时参数必填
+// @param patterns ["paramKey:paramName:paramType:defaultValue"] defaultValue为nil时参数必填
 // 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 func GetQueries(c *gin.Context, patterns []string) (res map[string]interface{}, resErr error) {
 	res = make(map[string]interface{})
@@ -105,7 +104,7 @@ func GetQueries(c *gin.Context, patterns []string) (res map[string]interface{}, 
 }
 
 // FilterParam 校验参数类型
-// paramType int整型64位, +int正整型64位, !-int非负整型64位, string字符串, []枚举, array数组
+// @param paramType int整型64位, +int正整型64位, !-int非负整型64位, string字符串, []枚举, array数组
 // 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 func FilterParam(c *gin.Context, paramName string, paramValue interface{}, paramType string, allowEmpty bool) (resValue interface{}, resErr error) {
 	valueType := reflect.TypeOf(paramValue).String()
@@ -213,7 +212,8 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 }
 
 // GetPageItems 获取分页数据
-// query {"ginContext": c, "db": db, "select": "", "from": "", "where": "", "orderBy": ""}
+// @param query {"ginContext": *gin.Context, "db": gorose.IOrm, "select": string, "from": string, "where": string, "orderBy": string}
+// @return {"page": int64, "per_page": int64, "total_page": int64, "total_counts": int64, "items": []map[string]interface{}}
 // 出现异常时方法会向客户端返回4xx错误, 调用方法捕获到error直接结束业务逻辑即可
 func GetPageItems(query map[string]interface{}) (res map[string]interface{}, resErr error) {
 	queries, resErr := GetQueries(query["ginContext"].(*gin.Context), []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
