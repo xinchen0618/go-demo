@@ -17,7 +17,8 @@ func GetUsers(c *gin.Context) {
 		"db":         di.Db,
 		"select":     "u.user_id,u.user_name,u.money,u.created_at,u.updated_at,uc.counts",
 		"from":       "t_users AS u JOIN t_user_counts AS uc ON u.user_id = uc.user_id",
-		"where":      "1",
+		"where":      "u.user_id > 2",
+		"bindParams": []interface{}{5},
 		"orderBy":    "user_id DESC",
 	})
 	if err != nil {

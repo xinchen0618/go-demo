@@ -212,7 +212,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 }
 
 // GetPageItems 获取分页数据
-// @param query {"ginContext": *gin.Context, "db": gorose.IOrm, "select": string, "from": string, "where": string, "orderBy": string}
+// @param query {"ginContext": *gin.Context, "db": gorose.IOrm, "select": string, "from": string, "where": string, "groupBy" => string, "having" => string, "orderBy": string}
 // @return {"page": int64, "per_page": int64, "total_page": int64, "total_counts": int64, "items": []map[string]interface{}}
 // 出现异常时方法会向客户端返回4xx错误, 调用方法捕获到error直接结束业务逻辑即可
 func GetPageItems(query map[string]interface{}) (res map[string]interface{}, resErr error) {
@@ -222,8 +222,27 @@ func GetPageItems(query map[string]interface{}) (res map[string]interface{}, res
 	}
 
 	res = make(map[string]interface{})
-	sql := fmt.Sprintf("SELECT COUNT(*) AS counts FROM %s WHERE %s", query["from"], query["where"])
-	counts, err := query["db"].(gorose.IOrm).Query(sql)
+
+	bindParams, ok := query["bindParams"].([]interface{}) // 参数绑定
+	if !ok {
+		bindParams = []interface{}{}
+	}
+
+	where := query["where"].(string)
+
+	var countSql string
+	groupBy, ok := query["groupBy"].(string) // GROUP BY存在总记录数计算方式会不同
+	if ok {
+		where = where + groupBy
+		having, ok := query["having"].(string)
+		if ok {
+			where = where + having
+		}
+		countSql = fmt.Sprintf("SELECT COUNT(*) AS counts FROM (SELECT %s FROM %s WHERE %s) AS t", query["select"], query["from"], where)
+	} else {
+		countSql = fmt.Sprintf("SELECT COUNT(*) AS counts FROM %s WHERE %s", query["from"], where)
+	}
+	counts, err := query["db"].(gorose.IOrm).Query(countSql, bindParams...) // 计算总记录数
 	if err != nil {
 		panic(err)
 	}
@@ -238,14 +257,14 @@ func GetPageItems(query map[string]interface{}) (res map[string]interface{}, res
 		return
 	}
 
-	sql = fmt.Sprintf("SELECT %s FROM %s WHERE %s", query["select"], query["from"], query["where"])
+	sql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", query["select"], query["from"], query["where"])
 	orderBy, ok := query["orderBy"]
 	if ok {
 		sql = sql + fmt.Sprintf(" ORDER BY %s", orderBy)
 	}
 	offset := (queries["page"].(int64) - 1) * queries["per_page"].(int64)
 	sql = sql + fmt.Sprintf(" LIMIT %d, %d", offset, queries["per_page"])
-	items, err := query["db"].(gorose.IOrm).Query(sql)
+	items, err := query["db"].(gorose.IOrm).Query(sql, bindParams...)
 	if err != nil {
 		panic(err)
 	}
