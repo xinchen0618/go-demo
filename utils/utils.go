@@ -233,10 +233,10 @@ func GetPageItems(query map[string]interface{}) (res map[string]interface{}, res
 	var countSql string
 	groupBy, ok := query["groupBy"].(string) // GROUP BY存在总记录数计算方式会不同
 	if ok {
-		where = where + groupBy
+		where += " " + groupBy
 		having, ok := query["having"].(string)
 		if ok {
-			where = where + having
+			where += " " + having
 		}
 		countSql = fmt.Sprintf("SELECT COUNT(*) AS counts FROM (SELECT %s FROM %s WHERE %s) AS t", query["select"], query["from"], where)
 	} else {
@@ -257,13 +257,13 @@ func GetPageItems(query map[string]interface{}) (res map[string]interface{}, res
 		return
 	}
 
-	sql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", query["select"], query["from"], query["where"])
+	sql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", query["select"], query["from"], where)
 	orderBy, ok := query["orderBy"]
 	if ok {
-		sql = sql + fmt.Sprintf(" ORDER BY %s", orderBy)
+		sql += fmt.Sprintf(" ORDER BY %s", orderBy)
 	}
 	offset := (queries["page"].(int64) - 1) * queries["per_page"].(int64)
-	sql = sql + fmt.Sprintf(" LIMIT %d, %d", offset, queries["per_page"])
+	sql += fmt.Sprintf(" LIMIT %d, %d", offset, queries["per_page"])
 	items, err := query["db"].(gorose.IOrm).Query(sql, bindParams...)
 	if err != nil {
 		panic(err)
@@ -275,6 +275,5 @@ func GetPageItems(query map[string]interface{}) (res map[string]interface{}, res
 		"total_counts": counts[0]["counts"],
 		"items":        items,
 	}
-
 	return
 }
