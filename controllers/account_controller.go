@@ -3,12 +3,12 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"go-test/di"
-	"go-test/services"
+	"go-test/utils"
 	"time"
 )
 
 func PostUserLogin(c *gin.Context) {
-	jsonBody, err := services.GetJsonBody(c, []string{"user_name:用户名:string:+", "password:密码:string:+"})
+	jsonBody, err := utils.GetJsonBody(c, []string{"user_name:用户名:string:+", "password:密码:string:+"})
 	if err != nil {
 		return
 	}
@@ -23,7 +23,7 @@ func PostUserLogin(c *gin.Context) {
 		return
 	}
 
-	token := services.GenToken()
+	token := utils.GenToken()
 	if err = di.Sess.HSet(di.Ctx, token, "user_id", user[0]["user_id"]).Err(); err != nil {
 		panic(err)
 	}
