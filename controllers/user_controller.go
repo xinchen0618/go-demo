@@ -1,50 +1,27 @@
 package controllers
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"github.com/gohouse/gorose/v2"
 	"go-test/di"
-	"go-test/services"
-	"time"
+	"go-test/utils"
 )
 
 func GetUsers(c *gin.Context) {
 	// 权限校验
-	if err := services.CheckAuth(c); err != nil {
+	//if err := services.CheckAuth(c); err != nil {
+	//	return
+	//}
+
+	res, err := utils.GetPageItems(map[string]interface{}{
+		"ginContext": c,
+		"db":         di.Db,
+		"select":     "u.user_id,u.user_name,u.money,u.created_at,u.updated_at,uc.counts",
+		"from":       "t_users AS u JOIN t_user_counts AS uc ON u.user_id = uc.user_id",
+		"where":      "1",
+		"orderBy":    "user_id DESC",
+	})
+	if err != nil {
 		return
 	}
-
-	key := "redis:users"
-	var res []gorose.Data
-	resCache, err := di.Cache.Get(di.Ctx, key).Result()
-	if err == nil { // 缓存存在
-		err = json.Unmarshal([]byte(resCache), &res)
-		if err != nil {
-			panic(err)
-		}
-
-	} else { // 缓存不存在
-		res, err = di.Db.Query("SELECT * FROM t_users LIMIT 12")
-		if err != nil {
-			panic(err)
-		}
-
-		data, err := json.Marshal(res)
-		if err != nil {
-			panic(err)
-		}
-		err = di.Cache.Set(di.Ctx, key, data, 10*time.Second).Err()
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	c.JSON(200, gin.H{
-		"page":         1,
-		"per_page":     12,
-		"total_pages":  1,
-		"total_counts": 1,
-		"items":        res,
-	})
+	c.JSON(200, res)
 }

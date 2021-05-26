@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/gohouse/gorose/v2"
+	"math"
 	"math/rand"
 	"reflect"
 	"strconv"
@@ -103,13 +105,13 @@ func GetQueries(c *gin.Context, patterns []string) (res map[string]interface{}, 
 }
 
 // FilterParam 校验参数类型
-// paramType int整型, +int正整型, !-int非负整型, string字符串, []枚举, array数组
+// paramType int整型64位, +int正整型64位, !-int非负整型64位, string字符串, []枚举, array数组
 // 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 func FilterParam(c *gin.Context, paramName string, paramValue interface{}, paramType string, allowEmpty bool) (resValue interface{}, resErr error) {
 	valueType := reflect.TypeOf(paramValue).String()
 
 	if "int" == paramType[len(paramType)-3:] { // 整型
-		var intValue int
+		var intValue int64
 		var err error
 		if "string" == valueType {
 			paramValue = strings.TrimSpace(paramValue.(string))
@@ -118,7 +120,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 				resErr = errors.New("emptyParam")
 				return
 			}
-			intValue, err = strconv.Atoi(paramValue.(string))
+			intValue, err = strconv.ParseInt(paramValue.(string), 10, 64)
 			if err != nil {
 				c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
 				resErr = errors.New("InvalidParam")
@@ -126,7 +128,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			}
 		} else if "float64" == valueType {
 			stringValue := fmt.Sprintf("%v", paramValue)
-			intValue, err = strconv.Atoi(stringValue)
+			intValue, err = strconv.ParseInt(stringValue, 10, 64)
 			if err != nil {
 				c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
 				resErr = errors.New("InvalidParam")
@@ -212,5 +214,53 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 
 	c.JSON(400, gin.H{"status": "UndefinedParamType", "message": fmt.Sprintf("未知数据类型: %s", paramName)})
 	resErr = errors.New("UndefinedParamType")
+	return
+}
+
+// GetPageItems 获取分页数据
+// query {"ginContext": c, "db": db, "select": "", "from": "", "where": "", "orderBy": ""}
+// 出现异常时方法会向客户端返回4xx错误, 调用方法捕获到error直接结束业务逻辑即可
+func GetPageItems(query map[string]interface{}) (res map[string]interface{}, resErr error) {
+	queries, resErr := GetQueries(query["ginContext"].(*gin.Context), []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
+	if resErr != nil {
+		return
+	}
+
+	res = make(map[string]interface{})
+	sql := fmt.Sprintf("SELECT COUNT(*) AS counts FROM %s WHERE %s", query["from"], query["where"])
+	counts, err := query["db"].(gorose.IOrm).Query(sql)
+	if err != nil {
+		panic(err)
+	}
+	if 0 == counts[0]["counts"].(int64) { // 没有数据
+		res = map[string]interface{}{
+			"page":        queries["page"],
+			"per_page":    queries["per_page"],
+			"total_pages": 0,
+			"total_items": 0,
+			"items":       []map[string]interface{}{},
+		}
+		return
+	}
+
+	sql = fmt.Sprintf("SELECT %s FROM %s WHERE %s", query["select"], query["from"], query["where"])
+	orderBy, ok := query["orderBy"]
+	if ok {
+		sql = sql + fmt.Sprintf(" ORDER BY %s", orderBy)
+	}
+	offset := (queries["page"].(int64) - 1) * queries["per_page"].(int64)
+	sql = sql + fmt.Sprintf(" LIMIT %d, %d", offset, queries["per_page"])
+	items, err := query["db"].(gorose.IOrm).Query(sql)
+	if err != nil {
+		panic(err)
+	}
+	res = map[string]interface{}{
+		"page":        queries["page"],
+		"per_page":    queries["per_page"],
+		"total_pages": math.Ceil(float64(counts[0]["counts"].(int64)) / float64(queries["per_page"].(int64))),
+		"total_items": counts[0]["counts"],
+		"items":       items,
+	}
+
 	return
 }
