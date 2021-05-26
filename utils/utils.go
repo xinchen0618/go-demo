@@ -113,33 +113,28 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 	if "int" == paramType[len(paramType)-3:] { // 整型
 		var intValue int64
 		var err error
+		var stringValue string // 先统一转字符串再转整型, 这样小数就不允许输入了
 		if "string" == valueType {
-			paramValue = strings.TrimSpace(paramValue.(string))
-			if "" == paramValue && !allowEmpty {
+			stringValue = strings.TrimSpace(paramValue.(string))
+			if "" == stringValue && !allowEmpty {
 				c.JSON(400, gin.H{"status": "emptyParam", "message": fmt.Sprintf("%s不得为空", paramName)})
 				resErr = errors.New("emptyParam")
 				return
 			}
-			intValue, err = strconv.ParseInt(paramValue.(string), 10, 64)
-			if err != nil {
-				c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
-				resErr = errors.New("InvalidParam")
-				return
-			}
 		} else if "float64" == valueType {
-			stringValue := fmt.Sprintf("%v", paramValue)
-			intValue, err = strconv.ParseInt(stringValue, 10, 64)
-			if err != nil {
-				c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
-				resErr = errors.New("InvalidParam")
-				return
-			}
+			stringValue = fmt.Sprintf("%v", paramValue)
 		} else {
 			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
 			resErr = errors.New("InvalidParam")
 			return
 		}
-		if ("+int" == paramType && intValue <= 0) || ("!-int" == paramType && intValue < 0) {
+		intValue, err = strconv.ParseInt(stringValue, 10, 64) // 转整型64位
+		if err != nil {
+			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
+			resErr = errors.New("InvalidParam")
+			return
+		}
+		if ("+int" == paramType && intValue <= 0) || ("!-int" == paramType && intValue < 0) { // 范围过滤
 			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
 			resErr = errors.New("InvalidParam")
 			return
@@ -149,13 +144,13 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 
 	} else if "string" == paramType { // 字符串, 去首尾空格
 		if "string" == valueType {
-			paramValue = strings.TrimSpace(paramValue.(string))
-			if "" == paramValue && !allowEmpty {
+			stringValue := strings.TrimSpace(paramValue.(string))
+			if "" == stringValue && !allowEmpty {
 				c.JSON(400, gin.H{"status": "emptyParam", "message": fmt.Sprintf("%s不得为空", paramName)})
 				resErr = errors.New("emptyParam")
 				return
 			}
-			resValue = paramValue
+			resValue = stringValue
 			return
 		} else if "float64" == valueType {
 			stringValue := fmt.Sprintf("%v", paramValue)
@@ -167,7 +162,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			return
 		}
 
-	} else if EnumMark := paramType[0:1]; "[" == EnumMark { // 枚举
+	} else if EnumMark := paramType[0:1]; "[" == EnumMark { // 枚举, 支持数字与字符串混合枚举
 		var enum []interface{}
 		if err := json.Unmarshal([]byte(paramType), &enum); err != nil {
 			panic(err)
@@ -234,11 +229,11 @@ func GetPageItems(query map[string]interface{}) (res map[string]interface{}, res
 	}
 	if 0 == counts[0]["counts"].(int64) { // 没有数据
 		res = map[string]interface{}{
-			"page":        queries["page"],
-			"per_page":    queries["per_page"],
-			"total_pages": 0,
-			"total_items": 0,
-			"items":       []map[string]interface{}{},
+			"page":         queries["page"],
+			"per_page":     queries["per_page"],
+			"total_pages":  0,
+			"total_counts": 0,
+			"items":        []map[string]interface{}{},
 		}
 		return
 	}
@@ -255,11 +250,11 @@ func GetPageItems(query map[string]interface{}) (res map[string]interface{}, res
 		panic(err)
 	}
 	res = map[string]interface{}{
-		"page":        queries["page"],
-		"per_page":    queries["per_page"],
-		"total_pages": math.Ceil(float64(counts[0]["counts"].(int64)) / float64(queries["per_page"].(int64))),
-		"total_items": counts[0]["counts"],
-		"items":       items,
+		"page":         queries["page"],
+		"per_page":     queries["per_page"],
+		"total_pages":  math.Ceil(float64(counts[0]["counts"].(int64)) / float64(queries["per_page"].(int64))),
+		"total_counts": counts[0]["counts"],
+		"items":        items,
 	}
 
 	return
