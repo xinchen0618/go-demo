@@ -28,7 +28,7 @@ func GenToken() string {
 // GetJsonBody 获取Json参数
 // pattern paramKey:paramName:paramType:paramPattern
 // valuePattern +必填不可为空, *选填可以为空, ?选填不可为空
-// 参数异常时方法会向客户端返回4xx错误, 调用捕获到error直接终止业务逻辑即可
+// 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 func GetJsonBody(c *gin.Context, patterns []string) (res map[string]interface{}, resErr error) {
 	jsonBody := make(map[string]interface{})
 	_ = c.ShouldBindJSON(&jsonBody) // 这里的error不要处理, 因为空body会报error
@@ -71,7 +71,7 @@ func GetJsonBody(c *gin.Context, patterns []string) (res map[string]interface{},
 
 // GetQueries 获取Query参数
 // pattern paramKey:paramName:paramType:defaultValue defaultValue为nil时参数必填
-// 参数异常时方法会向客户端返回4xx错误, 调用捕获到error直接终止业务逻辑即可
+// 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 func GetQueries(c *gin.Context, patterns []string) (res map[string]interface{}, resErr error) {
 	res = make(map[string]interface{})
 
@@ -104,7 +104,7 @@ func GetQueries(c *gin.Context, patterns []string) (res map[string]interface{}, 
 
 // FilterParam 校验参数类型
 // paramType int整型, +int正整型, !-int非负整型, string字符串, []枚举, array数组
-// 参数异常时方法会向客户端返回4xx错误, 调用捕获到error直接终止业务逻辑即可
+// 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 func FilterParam(c *gin.Context, paramName string, paramValue interface{}, paramType string, allowEmpty bool) (resValue interface{}, resErr error) {
 	valueType := reflect.TypeOf(paramValue).String()
 
