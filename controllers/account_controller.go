@@ -7,6 +7,7 @@ import (
 	"go-test/di"
 	"go-test/services"
 	"go-test/utils"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -28,18 +29,20 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 	}
 
 	// JWT
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id":    user[0]["user_id"],
-		"expired_at": time.Now().Unix() + 86400*30,
-		"issuer":     "go-test",
-	})
+	loginTtl := 86400 * 30 * time.Second // 登录有效时长
+	claims := &jwt.StandardClaims{
+		ExpiresAt: time.Now().Add(loginTtl).Unix(),
+		Id:        strconv.FormatInt(user[0]["user_id"].(int64), 10),
+		Issuer:    "go-test-user-login",
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(viper.GetString("jwtSecret")))
 	if err != nil {
 		panic(err)
 	}
-	// redis存储
+	// redis登录白名单
 	tokenAtoms := strings.Split(tokenString, ".")
-	if err = di.JwtRedis.Set(di.Ctx, tokenAtoms[2], user[0]["user_id"], 30*86400*time.Second).Err(); err != nil {
+	if err = di.JwtRedis.Set(di.Ctx, tokenAtoms[2], user[0]["user_id"], loginTtl).Err(); err != nil {
 		panic(err)
 	}
 	c.JSON(200, gin.H{"user_id": user[0]["user_id"], "token": tokenString})
