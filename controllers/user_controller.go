@@ -9,7 +9,7 @@ import (
 
 func GetUsers(c *gin.Context) {
 	// 登录校验
-	if _, err := services.CheckLogin(c); err != nil {
+	if _, err := services.CheckUserLogin(c); err != nil {
 		return
 	}
 

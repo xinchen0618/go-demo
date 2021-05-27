@@ -11,12 +11,13 @@ import (
 	"time"
 )
 
-// CheckLogin 登录权限
+// CheckUserLogin 登录权限
+// 先校验JWT, 再校验redis白名单
 // 校验不通过方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
-func CheckLogin(c *gin.Context) (userId int64, resErr error) {
+func CheckUserLogin(c *gin.Context) (userId int64, resErr error) {
 	tokenString := c.Request.Header.Get("X-Token")
 	if "" == tokenString { // 没有携带token
-		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录, 请重新登录"})
+		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录, 请登录"})
 		resErr = errors.New("UserUnauthorized")
 		return
 	}
@@ -29,7 +30,7 @@ func CheckLogin(c *gin.Context) (userId int64, resErr error) {
 		return []byte(viper.GetString("jwtSecret")), nil
 	})
 	if err != nil { // 非法token
-		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录, 请重新登录"})
+		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录, 请登录"})
 		resErr = errors.New("UserUnauthorized")
 		return
 	}
@@ -54,7 +55,7 @@ func CheckLogin(c *gin.Context) (userId int64, resErr error) {
 		return
 
 	} else {
-		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录, 请重新登录"})
+		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录, 请登录"})
 		resErr = errors.New("UserUnauthorized")
 		return
 	}
