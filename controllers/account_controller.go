@@ -31,6 +31,7 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id":    user[0]["user_id"],
 		"expired_at": time.Now().Unix() + 86400*30,
+		"issuer":     "go-test",
 	})
 	tokenString, err := token.SignedString([]byte(viper.GetString("jwtSecret")))
 	if err != nil {
