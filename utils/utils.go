@@ -252,7 +252,7 @@ func GetPageItems(query map[string]interface{}) (res map[string]interface{}, res
 			"per_page":     queries["per_page"],
 			"total_pages":  0,
 			"total_counts": 0,
-			"items":        []map[string]interface{}{},
+			"items":        []gorose.Data{},
 		}
 		return
 	}
