@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"go-test/di"
 	"go-test/utils"
+	"strings"
 	"time"
 )
 
@@ -23,12 +26,19 @@ func PostUserLogin(c *gin.Context) {
 		return
 	}
 
-	token := utils.GenToken()
-	if err = di.Sess.HSet(di.Ctx, token, "user_id", user[0]["user_id"]).Err(); err != nil {
+	// JWT
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id":    user[0]["user_id"],
+		"expired_at": time.Now().Unix() + 86400*30,
+	})
+	tokenString, err := token.SignedString([]byte(viper.GetString("jwtSecret")))
+	if err != nil {
 		panic(err)
 	}
-	if err = di.Sess.Expire(di.Ctx, token, 30*3600*time.Second).Err(); err != nil {
+	// redis存储
+	tokenAtoms := strings.Split(tokenString, ".")
+	if err = di.JwtRedis.Set(di.Ctx, tokenAtoms[2], user[0]["user_id"], 30*86400*time.Second).Err(); err != nil {
 		panic(err)
 	}
-	c.JSON(200, gin.H{"token": token})
+	c.JSON(200, gin.H{"user_id": user[0]["user_id"], "token": tokenString})
 }

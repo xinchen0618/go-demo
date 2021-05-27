@@ -12,6 +12,7 @@ redis:
   auth: ""
   index:
     cache: 0     # 缓存
-    redis: 1     # 存储
-    session: 2   # SESSION
-    queue: 3     # 队列
+    storage: 1   # 存储
+    jwt: 2       # JWT
+
+jwtSecret: "Xx4KJQ2AguFL5gWurcRJvVfDC5a2itLi53vFJN9wthYkrxtQbdeRDkWTHzAjnn5n"

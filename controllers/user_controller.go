@@ -3,14 +3,15 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"go-test/di"
+	"go-test/services"
 	"go-test/utils"
 )
 
 func GetUsers(c *gin.Context) {
-	// 权限校验
-	//if err := services.CheckAuth(c); err != nil {
-	//	return
-	//}
+	// 登录校验
+	if _, err := services.CheckLogin(c); err != nil {
+		return
+	}
 
 	res, err := utils.GetPageItems(map[string]interface{}{
 		"ginContext": c,
