@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-var db gorose.IOrm
+var dbEngine *gorose.Engin
 var ctx = context.Background()
 var cacheRedis *redis.Client
 var jwtRedis *redis.Client
@@ -38,11 +38,10 @@ func init() {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",
 		viper.Get("mysql.username"), viper.Get("mysql.password"), viper.Get("mysql.host"),
 		viper.Get("mysql.port"), viper.Get("mysql.dbname"), viper.Get("mysql.charset"))
-	engine, err := gorose.Open(&gorose.Config{Driver: "mysql", Dsn: dsn})
+	dbEngine, err = gorose.Open(&gorose.Config{Driver: "mysql", Dsn: dsn})
 	if err != nil {
 		panic(err)
 	}
-	db = engine.NewOrm()
 
 	/* redis */
 	cacheRedis = redis.NewClient(&redis.Options{
@@ -58,7 +57,7 @@ func init() {
 }
 
 func Db() gorose.IOrm {
-	return db
+	return dbEngine.NewOrm()
 }
 
 func Ctx() context.Context {
