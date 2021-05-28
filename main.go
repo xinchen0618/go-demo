@@ -9,12 +9,12 @@ import (
 )
 
 // Panic处理
-// 与业务无关的错误, 使用panic, 统一向客户端返回500错误
+// 与业务无关的错误, 使用panic, 记录错误日志并统一向客户端返回500错误
 func recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
-				// Log
+				// 记录错误日志
 				buf := make([]byte, 2048)
 				n := runtime.Stack(buf, false)
 				stackInfo := fmt.Sprintf("%s", buf[:n])
