@@ -8,7 +8,8 @@ import (
 	"runtime"
 )
 
-/* Panic处理 */
+// Panic处理
+// 与业务无关的错误, 使用panic, 统一向客户端返回500错误
 func recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
