@@ -11,10 +11,10 @@ import (
 	"os"
 )
 
-var Db gorose.IOrm
-var Ctx = context.Background()
-var CacheRedis *redis.Client
-var JwtRedis *redis.Client
+var db gorose.IOrm
+var ctx = context.Background()
+var cacheRedis *redis.Client
+var jwtRedis *redis.Client
 
 func init() {
 	/* Log */
@@ -42,18 +42,33 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	Db = engine.NewOrm()
+	db = engine.NewOrm()
 
 	/* redis */
-	CacheRedis = redis.NewClient(&redis.Options{
+	cacheRedis = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", viper.Get("redis.host"), viper.Get("redis.port")),
 		Password: viper.GetString("redis.auth"),
 		DB:       viper.GetInt("redis.index.cache"),
 	})
-	JwtRedis = redis.NewClient(&redis.Options{
+	jwtRedis = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", viper.Get("redis.host"), viper.Get("redis.port")),
 		Password: viper.GetString("redis.auth"),
 		DB:       viper.GetInt("redis.index.jwt"),
 	})
+}
 
+func Db() gorose.IOrm {
+	return db
+}
+
+func Ctx() context.Context {
+	return ctx
+}
+
+func CacheRedis() *redis.Client {
+	return cacheRedis
+}
+
+func JwtRedis() *redis.Client {
+	return jwtRedis
 }

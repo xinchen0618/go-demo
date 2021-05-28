@@ -18,7 +18,7 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 		return
 	}
 
-	user, err := di.Db.Query("SELECT user_id FROM t_users WHERE user_name = ? AND password = ? LIMIT 1",
+	user, err := di.Db().Query("SELECT user_id FROM t_users WHERE user_name = ? AND password = ? LIMIT 1",
 		jsonBody["user_name"], jsonBody["password"])
 	if err != nil {
 		panic(err)
@@ -42,7 +42,7 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 	}
 	// redis登录白名单
 	tokenAtoms := strings.Split(tokenString, ".")
-	if err = di.JwtRedis.Set(di.Ctx, tokenAtoms[2], user[0]["user_id"], loginTtl).Err(); err != nil {
+	if err = di.JwtRedis().Set(di.Ctx(), tokenAtoms[2], user[0]["user_id"], loginTtl).Err(); err != nil {
 		panic(err)
 	}
 	c.JSON(200, gin.H{"user_id": user[0]["user_id"], "token": tokenString})
@@ -57,7 +57,7 @@ func DeleteUserLogout(c *gin.Context) {
 	// 删除对应redis白名单记录
 	tokenString := c.Request.Header.Get("X-Token")
 	tokenAtoms := strings.Split(tokenString, ".")
-	if err := di.JwtRedis.Del(di.Ctx, tokenAtoms[2]).Err(); err != nil {
+	if err := di.JwtRedis().Del(di.Ctx(), tokenAtoms[2]).Err(); err != nil {
 		panic(err)
 	}
 

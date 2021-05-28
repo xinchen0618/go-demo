@@ -15,7 +15,7 @@ func GetUsers(c *gin.Context) {
 
 	res, err := utils.GetPageItems(map[string]interface{}{
 		"ginContext": c,
-		"db":         di.Db,
+		"db":         di.Db(),
 		"select":     "u.user_id,u.user_name,u.money,u.created_at,u.updated_at,uc.counts",
 		"from":       "t_users AS u JOIN t_user_counts AS uc ON u.user_id = uc.user_id",
 		"where":      "u.user_id > ?",
