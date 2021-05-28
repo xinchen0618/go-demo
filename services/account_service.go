@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// CheckUserLogin 登录权限
+// CheckUserLogin 登录校验
 // 先校验JWT, 再校验redis白名单
 // 校验不通过方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 func CheckUserLogin(c *gin.Context) (userId int64, resErr error) {
