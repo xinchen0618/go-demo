@@ -1,34 +1,19 @@
 package utils
 
 import (
-	"crypto/md5"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gohouse/gorose/v2"
 	"math"
-	"math/rand"
 	"reflect"
 	"strconv"
 	"strings"
-	"time"
 )
 
-// Md5 md5加密字符串
-func Md5(str string) string {
-	return fmt.Sprintf("%x", md5.Sum([]byte(str)))
-}
-
-// GenToken 生成一个token字符串
-func GenToken() string {
-	seed := strconv.FormatInt(time.Now().UnixNano(), 10) + strconv.Itoa(rand.Int())
-
-	return Md5(seed)
-}
-
 // GetJsonBody 获取Json参数
-// @param patterns ["paramKey:paramName:paramType:paramPattern"] paramPattern +必填不可为空, *选填可以为空, ?选填不可为空
+// @param patterns ["paramKey:paramName:paramType:paramPattern"] paramPattern +必填不可为空, *选填可为空, ?选填不可为空
 // 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 func GetJsonBody(c *gin.Context, patterns []string) (res map[string]interface{}, resErr error) {
 	jsonBody := make(map[string]interface{})
