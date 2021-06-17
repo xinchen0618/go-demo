@@ -93,7 +93,8 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, erro
 func FilterParam(c *gin.Context, paramName string, paramValue interface{}, paramType string, allowEmpty bool) (interface{}, error) {
 	valueType := reflect.TypeOf(paramValue).String()
 
-	if "int" == paramType { /* 整型 */
+	/* 整型 */
+	if "int" == paramType {
 		var stringValue string // 先统一转字符串再转整型, 这样小数就不允许输入了
 		if "string" == valueType {
 			stringValue = strings.TrimSpace(paramValue.(string))
@@ -113,8 +114,10 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			return nil, errors.New("InvalidParam")
 		}
 		return intValue, nil
+	}
 
-	} else if "+int" == paramType { /* 正整数64位 */
+	/* 正整数64位 */
+	if "+int" == paramType {
 		intValue, err := FilterParam(c, paramName, paramValue, "int", allowEmpty)
 		if err != nil {
 			return nil, err
@@ -124,8 +127,10 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			return nil, errors.New("InvalidParam")
 		}
 		return intValue, nil
+	}
 
-	} else if "!-int" == paramType { /* 非负整数64位 */
+	/* 非负整数64位 */
+	if "!-int" == paramType {
 		intValue, err := FilterParam(c, paramName, paramValue, "int", allowEmpty)
 		if err != nil {
 			return nil, err
@@ -135,8 +140,10 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			return nil, errors.New("InvalidParam")
 		}
 		return intValue, nil
+	}
 
-	} else if "string" == paramType { /* 字符串, 去首尾空格*/
+	/* 字符串, 去首尾空格*/
+	if "string" == paramType {
 		if "string" == valueType {
 			stringValue := strings.TrimSpace(paramValue.(string))
 			if "" == stringValue && !allowEmpty {
@@ -151,8 +158,10 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
 			return nil, errors.New("InvalidParam")
 		}
+	}
 
-	} else if EnumMark := paramType[0:1]; "[" == EnumMark { /* 枚举, 支持数字与字符串混合枚举 */
+	/* 枚举, 支持数字与字符串混合枚举 */
+	if EnumMark := paramType[0:1]; "[" == EnumMark {
 		var enum []interface{}
 		if err := json.Unmarshal([]byte(paramType), &enum); err != nil {
 			panic(err)
@@ -180,8 +189,10 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 		}
 		c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
 		return nil, errors.New("InvalidParam")
+	}
 
-	} else if "array" == paramType { /* 数组 */
+	/* 数组 */
+	if "array" == paramType {
 		if "[]interface {}" == valueType {
 			return paramValue, nil
 		} else {
