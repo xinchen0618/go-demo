@@ -15,11 +15,12 @@ import (
 // GetJsonBody 获取Json参数
 // @param patterns ["paramKey:paramName:paramType:paramPattern"] paramPattern +必填不可为空, *选填可为空, ?选填不可为空
 // 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
-func GetJsonBody(c *gin.Context, patterns []string) (res map[string]interface{}, resErr error) {
+func GetJsonBody(c *gin.Context, patterns []string) (map[string]interface{}, error) {
 	jsonBody := make(map[string]interface{})
 	_ = c.ShouldBindJSON(&jsonBody) // 这里的error不要处理, 因为空body会报error
-	res = make(map[string]interface{})
 
+	res := make(map[string]interface{})
+	var err error
 	for _, pattern := range patterns {
 		patternAtoms := strings.Split(pattern, ":")
 		required := true
@@ -39,28 +40,27 @@ func GetJsonBody(c *gin.Context, patterns []string) (res map[string]interface{},
 		if !ok {
 			if required {
 				c.JSON(400, gin.H{"status": "emptyParam", "message": fmt.Sprintf("%s不得为空", patternAtoms[1])})
-				resErr = errors.New("emptyParam")
-				return
+				return nil, errors.New("emptyParam")
 			} else {
 				continue
 			}
 		}
 
-		res[patternAtoms[0]], resErr = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
-		if resErr != nil {
-			return
+		res[patternAtoms[0]], err = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
+		if err != nil {
+			return nil, err
 		}
 	}
 
-	return
+	return res, nil
 }
 
 // GetQueries 获取Query参数
 // @param patterns ["paramKey:paramName:paramType:defaultValue"] defaultValue为nil时参数必填
 // 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
-func GetQueries(c *gin.Context, patterns []string) (res map[string]interface{}, resErr error) {
-	res = make(map[string]interface{})
-
+func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, error) {
+	res := make(map[string]interface{})
+	var err error
 	for _, pattern := range patterns {
 		patternAtoms := strings.Split(pattern, ":")
 		allowEmpty := false
@@ -72,81 +72,87 @@ func GetQueries(c *gin.Context, patterns []string) (res map[string]interface{}, 
 		if "" == paramValue {
 			if "nil" == patternAtoms[3] { // 必填
 				c.JSON(400, gin.H{"status": "emptyParam", "message": fmt.Sprintf("%s不得为空", patternAtoms[1])})
-				resErr = errors.New("emptyParam")
-				return
+				return nil, errors.New("emptyParam")
 			} else {
 				paramValue = patternAtoms[3]
 			}
 		}
 
-		res[patternAtoms[0]], resErr = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
-		if resErr != nil {
-			return
+		res[patternAtoms[0]], err = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
+		if err != nil {
+			return nil, err
 		}
 	}
 
-	return
+	return res, nil
 }
 
 // FilterParam 校验参数类型
 // @param paramType int整型64位, +int正整型64位, !-int非负整型64位, string字符串, []枚举, array数组
 // 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
-func FilterParam(c *gin.Context, paramName string, paramValue interface{}, paramType string, allowEmpty bool) (resValue interface{}, resErr error) {
+func FilterParam(c *gin.Context, paramName string, paramValue interface{}, paramType string, allowEmpty bool) (interface{}, error) {
 	valueType := reflect.TypeOf(paramValue).String()
 
-	if "int" == paramType[len(paramType)-3:] { // 整型
-		var intValue int64
-		var err error
+	if "int" == paramType { /* 整型 */
 		var stringValue string // 先统一转字符串再转整型, 这样小数就不允许输入了
 		if "string" == valueType {
 			stringValue = strings.TrimSpace(paramValue.(string))
 			if "" == stringValue && !allowEmpty {
 				c.JSON(400, gin.H{"status": "emptyParam", "message": fmt.Sprintf("%s不得为空", paramName)})
-				resErr = errors.New("emptyParam")
-				return
+				return nil, errors.New("emptyParam")
 			}
 		} else if "float64" == valueType {
 			stringValue = fmt.Sprintf("%v", paramValue)
 		} else {
 			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
-			resErr = errors.New("InvalidParam")
-			return
+			return nil, errors.New("InvalidParam")
 		}
-		intValue, err = strconv.ParseInt(stringValue, 10, 64) // 转整型64位
+		intValue, err := strconv.ParseInt(stringValue, 10, 64) // 转整型64位
 		if err != nil {
 			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
-			resErr = errors.New("InvalidParam")
-			return
+			return nil, errors.New("InvalidParam")
 		}
-		if ("+int" == paramType && intValue <= 0) || ("!-int" == paramType && intValue < 0) { // 范围过滤
-			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
-			resErr = errors.New("InvalidParam")
-			return
-		}
-		resValue = intValue
-		return
+		return intValue, nil
 
-	} else if "string" == paramType { // 字符串, 去首尾空格
+	} else if "+int" == paramType { /* 正整数64位 */
+		intValue, err := FilterParam(c, paramName, paramValue, "int", allowEmpty)
+		if err != nil {
+			return nil, err
+		}
+		if intValue.(int64) <= 0 {
+			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
+			return nil, errors.New("InvalidParam")
+		}
+		return intValue, nil
+
+	} else if "!-int" == paramType { /* 非负整数64位 */
+		intValue, err := FilterParam(c, paramName, paramValue, "int", allowEmpty)
+		if err != nil {
+			return nil, err
+		}
+		if intValue.(int64) < 0 {
+			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
+			return nil, errors.New("InvalidParam")
+		}
+		return intValue, nil
+
+	} else if "string" == paramType { /* 字符串, 去首尾空格*/
 		if "string" == valueType {
 			stringValue := strings.TrimSpace(paramValue.(string))
 			if "" == stringValue && !allowEmpty {
 				c.JSON(400, gin.H{"status": "emptyParam", "message": fmt.Sprintf("%s不得为空", paramName)})
-				resErr = errors.New("emptyParam")
-				return
+				return nil, errors.New("emptyParam")
 			}
-			resValue = stringValue
-			return
+			return stringValue, nil
 		} else if "float64" == valueType {
 			stringValue := fmt.Sprintf("%v", paramValue)
-			resValue = stringValue
-			return
+			return stringValue, nil
 		} else {
 			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
-			resErr = errors.New("InvalidParam")
-			return
+			return nil, errors.New("InvalidParam")
 		}
 
-	} else if EnumMark := paramType[0:1]; "[" == EnumMark { // 枚举, 支持数字与字符串混合枚举
+	} else if EnumMark := paramType[0:1]; "[" == EnumMark { /* 枚举, 支持数字与字符串混合枚举 */
 		var enum []interface{}
 		if err := json.Unmarshal([]byte(paramType), &enum); err != nil {
 			panic(err)
@@ -154,59 +160,49 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 		for _, value := range enum {
 			enumType := reflect.TypeOf(enum[0]).String()
 			if enumType == valueType && paramValue == value {
-				resValue = value
-				return
+				return value, nil
 			}
 			if "float64" == valueType {
 				stringValue := fmt.Sprintf("%v", paramValue)
 				if stringValue == value {
-					resValue = value
-					return
+					return value, nil
 				}
 			} else if "string" == valueType {
 				floatValue, err := strconv.ParseFloat(paramValue.(string), 64)
 				if err != nil {
 					panic(err)
 				}
-				resValue = floatValue
-				return
+				return floatValue, nil
 			} else {
 				c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
-				resErr = errors.New("InvalidParam")
-				return
+				return nil, errors.New("InvalidParam")
 			}
 		}
 		c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
-		resErr = errors.New("InvalidParam")
-		return
+		return nil, errors.New("InvalidParam")
 
-	} else if "array" == paramType { // 数组
+	} else if "array" == paramType { /* 数组 */
 		if "[]interface {}" == valueType {
-			resValue = paramValue
-			return
+			return paramValue, nil
 		} else {
 			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
-			resErr = errors.New("InvalidParam")
-			return
+			return nil, errors.New("InvalidParam")
 		}
 	}
 
 	c.JSON(400, gin.H{"status": "UndefinedParamType", "message": fmt.Sprintf("未知数据类型: %s", paramName)})
-	resErr = errors.New("UndefinedParamType")
-	return
+	return nil, errors.New("UndefinedParamType")
 }
 
 // GetPageItems 获取分页数据
 // @param query {"ginContext": *gin.Context, "db": gorose.IOrm, "select": string, "from": string, "where": string, "groupBy" => string, "having" => string, "orderBy": string}
 // @return {"page": int64, "per_page": int64, "total_page": int64, "total_counts": int64, "items": []map[string]interface{}}
 // 出现异常时方法会向客户端返回4xx错误, 调用方法捕获到error直接结束业务逻辑即可
-func GetPageItems(query map[string]interface{}) (res map[string]interface{}, resErr error) {
-	queries, resErr := GetQueries(query["ginContext"].(*gin.Context), []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
-	if resErr != nil {
-		return
+func GetPageItems(query map[string]interface{}) (map[string]interface{}, error) {
+	queries, err := GetQueries(query["ginContext"].(*gin.Context), []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
+	if err != nil {
+		return nil, err
 	}
-
-	res = make(map[string]interface{})
 
 	bindParams, ok := query["bindParams"].([]interface{}) // 参数绑定
 	if !ok {
@@ -232,14 +228,14 @@ func GetPageItems(query map[string]interface{}) (res map[string]interface{}, res
 		panic(err)
 	}
 	if 0 == counts[0]["counts"].(int64) { // 没有数据
-		res = map[string]interface{}{
+		res := map[string]interface{}{
 			"page":         queries["page"],
 			"per_page":     queries["per_page"],
 			"total_pages":  0,
 			"total_counts": 0,
 			"items":        []gorose.Data{},
 		}
-		return
+		return res, nil
 	}
 
 	sql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", query["select"], query["from"], where)
@@ -253,12 +249,12 @@ func GetPageItems(query map[string]interface{}) (res map[string]interface{}, res
 	if err != nil {
 		panic(err)
 	}
-	res = map[string]interface{}{
+	res := map[string]interface{}{
 		"page":         queries["page"],
 		"per_page":     queries["per_page"],
 		"total_pages":  math.Ceil(float64(counts[0]["counts"].(int64)) / float64(queries["per_page"].(int64))),
 		"total_counts": counts[0]["counts"],
 		"items":        items,
 	}
-	return
+	return res, nil
 }
