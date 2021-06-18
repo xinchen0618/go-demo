@@ -57,14 +57,15 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 
 func DeleteUserLogout(c *gin.Context) {
 	// 登录校验
-	if _, err := services.CheckUserLogin(c); err != nil {
+	userId, err := services.CheckUserLogin(c)
+	if err != nil {
 		return
 	}
 
 	// 删除对应redis白名单记录
 	tokenString := c.Request.Header.Get("X-Token")
 	tokenAtoms := strings.Split(tokenString, ".")
-	if err := di.JwtRedis().Del(di.Ctx(), tokenAtoms[2]).Err(); err != nil {
+	if err := di.JwtRedis().Del(di.Ctx(), "jwt:"+strconv.FormatInt(userId, 10)+":"+tokenAtoms[2]).Err(); err != nil {
 		panic(err)
 	}
 
