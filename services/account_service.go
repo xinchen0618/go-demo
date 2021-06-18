@@ -33,7 +33,7 @@ func CheckUserLogin(c *gin.Context) (userId int64, resErr error) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// redis白名单校验
 		tokenAtoms := strings.Split(tokenString, ".")
-		_, err := di.JwtRedis().Get(di.Ctx(), tokenAtoms[2]).Result()
+		_, err := di.JwtRedis().Get(di.Ctx(), "jwt:"+tokenAtoms[2]).Result()
 		if err != nil {
 			if "redis: nil" == err.Error() {
 				c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})

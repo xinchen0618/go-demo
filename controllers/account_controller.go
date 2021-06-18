@@ -42,7 +42,7 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 	}
 	// redis登录白名单
 	tokenAtoms := strings.Split(tokenString, ".")
-	if err = di.JwtRedis().Set(di.Ctx(), tokenAtoms[2], user[0]["user_id"], loginTtl).Err(); err != nil {
+	if err = di.JwtRedis().Set(di.Ctx(), "jwt:"+tokenAtoms[2], user[0]["user_id"], loginTtl).Err(); err != nil {
 		panic(err)
 	}
 	c.JSON(200, gin.H{"user_id": user[0]["user_id"], "token": tokenString})
