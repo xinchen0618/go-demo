@@ -35,6 +35,7 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 		Audience:  jsonBody["user_name"].(string),
 		ExpiresAt: time.Now().Add(loginTtl).Unix(),
 		Id:        strconv.FormatInt(user[0]["user_id"].(int64), 10),
+		IssuedAt:  time.Now().Unix(),
 		Issuer:    "go-test:UserLogin",
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
