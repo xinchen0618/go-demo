@@ -95,20 +95,14 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 
 	/* 整型 */
 	if "int" == paramType {
-		var stringValue string // 先统一转字符串再转整型, 这样小数就不允许输入了
-		if "string" == valueType {
-			stringValue = strings.TrimSpace(paramValue.(string))
-			if "" == stringValue && !allowEmpty {
-				c.JSON(400, gin.H{"status": "emptyParam", "message": fmt.Sprintf("%s不得为空", paramName)})
-				return nil, errors.New("emptyParam")
-			}
-		} else if "float64" == valueType {
-			stringValue = fmt.Sprintf("%v", paramValue)
-		} else {
-			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
-			return nil, errors.New("InvalidParam")
+		stringValue, err := FilterParam(c, paramName, paramValue, "string", allowEmpty) // 先统一转字符串再转整型, 这样小数就不允许输入了
+		if err != nil {
+			return nil, err
 		}
-		intValue, err := strconv.ParseInt(stringValue, 10, 64) // 转整型64位
+		if "" == stringValue.(string) {
+			return 0, nil
+		}
+		intValue, err := strconv.ParseInt(stringValue.(string), 10, 64) // 转整型64位
 		if err != nil {
 			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
 			return nil, errors.New("InvalidParam")
