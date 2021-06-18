@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -31,9 +32,10 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 	// JWT
 	loginTtl := 86400 * 30 * time.Second // 登录有效时长
 	claims := &jwt.StandardClaims{
+		Audience:  jsonBody["user_name"].(string),
 		ExpiresAt: time.Now().Add(loginTtl).Unix(),
 		Id:        strconv.FormatInt(user[0]["user_id"].(int64), 10),
-		Issuer:    "go-test-user-login",
+		Issuer:    "go-test:UserLogin",
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(viper.GetString("jwtSecret")))
@@ -42,7 +44,11 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 	}
 	// redis登录白名单
 	tokenAtoms := strings.Split(tokenString, ".")
-	if err = di.JwtRedis().Set(di.Ctx(), "jwt:"+tokenAtoms[2], user[0]["user_id"], loginTtl).Err(); err != nil {
+	payload, err := json.Marshal(claims)
+	if err != nil {
+		panic(err)
+	}
+	if err = di.JwtRedis().Set(di.Ctx(), "jwt:"+tokenAtoms[2], payload, loginTtl).Err(); err != nil {
 		panic(err)
 	}
 	c.JSON(200, gin.H{"user_id": user[0]["user_id"], "token": tokenString})
