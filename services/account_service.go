@@ -13,12 +13,11 @@ import (
 // CheckUserLogin 登录校验
 // 先校验JWT, 再校验redis白名单
 // 校验不通过方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
-func CheckUserLogin(c *gin.Context) (userId int64, resErr error) {
+func CheckUserLogin(c *gin.Context) (int64, error) {
 	tokenString := c.Request.Header.Get("X-Token")
 	if "" == tokenString { // 没有携带token
 		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
-		resErr = errors.New("UserUnauthorized")
-		return
+		return 0, errors.New("UserUnauthorized")
 	}
 
 	// JWT
@@ -27,8 +26,7 @@ func CheckUserLogin(c *gin.Context) (userId int64, resErr error) {
 	})
 	if err != nil {
 		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
-		resErr = errors.New("UserUnauthorized")
-		return
+		return 0, errors.New("UserUnauthorized")
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// redis白名单校验
@@ -37,20 +35,18 @@ func CheckUserLogin(c *gin.Context) (userId int64, resErr error) {
 		if err != nil {
 			if "redis: nil" == err.Error() {
 				c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
-				resErr = errors.New("UserUnauthorized")
-				return
+				return 0, errors.New("UserUnauthorized")
 			}
 			panic(err) // redis服务异常
 		}
-		userId, err = strconv.ParseInt(claims["jti"].(string), 10, 64)
+		userId, err := strconv.ParseInt(claims["jti"].(string), 10, 64)
 		if err != nil {
 			panic(err)
 		}
-		return
+		return userId, nil
 
 	} else {
 		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
-		resErr = errors.New("UserUnauthorized")
-		return
+		return 0, errors.New("UserUnauthorized")
 	}
 }
