@@ -32,7 +32,7 @@ func recovery() gin.HandlerFunc {
 func main() {
 	/* Run gin */
 	runtimeEnv := os.Getenv("RUNTIME_ENV")
-	if runtimeEnv == "prod" || runtimeEnv == "stage" {
+	if runtimeEnv == "" || runtimeEnv == "prod" || runtimeEnv == "stage" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	r := gin.Default()
