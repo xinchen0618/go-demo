@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-test/routers"
 	"log"
+	"os"
 	"runtime"
 )
 
@@ -30,6 +31,10 @@ func recovery() gin.HandlerFunc {
 
 func main() {
 	/* Run gin */
+	runtimeEnv := os.Getenv("RUNTIME_ENV")
+	if runtimeEnv == "prod" || runtimeEnv == "stage" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	r := gin.Default()
 
 	// Panic处理
