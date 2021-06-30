@@ -27,7 +27,12 @@ func init() {
 	log.SetFlags(log.Llongfile | log.Lmicroseconds | log.Ldate)
 
 	/* 配置 */
-	viper.SetConfigName("config")   // name of config file (without extension)
+	configName := "config"
+	runtimeEnv := os.Getenv("RUNTIME_ENV") // 多环境配置
+	if runtimeEnv != "" && runtimeEnv != "prod" {
+		configName = "config_" + runtimeEnv
+	}
+	viper.SetConfigName(configName) // name of config file (without extension)
 	viper.SetConfigType("yaml")     // REQUIRED if the config file does not have the extension in the name
 	viper.AddConfigPath("./config") // path to look for the config file in
 	err = viper.ReadInConfig()      // Find and read the config file
