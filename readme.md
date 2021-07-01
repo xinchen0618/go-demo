@@ -12,7 +12,7 @@
 
 ```
 - config/               配置
-  - config.yaml         生产配置. 环境配置 config_{RUNTIME_ENV}.yaml, dev环境配置不参与版本控制.
+  - config.yaml         公共配置. 环境配置 config_{RUNTIME_ENV}.yaml, dev环境配置不参与版本控制.
 - controllers/          控制器
 - di                    服务注入
   - services.go         Di注册服务

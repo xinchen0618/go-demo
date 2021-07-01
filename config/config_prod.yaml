@@ -1,0 +1,10 @@
+redis:
+  host: "127.0.0.1"
+  port: 6379
+  auth: ""
+  index:
+    cache: 0     # 缓存
+    storage: 1   # 存储
+    jwt: 2       # JWT
+
+jwtSecret: "btRZ5QHXX9VjfYhfGGHdCTcWiwQ6WFJXq9ZCwdqZwzk2ZfhceM9K3V5UGKsYLd9m"
