@@ -56,7 +56,7 @@ func GetJsonBody(c *gin.Context, patterns []string) (map[string]interface{}, err
 }
 
 // GetQueries 获取Query参数
-// @param patterns ["paramKey:paramName:paramType:defaultValue"] defaultValue为nil时参数必填
+// @param patterns ["paramKey:paramName:paramType:defaultValue"] defaultValue为required时参数必填
 // 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, error) {
 	res := make(map[string]interface{})
@@ -70,7 +70,7 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, erro
 		}
 		paramValue := c.Query(patternAtoms[0])
 		if "" == paramValue {
-			if "nil" == patternAtoms[3] { // 必填
+			if "required" == patternAtoms[3] { // 必填
 				c.JSON(400, gin.H{"status": "emptyParam", "message": fmt.Sprintf("%s不得为空", patternAtoms[1])})
 				return nil, errors.New("emptyParam")
 			} else {
