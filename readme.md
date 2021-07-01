@@ -27,7 +27,7 @@
 
 ### 环境定义
 
-环境变量 `RUNTIME_ENV` 指定执行环境. 默认为生产环境.
+环境变量 `RUNTIME_ENV` 指定执行环境. 默认为生产环境. 参考 <a href="https://en.wikipedia.org/wiki/Deployment_environment" target="_blank">Deployment environment</a>
 
 - `dev`       开发环境
 - `testing`   测试环境
