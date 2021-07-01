@@ -18,6 +18,10 @@
   - services.go         Di注册服务
 - routers/              Restful路由
 - services/             公共业务逻辑
+- utils                 工具包
+  - utils.go            工具方法
+- go.mod                包管理  
+- main.go               入口  
 
 ```
 
