@@ -54,3 +54,14 @@
     - `controllers/` 用于处理业务, 事务控制尽量放置在这里, 放置在 `services/` 中容易出现事务嵌套的问题.
     - `services/` 用于封装公共的业务逻辑, 为可选.
     
+
+### 运行
+
+开发环境使用Air实时热重载
+
+```
+cd go-test
+go mod download
+go get github.com/cosmtrek/air
+RUNTIME_ENV=dev air
+```
