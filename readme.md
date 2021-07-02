@@ -8,6 +8,7 @@
 - Redis go-redis  https://github.com/go-redis/redis
 - 登录   jwt-go  https://github.com/dgrijalva/jwt-go
 
+
 ### 目录结构
 
 ```
@@ -25,6 +26,7 @@
 
 ```
 
+
 ### 环境定义
 
 环境变量 `RUNTIME_ENV` 指定执行环境. 默认为生产环境. 参考 <a href="https://en.wikipedia.org/wiki/Deployment_environment" target="_blank">Deployment environment</a>
@@ -38,6 +40,7 @@
 ### 日志
 
 错误日志路径 `/var/log/golang_error.log`
+
 
 ### RESTful
 
