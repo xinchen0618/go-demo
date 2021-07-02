@@ -34,6 +34,11 @@
 - `stage`     预发布环境
 - `prod`      生产环境
 
+
+### 日志
+
+错误日志路径 `/var/log/golang_error.log`
+
 ### RESTful
 
 - RESTful指南参考 <a href="https://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api" target="_blank">Best Practices for Designing a Pragmatic RESTful API</a>
