@@ -57,11 +57,11 @@
 
 ### 运行
 
-开发环境使用Air实时热重载
+开发&测试环境使用Air实时热重载
 
 ```
 cd go-test
 go mod download
 go get github.com/cosmtrek/air
-RUNTIME_ENV=dev air
+RUNTIME_ENV=testing air
 ```
