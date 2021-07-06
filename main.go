@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"go-test/routers"
 	"log"
 	"os"
 	"runtime"
+
+	"go-test/router"
+
+	"github.com/gin-gonic/gin"
 )
 
 // Panic处理
@@ -41,7 +43,7 @@ func main() {
 	r.Use(recovery())
 
 	// 加载路由
-	routers.LoadAccount(r)
+	router.LoadAccount(r)
 
 	if err := r.Run(":8080"); err != nil {
 		panic(err)

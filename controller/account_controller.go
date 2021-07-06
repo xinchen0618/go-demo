@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"encoding/json"
@@ -6,16 +6,17 @@ import (
 	"strings"
 	"time"
 
+	"go-test/di"
+	"go-test/service"
+	"go-test/util"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"go-test/di"
-	"go-test/services"
-	"go-test/utils"
 )
 
 func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
-	jsonBody, err := utils.GetJsonBody(c, []string{"user_name:用户名:string:+", "password:密码:string:+"})
+	jsonBody, err := util.GetJsonBody(c, []string{"user_name:用户名:string:+", "password:密码:string:+"})
 	if err != nil {
 		return
 	}
@@ -58,7 +59,7 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 
 func DeleteUserLogout(c *gin.Context) {
 	// 登录校验
-	userId, err := services.CheckUserLogin(c)
+	userId, err := service.CheckUserLogin(c)
 	if err != nil {
 		return
 	}
@@ -75,11 +76,11 @@ func DeleteUserLogout(c *gin.Context) {
 
 func GetUsers(c *gin.Context) {
 	// 登录校验
-	if _, err := services.CheckUserLogin(c); err != nil {
+	if _, err := service.CheckUserLogin(c); err != nil {
 		return
 	}
 
-	res, err := utils.GetPageItems(map[string]interface{}{
+	res, err := util.GetPageItems(map[string]interface{}{
 		"ginContext": c,
 		"db":         di.Db(),
 		"select":     "u.user_id,u.user_name,u.money,u.created_at,u.updated_at,uc.counts",
