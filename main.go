@@ -41,10 +41,9 @@ func main() {
 	r.Use(recovery())
 
 	// 加载路由
-	routers.LoadUser(r)
 	routers.LoadAccount(r)
 
-	if err := r.Run(); err != nil {
+	if err := r.Run(":8080"); err != nil {
 		panic(err)
 	}
 }
