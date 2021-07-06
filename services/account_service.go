@@ -2,12 +2,13 @@ package services
 
 import (
 	"errors"
+	"strconv"
+	"strings"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"go-test/di"
-	"strconv"
-	"strings"
 )
 
 // CheckUserLogin 登录校验

@@ -3,12 +3,13 @@ package di
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/go-redis/redis/v8"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gohouse/gorose/v2"
 	"github.com/spf13/viper"
-	"log"
-	"os"
 )
 
 // 先定义私有变量存放实例(保证实例不能被外部修改), 然后在init()中初始化实例(保证实例只初始化一次), 最后定义公共方法获取实例使用

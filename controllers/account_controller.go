@@ -2,15 +2,16 @@ package controllers
 
 import (
 	"encoding/json"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"go-test/di"
 	"go-test/services"
 	"go-test/utils"
-	"strconv"
-	"strings"
-	"time"
 )
 
 func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
