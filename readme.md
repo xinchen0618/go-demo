@@ -1,6 +1,6 @@
-## Golang
+# Golang
 
-### 技术栈
+## 技术栈
 
 - 路由   Gin https://github.com/gin-gonic/gin
 - 配置   viper https://github.com/spf13/viper
@@ -9,7 +9,12 @@
 - 登录   jwt-go  https://github.com/dgrijalva/jwt-go
 
 
-### 目录结构
+##  编码规范
+
+参考 <a href="https://github.com/xxjwxc/uber_go_guide_cn" target="_blank">Uber Go 语言编码规范</a>
+
+
+## 目录结构
 
 ```
 - config/               配置
@@ -27,7 +32,7 @@
 ```
 
 
-### 环境定义
+## 环境定义
 
 环境变量 `RUNTIME_ENV` 指定执行环境. 默认为生产环境. 参考 <a href="https://en.wikipedia.org/wiki/Deployment_environment" target="_blank">Deployment environment</a>
 
@@ -37,12 +42,12 @@
 - `prod`      生产环境
 
 
-### 日志
+## 日志
 
 错误日志路径 `/var/log/golang_error.log`
 
 
-### RESTful
+## RESTful
 
 - RESTful指南参考 <a href="https://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api" target="_blank">Best Practices for Designing a Pragmatic RESTful API</a>
 
@@ -55,7 +60,7 @@
     - `services/` 用于封装公共的业务逻辑, 为可选.
     
 
-### 运行
+## 运行
 
 开发&测试环境使用Air实时热重载
 
