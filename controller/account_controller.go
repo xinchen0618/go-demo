@@ -100,20 +100,20 @@ func GetUsers(c *gin.Context) {
 
 	// 多线程读
 	var wg sync.WaitGroup
-	for key, _ := range result["items"].([]gorose.Data) {
+	for _, item := range result["items"].([]gorose.Data) {
 		wg.Add(1)
 
-		go func(key int) {
+		go func(item gorose.Data) {
 			defer wg.Done()
 
 			sql := "SELECT counts FROM t_user_counts WHERE user_id = ? LIMIT 1"
-			userCount, err := di.Db().Query(sql, result["items"].([]gorose.Data)[key]["user_id"])
+			userCount, err := di.Db().Query(sql, item["user_id"])
 			if err != nil {
 				log.Printf("%v\n", err)
 				return
 			}
-			result["items"].([]gorose.Data)[key]["counts"] = userCount[0]["counts"]
-		}(key)
+			item["counts"] = userCount[0]["counts"]
+		}(item)
 	}
 	wg.Wait()
 
