@@ -202,7 +202,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 
 // GetPageItems 获取分页数据
 // @param query {"ginContext": *gin.Context, "db": gorose.IOrm, "select": string, "from": string, "where": string, "groupBy" => string, "having" => string, "orderBy": string}
-// @return {"page": int64, "per_page": int64, "total_page": int64, "total_counts": int64, "items": []map[string]interface{}}
+// @return {"page": int64, "per_page": int64, "total_page": int64, "total_counts": int64, "items": []gorose.Data}
 // 出现异常时方法会向客户端返回4xx错误, 调用方法捕获到error直接结束业务逻辑即可
 func GetPageItems(query map[string]interface{}) (map[string]interface{}, error) {
 	queries, err := GetQueries(query["ginContext"].(*gin.Context), []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
@@ -234,14 +234,14 @@ func GetPageItems(query map[string]interface{}) (map[string]interface{}, error) 
 		panic(err)
 	}
 	if 0 == counts[0]["counts"].(int64) { // 没有数据
-		res := map[string]interface{}{
+		result := map[string]interface{}{
 			"page":         queries["page"],
 			"per_page":     queries["per_page"],
 			"total_pages":  0,
 			"total_counts": 0,
 			"items":        []gorose.Data{},
 		}
-		return res, nil
+		return result, nil
 	}
 
 	sql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", query["select"], query["from"], where)
@@ -255,12 +255,12 @@ func GetPageItems(query map[string]interface{}) (map[string]interface{}, error) 
 	if err != nil {
 		panic(err)
 	}
-	res := map[string]interface{}{
+	result := map[string]interface{}{
 		"page":         queries["page"],
 		"per_page":     queries["per_page"],
 		"total_pages":  math.Ceil(float64(counts[0]["counts"].(int64)) / float64(queries["per_page"].(int64))),
 		"total_counts": counts[0]["counts"],
 		"items":        items,
 	}
-	return res, nil
+	return result, nil
 }

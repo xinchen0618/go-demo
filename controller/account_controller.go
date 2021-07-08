@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"go-test/di"
@@ -84,19 +85,39 @@ func GetUsers(c *gin.Context) {
 	//	return
 	//}
 
-	res, err := util.GetPageItems(map[string]interface{}{
+	result, err := util.GetPageItems(map[string]interface{}{
 		"ginContext": c,
 		"db":         di.Db(),
-		"select":     "u.user_id,u.user_name,u.money,u.created_at,u.updated_at,uc.counts",
-		"from":       "t_users AS u JOIN t_user_counts AS uc ON u.user_id = uc.user_id",
-		"where":      "u.user_id > ?",
+		"select":     "user_id,user_name,money,created_at,updated_at",
+		"from":       "t_users",
+		"where":      "user_id > ?",
 		"bindParams": []interface{}{5},
 		"orderBy":    "user_id DESC",
 	})
 	if err != nil {
 		return
 	}
-	c.JSON(200, res)
+
+	// 多线程读
+	var wg sync.WaitGroup
+	for key, _ := range result["items"].([]gorose.Data) {
+		wg.Add(1)
+
+		go func(key int) {
+			defer wg.Done()
+
+			sql := "SELECT counts FROM t_user_counts WHERE user_id = ? LIMIT 1"
+			userCount, err := di.Db().Query(sql, result["items"].([]gorose.Data)[key]["user_id"])
+			if err != nil {
+				log.Printf("%v\n", err)
+				return
+			}
+			result["items"].([]gorose.Data)[key]["counts"] = userCount[0]["counts"]
+		}(key)
+	}
+	wg.Wait()
+
+	c.JSON(200, result)
 }
 
 func PostUsers(c *gin.Context) {
@@ -113,6 +134,7 @@ func PostUsers(c *gin.Context) {
 	startTime := time.Now().UnixNano()
 
 	for i := int64(0); i < counts.(int64); i++ {
+		// 多线程写
 		go func() {
 			db := di.Db()
 			err := db.Begin()
