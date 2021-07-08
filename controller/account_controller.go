@@ -119,6 +119,7 @@ func PostUsers(c *gin.Context) {
 			err := db.Begin()
 			if err != nil {
 				log.Printf("%v\n", err)
+				return
 			}
 
 			rand.Seed(time.Now().UnixNano())
@@ -127,26 +128,31 @@ func PostUsers(c *gin.Context) {
 			user, err := db.Query(sql, userName)
 			if err != nil {
 				log.Printf("%v\n", err)
+				return
 			}
 			if 0 == len(user) { // 记录不存在
 				userId, err := db.Table("t_users").Data(gorose.Data{"user_name": userName}).InsertGetId()
 				if err != nil {
 					log.Printf("%v\n", err)
+					return
 				}
 				if _, err = db.Table("t_user_counts").Data(gorose.Data{"user_id": userId, "counts": 1}).Insert(); err != nil {
 					log.Printf("%v\n", err)
+					return
 				}
 			} else { // 记录存在
 				userId := user[0]["user_id"].(int64)
 				sql = "UPDATE t_user_counts SET counts = counts + 1 WHERE user_id = ?"
 				if _, err = db.Execute(sql, userId); err != nil {
 					log.Printf("%v\n", err)
+					return
 				}
 			}
 
 			err = db.Commit()
 			if err != nil {
 				log.Printf("%v\n", err)
+				return
 			}
 		}()
 	}
