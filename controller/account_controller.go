@@ -9,14 +9,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gohouse/gorose/v2"
-
 	"go-test/di"
 	"go-test/service"
 	"go-test/util"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/gohouse/gorose/v2"
 	"github.com/spf13/viper"
 )
 
