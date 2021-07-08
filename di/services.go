@@ -50,7 +50,7 @@ func init() {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",
 		viper.Get("mysql.username"), viper.Get("mysql.password"), viper.Get("mysql.host"),
 		viper.Get("mysql.port"), viper.Get("mysql.dbname"), viper.Get("mysql.charset"))
-	dbEngine, err = gorose.Open(&gorose.Config{Driver: "mysql", Dsn: dsn})
+	dbEngine, err = gorose.Open(&gorose.Config{Driver: "mysql", Dsn: dsn, SetMaxOpenConns: 100, SetMaxIdleConns: 100})
 	if err != nil {
 		panic(err)
 	}

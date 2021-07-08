@@ -11,6 +11,8 @@ func LoadAccount(e *gin.Engine) {
 	{
 		accountGroup.POST("/v1/login", controller.PostUserLogin)
 		accountGroup.DELETE("/v1/logout", controller.DeleteUserLogout)
+
 		accountGroup.GET("/v1/users", controller.GetUsers)
+		accountGroup.POST("/v1/users", controller.PostUsers)
 	}
 }

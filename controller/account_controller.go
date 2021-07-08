@@ -2,9 +2,14 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
+	"math/rand"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gohouse/gorose/v2"
 
 	"go-test/di"
 	"go-test/service"
@@ -76,9 +81,9 @@ func DeleteUserLogout(c *gin.Context) {
 
 func GetUsers(c *gin.Context) {
 	// 登录校验
-	if _, err := service.CheckUserLogin(c); err != nil {
-		return
-	}
+	//if _, err := service.CheckUserLogin(c); err != nil {
+	//	return
+	//}
 
 	res, err := util.GetPageItems(map[string]interface{}{
 		"ginContext": c,
@@ -93,4 +98,60 @@ func GetUsers(c *gin.Context) {
 		return
 	}
 	c.JSON(200, res)
+}
+
+func PostUsers(c *gin.Context) {
+	jsonBody, err := util.GetJsonBody(c, []string{"counts:数量:+int:*"})
+	if err != nil {
+		return
+	}
+
+	counts, ok := jsonBody["counts"]
+	if !ok {
+		counts = 100
+	}
+
+	startTime := time.Now().UnixNano()
+
+	for i := int64(0); i < counts.(int64); i++ {
+		go func() {
+			db := di.Db()
+			err := db.Begin()
+			if err != nil {
+				log.Printf("%v\n", err)
+			}
+
+			rand.Seed(time.Now().UnixNano())
+			userName := strconv.Itoa(rand.Int())
+			sql := "SELECT user_id FROM t_users WHERE user_name = ? LIMIT 1"
+			user, err := db.Query(sql, userName)
+			if err != nil {
+				log.Printf("%v\n", err)
+			}
+			if 0 == len(user) { // 记录不存在
+				userId, err := db.Table("t_users").Data(gorose.Data{"user_name": userName}).InsertGetId()
+				if err != nil {
+					log.Printf("%v\n", err)
+				}
+				if _, err = db.Table("t_user_counts").Data(gorose.Data{"user_id": userId, "counts": 1}).Insert(); err != nil {
+					log.Printf("%v\n", err)
+				}
+			} else { // 记录存在
+				userId := user[0]["user_id"].(int64)
+				sql = "UPDATE t_user_counts SET counts = counts + 1 WHERE user_id = ?"
+				if _, err = db.Execute(sql, userId); err != nil {
+					log.Printf("%v\n", err)
+				}
+			}
+
+			err = db.Commit()
+			if err != nil {
+				log.Printf("%v\n", err)
+			}
+		}()
+	}
+
+	timeCost := time.Now().UnixNano() - startTime
+
+	c.JSON(201, gin.H{"time_cost": fmt.Sprintf("%d ns", timeCost)})
 }
