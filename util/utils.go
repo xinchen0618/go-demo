@@ -20,7 +20,7 @@ func GetJsonBody(c *gin.Context, patterns []string) (map[string]interface{}, err
 	jsonBody := make(map[string]interface{})
 	_ = c.ShouldBindJSON(&jsonBody) // 这里的error不要处理, 因为空body会报error
 
-	res := make(map[string]interface{})
+	result := make(map[string]interface{})
 	var err error
 	for _, pattern := range patterns {
 		patternAtoms := strings.Split(pattern, ":")
@@ -47,20 +47,20 @@ func GetJsonBody(c *gin.Context, patterns []string) (map[string]interface{}, err
 			}
 		}
 
-		res[patternAtoms[0]], err = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
+		result[patternAtoms[0]], err = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return res, nil
+	return result, nil
 }
 
 // GetQueries 获取Query参数
 // @param patterns ["paramKey:paramName:paramType:defaultValue"] defaultValue为required时参数必填
 // 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, error) {
-	res := make(map[string]interface{})
+	result := make(map[string]interface{})
 	var err error
 	for _, pattern := range patterns {
 		patternAtoms := strings.Split(pattern, ":")
@@ -79,13 +79,13 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, erro
 			}
 		}
 
-		res[patternAtoms[0]], err = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
+		result[patternAtoms[0]], err = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return res, nil
+	return result, nil
 }
 
 // FilterParam 校验参数类型
