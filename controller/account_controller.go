@@ -102,14 +102,13 @@ func GetUsers(c *gin.Context) {
 	var wg sync.WaitGroup
 	for _, item := range result["items"].([]gorose.Data) {
 		wg.Add(1)
-
 		go func(item gorose.Data) {
 			defer wg.Done()
 
 			sql := "SELECT counts FROM t_user_counts WHERE user_id = ? LIMIT 1"
 			userCount, err := di.Db().Query(sql, item["user_id"])
 			if err != nil {
-				log.Printf("%v\n", err)
+				log.Println(err)
 				return
 			}
 			item["counts"] = userCount[0]["counts"]
@@ -139,40 +138,41 @@ func PostUsers(c *gin.Context) {
 			db := di.Db()
 			err := db.Begin()
 			if err != nil {
-				log.Printf("%v\n", err)
+				log.Println(err)
 				return
 			}
 
 			rand.Seed(time.Now().UnixNano())
-			userName := strconv.Itoa(rand.Int())
+			userName := strconv.Itoa(rand.Intn(100))
 			sql := "SELECT user_id FROM t_users WHERE user_name = ? LIMIT 1"
 			user, err := db.Query(sql, userName)
 			if err != nil {
-				log.Printf("%v\n", err)
+				log.Println(err)
+				_ = db.Rollback()
 				return
 			}
-			if 0 == len(user) { // 记录不存在
-				userId, err := db.Table("t_users").Data(gorose.Data{"user_name": userName}).InsertGetId()
+			var userId int64
+			if 1 == len(user) { // 记录存在
+				userId = user[0]["user_id"].(int64)
+			} else { // 记录不存在
+				userId, err = db.Table("t_users").Data(gorose.Data{"user_name": userName}).InsertGetId()
 				if err != nil {
-					log.Printf("%v\n", err)
+					log.Println(err)
+					_ = db.Rollback()
 					return
 				}
-				if _, err = db.Table("t_user_counts").Data(gorose.Data{"user_id": userId, "counts": 1}).Insert(); err != nil {
-					log.Printf("%v\n", err)
-					return
-				}
-			} else { // 记录存在
-				userId := user[0]["user_id"].(int64)
-				sql = "UPDATE t_user_counts SET counts = counts + 1 WHERE user_id = ?"
-				if _, err = db.Execute(sql, userId); err != nil {
-					log.Printf("%v\n", err)
-					return
-				}
+			}
+			sql = "INSERT INTO t_user_counts(user_id,counts) VALUES(?,1) ON DUPLICATE KEY UPDATE counts = counts + 1"
+			if _, err = db.Execute(sql, userId); err != nil {
+				log.Println(err)
+				_ = db.Rollback()
+				return
 			}
 
 			err = db.Commit()
 			if err != nil {
-				log.Printf("%v\n", err)
+				log.Println(err)
+				_ = db.Rollback()
 				return
 			}
 		}()
@@ -180,5 +180,5 @@ func PostUsers(c *gin.Context) {
 
 	timeCost := time.Now().UnixNano() - startTime
 
-	c.JSON(201, gin.H{"time_cost": fmt.Sprintf("%d ns", timeCost)})
+	c.JSON(201, gin.H{"time_cost": fmt.Sprintf("%dns", timeCost)})
 }
