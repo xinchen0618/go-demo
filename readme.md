@@ -19,12 +19,12 @@
 ```
 - config/               配置
   - config.yaml         公共配置. 环境配置 config_{RUNTIME_ENV}.yaml, dev环境配置不参与版本控制.
-- controllers/          控制器
+- controller/          控制器
 - di                    服务注入
   - services.go         Di注册服务
-- routers/              Restful路由
-- services/             公共业务逻辑
-- utils                 工具包
+- router/              Restful路由
+- service/             公共业务逻辑
+- util                 工具包
   - utils.go            工具方法
 - go.mod                包管理  
 - main.go               入口  
@@ -53,11 +53,11 @@
 
 - 流程
 
-  `main.go` -> `routers/` -> `controllers/` [-> `services/`]
+  `main.go` -> `router/` -> `controller/` [-> `service/`]
 
-    - `routes/` 路由, API版本在此控制, Major[.Minor], 比如 /v1, /v1.1, API出现向下不兼容且旧版仍需继续使用的情况, ~~比如不升级的旧版APP,~~ 新增Minor版本号. 业务出现结构性变化, 新增Major版本号.
-    - `controllers/` 用于处理业务, 事务控制尽量放置在这里, 放置在 `services/` 中容易出现事务嵌套的问题.
-    - `services/` 用于封装公共的业务逻辑, 为可选.
+    - `router/` 路由, API版本在此控制, Major[.Minor], 比如 /v1, /v1.1, API出现向下不兼容且旧版仍需继续使用的情况, ~~比如不升级的旧版APP,~~ 新增Minor版本号. 业务出现结构性变化, 新增Major版本号.
+    - `controller/` 用于处理业务. 事务控制尽量放置在这里, 放置在 `service/` 中容易出现事务嵌套的问题.
+    - `service/` 用于封装公共的业务逻辑, 为可选.
     
 
 ### 运行
