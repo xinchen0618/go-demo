@@ -26,8 +26,7 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 		return
 	}
 
-	user, err := di.Db().Query("SELECT user_id FROM t_users WHERE user_name = ? AND password = ? LIMIT 1",
-		jsonBody["user_name"], jsonBody["password"])
+	user, err := di.Db().Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": jsonBody["user_name"], "password": jsonBody["password"]}).First()
 	if err != nil {
 		panic(err)
 	}
@@ -41,7 +40,7 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 	claims := &jwt.StandardClaims{
 		Audience:  jsonBody["user_name"].(string),
 		ExpiresAt: time.Now().Add(loginTtl).Unix(),
-		Id:        strconv.FormatInt(user[0]["user_id"].(int64), 10),
+		Id:        strconv.FormatInt(user["user_id"].(int64), 10),
 		IssuedAt:  time.Now().Unix(),
 		Issuer:    "go-test:UserLogin",
 	}
@@ -59,7 +58,8 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 	if err = di.JwtRedis().Set(di.Ctx(), "jwt:"+claims.Id+":"+tokenAtoms[2], payload, loginTtl).Err(); err != nil {
 		panic(err)
 	}
-	c.JSON(200, gin.H{"user_id": user[0]["user_id"], "token": tokenString})
+
+	c.JSON(200, gin.H{"user_id": user["user_id"], "token": tokenString})
 }
 
 func DeleteUserLogout(c *gin.Context) {
@@ -105,13 +105,12 @@ func GetUsers(c *gin.Context) {
 		go func(item gorose.Data) {
 			defer wg.Done()
 
-			sql := "SELECT counts FROM t_user_counts WHERE user_id = ? LIMIT 1"
-			userCount, err := di.Db().Query(sql, item["user_id"])
+			userCounts, err := di.Db().Table("t_user_counts").Fields("counts").Where(gorose.Data{"user_id": item["user_id"]}).First()
 			if err != nil {
 				log.Println(err)
 				return
 			}
-			item["counts"] = userCount[0]["counts"]
+			item["counts"] = userCounts["counts"]
 		}(item)
 	}
 	wg.Wait()
@@ -143,17 +142,16 @@ func PostUsers(c *gin.Context) {
 			}
 
 			rand.Seed(time.Now().UnixNano())
-			userName := strconv.Itoa(rand.Intn(100))
-			sql := "SELECT user_id FROM t_users WHERE user_name = ? LIMIT 1"
-			user, err := db.Query(sql, userName)
+			userName := strconv.Itoa(rand.Int())
+			user, err := db.Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": userName}).First()
 			if err != nil {
 				log.Println(err)
 				_ = db.Rollback()
 				return
 			}
-			var userId int64
-			if 1 == len(user) { // 记录存在
-				userId = user[0]["user_id"].(int64)
+			userId := int64(0)
+			if len(user) > 0 { // 记录存在
+				userId = user["user_id"].(int64)
 			} else { // 记录不存在
 				userId, err = db.Table("t_users").Data(gorose.Data{"user_name": userName}).InsertGetId()
 				if err != nil {
@@ -162,7 +160,7 @@ func PostUsers(c *gin.Context) {
 					return
 				}
 			}
-			sql = "INSERT INTO t_user_counts(user_id,counts) VALUES(?,1) ON DUPLICATE KEY UPDATE counts = counts + 1"
+			sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,1) ON DUPLICATE KEY UPDATE counts = counts + 1"
 			if _, err = db.Execute(sql, userId); err != nil {
 				log.Println(err)
 				_ = db.Rollback()
