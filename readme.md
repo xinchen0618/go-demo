@@ -19,13 +19,13 @@
 ```
 - config/               配置
   - config.yaml         公共配置. 环境配置 config_{RUNTIME_ENV}.yaml, dev环境配置不参与版本控制.
-- controller/          控制器
+- controller/           控制器
 - di                    服务注入
   - services.go         Di注册服务
-- router/              Restful路由
-- service/             公共业务逻辑
-- util                 工具包
-  - utils.go            工具方法
+- router/               Restful路由
+- service/              公共业务逻辑
+- util                  工具包
+  - api_utils.go        API工具方法
 - go.mod                包管理  
 - main.go               入口  
 
