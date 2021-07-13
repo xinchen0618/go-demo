@@ -14,8 +14,11 @@ import (
 )
 
 // GetJsonBody 获取Json参数
-// @param patterns ["paramKey:paramName:paramType:paramPattern"] paramPattern +必填不可为空, *选填可为空, ?选填不可为空
-// 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
+//	参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
+// 	@param c *gin.Context
+// 	@param patterns []string ["paramKey:paramName:paramType:paramPattern"] paramPattern +必填不可为空, *选填可为空, ?选填不可为空
+//	@return map[string]interface{}
+//	@return error
 func GetJsonBody(c *gin.Context, patterns []string) (map[string]interface{}, error) {
 	jsonBody := make(map[string]interface{})
 	_ = c.ShouldBindJSON(&jsonBody) // 这里的error不要处理, 因为空body会报error
@@ -57,8 +60,11 @@ func GetJsonBody(c *gin.Context, patterns []string) (map[string]interface{}, err
 }
 
 // GetQueries 获取Query参数
-// @param patterns ["paramKey:paramName:paramType:defaultValue"] defaultValue为required时参数必填
-// 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
+//	参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
+// 	@param c *gin.Context
+// 	@param patterns []string ["paramKey:paramName:paramType:defaultValue"] defaultValue为required时参数必填
+//	@return map[string]interface{}
+//	@return error
 func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, error) {
 	result := make(map[string]interface{})
 	var err error
@@ -89,8 +95,14 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, erro
 }
 
 // FilterParam 校验参数类型
-// @param paramType int整型64位, +int正整型64位, !-int非负整型64位, string字符串, []枚举, array数组
-// 参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
+//	参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
+// 	@param c *gin.Context
+// 	@param paramName string
+// 	@param paramValue interface{}
+// 	@param paramType string int整型64位, +int正整型64位, !-int非负整型64位, string字符串, []枚举, array数组
+// 	@param allowEmpty bool
+//	@return interface{}
+//	@return error
 func FilterParam(c *gin.Context, paramName string, paramValue interface{}, paramType string, allowEmpty bool) (interface{}, error) {
 	valueType := reflect.TypeOf(paramValue).String()
 
@@ -201,9 +213,10 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 }
 
 // GetPageItems 获取分页数据
-// @param query {"ginContext": *gin.Context, "db": gorose.IOrm, "select": string, "from": string, "where": string, "groupBy" => string, "having" => string, "orderBy": string}
-// @return {"page": int64, "per_page": int64, "total_page": int64, "total_counts": int64, "items": []gorose.Data}
-// 出现异常时方法会向客户端返回4xx错误, 调用方法捕获到error直接结束业务逻辑即可
+// 	出现异常时方法会向客户端返回4xx错误, 调用方法捕获到error直接结束业务逻辑即可
+// 	@param query map[string]interface{} {"ginContext": *gin.Context, "db": gorose.IOrm, "select": string, "from": string, "where": string, "groupBy" => string, "having" => string, "orderBy": string}
+//	@return map[string]interface{} {"page": int64, "per_page": int64, "total_page": int64, "total_counts": int64, "items": []gorose.Data}
+//	@return error
 func GetPageItems(query map[string]interface{}) (map[string]interface{}, error) {
 	queries, err := GetQueries(query["ginContext"].(*gin.Context), []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
 	if err != nil {
