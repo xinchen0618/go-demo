@@ -19,6 +19,7 @@
 ```
 - config/               配置
   - config.yaml         公共配置. 环境配置 config_{RUNTIME_ENV}.yaml, dev环境配置不参与版本控制.
+  - constants.go        常量定义. Redis key统一在此定义避免冲突.
 - controller/           控制器
 - di                    服务注入
   - services.go         Di注册服务

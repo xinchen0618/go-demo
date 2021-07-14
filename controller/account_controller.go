@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"go-test/config"
 	"go-test/di"
 	"go-test/service"
 	"go-test/util"
@@ -117,6 +118,47 @@ func GetUsers(c *gin.Context) {
 	wg.Wait()
 
 	c.JSON(200, result)
+}
+
+func GetUsersById(c *gin.Context) {
+	userId, err := util.FilterParam(c, "用户id", c.Param("user_id"), "+int", false)
+	if err != nil {
+		return
+	}
+
+	// cache
+	key := fmt.Sprintf(config.RedisUser, userId)
+	userStr, err := di.CacheRedis().Get(context.Background(), key).Result()
+	if err != nil && "redis: nil" != err.Error() {
+		panic(err)
+	}
+	if userStr != "" {
+		var user gorose.Data
+		if err = json.Unmarshal([]byte(userStr), &user); err != nil {
+			panic(err)
+		}
+
+		c.JSON(200, user)
+		return
+	}
+
+	user, err := di.Db().Table("t_users").Where(gorose.Data{"user_id": userId}).First()
+	if err != nil {
+		panic(err)
+	}
+	if 0 == len(user) {
+		c.JSON(404, gin.H{"status": "UserNotFound", "message": "用户不存在"})
+		return
+	}
+	userBytes, err := json.Marshal(user)
+	if err != nil {
+		panic(err)
+	}
+	if err = di.CacheRedis().Set(context.Background(), key, userBytes, time.Second*30).Err(); err != nil {
+		panic(err)
+	}
+
+	c.JSON(200, user)
 }
 
 func PostUsers(c *gin.Context) {
