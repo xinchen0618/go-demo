@@ -22,7 +22,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
+type AccountController struct {
+}
+
+func (accountController AccountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 	jsonBody, err := util.GetJsonBody(c, []string{"user_name:用户名:string:+", "password:密码:string:+"})
 	if err != nil {
 		return
@@ -64,7 +67,7 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 	c.JSON(200, gin.H{"user_id": user["user_id"], "token": tokenString})
 }
 
-func DeleteUserLogout(c *gin.Context) {
+func (accountController AccountController) DeleteUserLogout(c *gin.Context) {
 	// 登录校验
 	userId, err := service.CheckUserLogin(c)
 	if err != nil {
@@ -81,7 +84,7 @@ func DeleteUserLogout(c *gin.Context) {
 	c.JSON(204, gin.H{})
 }
 
-func GetUsers(c *gin.Context) {
+func (accountController AccountController) GetUsers(c *gin.Context) {
 	// 登录校验
 	//if _, err := service.CheckUserLogin(c); err != nil {
 	//	return
@@ -120,7 +123,7 @@ func GetUsers(c *gin.Context) {
 	c.JSON(200, result)
 }
 
-func GetUsersById(c *gin.Context) {
+func (accountController AccountController) GetUsersById(c *gin.Context) {
 	userId, err := util.FilterParam(c, "用户id", c.Param("user_id"), "+int", false)
 	if err != nil {
 		return
@@ -161,7 +164,7 @@ func GetUsersById(c *gin.Context) {
 	c.JSON(200, user)
 }
 
-func PostUsers(c *gin.Context) {
+func (accountController AccountController) PostUsers(c *gin.Context) {
 	jsonBody, err := util.GetJsonBody(c, []string{"counts:数量:+int:*"})
 	if err != nil {
 		return

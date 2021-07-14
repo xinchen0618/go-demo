@@ -70,11 +70,13 @@ func cors() gin.HandlerFunc {
 }
 
 func main() {
-	/* Run gin */
+	// 多环境
 	runtimeEnv := os.Getenv("RUNTIME_ENV")
 	if runtimeEnv == "" || runtimeEnv == "prod" || runtimeEnv == "stage" {
 		gin.SetMode(gin.ReleaseMode)
 	}
+
+	// Run gin
 	r := gin.Default()
 
 	// Panic处理
@@ -83,7 +85,7 @@ func main() {
 	r.Use(cors())
 
 	// 加载路由
-	router.LoadAccount(r)
+	router.Init(r)
 
 	if err := r.Run(":8080"); err != nil {
 		panic(err)

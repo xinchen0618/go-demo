@@ -6,14 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func LoadAccount(e *gin.Engine) {
-	accountGroup := e.Group("/account")
+func LoadAccount(r *gin.Engine) {
+	accountGroup := r.Group("/account")
 	{
-		accountGroup.POST("/v1/login", controller.PostUserLogin)
-		accountGroup.DELETE("/v1/logout", controller.DeleteUserLogout)
+		accountController := controller.AccountController{}
 
-		accountGroup.GET("/v1/users", controller.GetUsers)
-		accountGroup.GET("/v1/users/:user_id", controller.GetUsersById)
-		accountGroup.POST("/v1/users", controller.PostUsers)
+		accountGroup.POST("/v1/login", accountController.PostUserLogin)
+		accountGroup.DELETE("/v1/logout", accountController.DeleteUserLogout)
+
+		accountGroup.GET("/v1/users", accountController.GetUsers)
+		accountGroup.GET("/v1/users/:user_id", accountController.GetUsersById)
+		accountGroup.POST("/v1/users", accountController.PostUsers)
 	}
 }

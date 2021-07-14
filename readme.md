@@ -24,6 +24,7 @@
 - di                    服务注入
   - services.go         Di注册服务
 - router/               Restful路由
+  - router.go           路由注册入口. 路由声明按业务分拆到不同文件, 然后统一在此注册.
 - service/              公共业务逻辑
 - util                  工具包
   - api_utils.go        API工具方法
