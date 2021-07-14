@@ -12,7 +12,7 @@ import (
 )
 
 // Panic处理
-// 与业务无关的错误, 使用panic, 记录错误日志并统一向客户端返回500错误
+// 主goroutine与业务无关的错误, 使用panic, 记录错误日志并统一向客户端返回500错误
 func recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {

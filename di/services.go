@@ -1,7 +1,6 @@
 package di
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
@@ -69,10 +68,6 @@ func init() {
 
 func Db() gorose.IOrm {
 	return dbEngine.NewOrm()
-}
-
-func Ctx() context.Context {
-	return context.Background()
 }
 
 func CacheRedis() *redis.Client {

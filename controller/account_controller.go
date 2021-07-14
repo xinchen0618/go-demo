@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -55,7 +56,7 @@ func PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 	if err != nil {
 		panic(err)
 	}
-	if err = di.JwtRedis().Set(di.Ctx(), "jwt:"+claims.Id+":"+tokenAtoms[2], payload, loginTtl).Err(); err != nil {
+	if err = di.JwtRedis().Set(context.Background(), "jwt:"+claims.Id+":"+tokenAtoms[2], payload, loginTtl).Err(); err != nil {
 		panic(err)
 	}
 
@@ -72,7 +73,7 @@ func DeleteUserLogout(c *gin.Context) {
 	// 删除对应redis白名单记录
 	tokenString := c.Request.Header.Get("X-Token")
 	tokenAtoms := strings.Split(tokenString, ".")
-	if err := di.JwtRedis().Del(di.Ctx(), "jwt:"+strconv.FormatInt(userId, 10)+":"+tokenAtoms[2]).Err(); err != nil {
+	if err := di.JwtRedis().Del(context.Background(), "jwt:"+strconv.FormatInt(userId, 10)+":"+tokenAtoms[2]).Err(); err != nil {
 		panic(err)
 	}
 
