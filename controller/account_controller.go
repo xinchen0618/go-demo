@@ -130,7 +130,7 @@ func (accountController *AccountController) GetUsersById(c *gin.Context) {
 	}
 
 	// cache
-	key := fmt.Sprintf(config.RedisUser, userId)
+	key := fmt.Sprintf(config.RedisUserInfo, userId)
 	userStr, err := di.CacheRedis().Get(context.Background(), key).Result()
 	if err != nil && "redis: nil" != err.Error() {
 		panic(err)
