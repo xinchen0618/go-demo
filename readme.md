@@ -64,7 +64,8 @@
 
 ### 运行
 
-开发&测试环境使用Air实时热重载
+开发&测试环境使用Air实时热重载. 
+注意, 是否配置了Go mod代理 `export GOPROXY=https://goproxy.cn,direct`, 是否配置了Go bin路径 `export PATH=$PATH:$HOME/go/bin`.
 
 ```
 cd go-test
