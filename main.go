@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"runtime"
-	"strings"
 
 	"go-test/router"
 
@@ -38,30 +37,17 @@ func recovery() gin.HandlerFunc {
 //	@return gin.HandlerFunc
 func cors() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		method := context.Request.Method
-		origin := context.Request.Header.Get("Origin")
-		var headerKeys []string
-		for k, _ := range context.Request.Header {
-			headerKeys = append(headerKeys, k)
-		}
-		headerStr := strings.Join(headerKeys, ",")
-		if headerStr != "" {
-			headerStr = fmt.Sprintf("access-control-allow-origin, access-control-allow-headers, %s", headerStr)
-		} else {
-			headerStr = "access-control-allow-origin, access-control-allow-headers"
-		}
-
-		if origin != "" {
+		if context.Request.Header.Get("Origin") != "" {
 			context.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 			context.Header("Access-Control-Allow-Origin", "*") // 设置允许访问所有域
 			context.Header("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS")
 			context.Header("Access-Control-Allow-Headers", "X-Token, Authorization, Content-Length, Accept, Origin, Host, Connection, Accept-Encoding, Accept-Language, DNT, Keep-Alive, User-Agent, If-Modified-Since, Cache-Control, Content-Type, Pragma")
 			context.Header("Access-Control-Max-Age", "1728000")
 			context.Header("Access-Control-Allow-Credentials", "false")
-		}
 
-		if method == "OPTIONS" {
-			context.JSON(http.StatusOK, gin.H{})
+			if "OPTIONS" == context.Request.Method {
+				context.JSON(http.StatusOK, gin.H{})
+			}
 		}
 
 		//处理请求
