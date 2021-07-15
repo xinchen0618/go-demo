@@ -7,6 +7,7 @@ import (
 	"os"
 	"runtime"
 
+	"go-test/di"
 	"go-test/router"
 
 	"github.com/gin-gonic/gin"
@@ -56,13 +57,14 @@ func cors() gin.HandlerFunc {
 }
 
 func main() {
-	// 多环境
+	// 初始化Di
+	di.Init()
+
+	// Run gin
 	runtimeEnv := os.Getenv("RUNTIME_ENV")
 	if runtimeEnv == "" || runtimeEnv == "prod" || runtimeEnv == "stage" {
 		gin.SetMode(gin.ReleaseMode)
 	}
-
-	// Run gin
 	r := gin.Default()
 
 	// Panic处理
