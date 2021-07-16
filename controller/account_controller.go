@@ -25,7 +25,7 @@ import (
 type AccountController struct {
 }
 
-func (a *AccountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
+func (AccountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 	jsonBody, err := util.GetJsonBody(c, []string{"user_name:用户名:string:+", "password:密码:string:+"})
 	if err != nil {
 		return
@@ -67,7 +67,7 @@ func (a *AccountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再
 	c.JSON(200, gin.H{"user_id": user["user_id"], "token": tokenString})
 }
 
-func (a *AccountController) DeleteUserLogout(c *gin.Context) {
+func (AccountController) DeleteUserLogout(c *gin.Context) {
 	// 登录校验
 	userId, err := service.CheckUserLogin(c)
 	if err != nil {
@@ -84,7 +84,7 @@ func (a *AccountController) DeleteUserLogout(c *gin.Context) {
 	c.JSON(204, gin.H{})
 }
 
-func (a *AccountController) GetUsers(c *gin.Context) {
+func (AccountController) GetUsers(c *gin.Context) {
 	// 登录校验
 	//if _, err := service.CheckUserLogin(c); err != nil {
 	//	return
@@ -123,7 +123,7 @@ func (a *AccountController) GetUsers(c *gin.Context) {
 	c.JSON(200, result)
 }
 
-func (a *AccountController) GetUsersById(c *gin.Context) {
+func (AccountController) GetUsersById(c *gin.Context) {
 	userId, err := util.FilterParam(c, "用户id", c.Param("user_id"), "+int", false)
 	if err != nil {
 		return
@@ -164,7 +164,7 @@ func (a *AccountController) GetUsersById(c *gin.Context) {
 	c.JSON(200, user)
 }
 
-func (a *AccountController) PostUsers(c *gin.Context) {
+func (AccountController) PostUsers(c *gin.Context) {
 	jsonBody, err := util.GetJsonBody(c, []string{"counts:数量:+int:*"})
 	if err != nil {
 		return
