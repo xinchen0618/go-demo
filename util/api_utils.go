@@ -233,10 +233,10 @@ func GetPageItems(query map[string]interface{}) (map[string]interface{}, error) 
 	var countSql string
 	groupBy, ok := query["groupBy"].(string) // GROUP BY存在总记录数计算方式会不同
 	if ok {
-		where += " " + groupBy
+		where += " GROUP BY " + groupBy
 		having, ok := query["having"].(string)
 		if ok {
-			where += " " + having
+			where += " HAVING " + having
 		}
 		countSql = fmt.Sprintf("SELECT COUNT(*) AS counts FROM (SELECT %s FROM %s WHERE %s) AS t", query["select"], query["from"], where)
 	} else {
