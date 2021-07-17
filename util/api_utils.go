@@ -99,7 +99,7 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, erro
 // 	@param c *gin.Context
 // 	@param paramName string
 // 	@param paramValue interface{}
-// 	@param paramType string int整型64位, +int正整型64位, !-int非负整型64位, string字符串, []枚举, array数组
+// 	@param paramType string int整型64位, +int正整型64位, !-int非负整型64位, string字符串, []枚举(支持数字float64与字符串string混合枚举), array数组
 // 	@param allowEmpty bool
 //	@return interface{}
 //	@return error
@@ -167,7 +167,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 		}
 	}
 
-	/* 枚举, 支持数字与字符串混合枚举 */
+	/* 枚举, 支持数字float64与字符串string混合枚举 */
 	if EnumMark := paramType[0:1]; "[" == EnumMark {
 		var enum []interface{}
 		if err := json.Unmarshal([]byte(paramType), &enum); err != nil {
