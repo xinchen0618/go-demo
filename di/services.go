@@ -23,19 +23,11 @@ var (
 
 func Init() {
 	once.Do(func() {
-		/* Log */
-		logFile, err := os.OpenFile("/var/log/golang_error.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0664)
-		if err != nil {
-			panic(err)
-		}
-		log.SetOutput(logFile)
-		log.SetFlags(log.Llongfile | log.Lmicroseconds | log.Ldate)
-
 		/* 配置 */
 		viper.SetConfigName("config")   // name of config file (without extension)
 		viper.SetConfigType("yaml")     // REQUIRED if the config file does not have the extension in the name
 		viper.AddConfigPath("./config") // path to look for the config file in
-		err = viper.ReadInConfig()      // Find and read the config file
+		err := viper.ReadInConfig()     // Find and read the config file
 		if err != nil {                 // Handle errors reading the config file
 			panic(err)
 		}
@@ -49,6 +41,14 @@ func Init() {
 		if err != nil {
 			panic(err)
 		}
+
+		/* Log */
+		logFile, err := os.OpenFile(viper.GetString("errorLog"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0664)
+		if err != nil {
+			panic(err)
+		}
+		log.SetOutput(logFile)
+		log.SetFlags(log.Llongfile | log.Lmicroseconds | log.Ldate)
 
 		/* mysql */
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",

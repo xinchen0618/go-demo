@@ -1,12 +1,7 @@
 # 生产环境配置
 
-redis:
-  host: "127.0.0.1"
-  port: 6379
-  auth: ""
-  index:
-    cache: 0     # 缓存
-    storage: 1   # 存储
-    jwt: 2       # JWT
+# 运行端口
+serverPort: 8081
 
+# JWT密钥
 jwtSecret: "btRZ5QHXX9VjfYhfGGHdCTcWiwQ6WFJXq9ZCwdqZwzk2ZfhceM9K3V5UGKsYLd9m"

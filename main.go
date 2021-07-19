@@ -11,6 +11,7 @@ import (
 	"go-test/router"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 // recovery Panic处理
@@ -75,7 +76,7 @@ func main() {
 	// 加载路由
 	router.Init(r)
 
-	if err := r.Run(":8080"); err != nil {
+	if err := r.Run(fmt.Sprintf(":%d", viper.GetInt64("serverPort"))); err != nil {
 		panic(err)
 	}
 }

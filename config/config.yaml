@@ -1,5 +1,9 @@
 # 公共配置
 
+# 错误日志路径
+errorLog: "/var/log/golang_error.log"
+
+# DB
 mysql:
   host: "127.0.0.1"
   port: 3306
@@ -7,3 +11,13 @@ mysql:
   password: "cx654321"
   dbname: "test"
   charset: "utf8mb4"
+
+# Redis
+redis:
+  host: "127.0.0.1"
+  port: 6379
+  auth: ""
+  index:
+    cache: 0     # 缓存
+    storage: 1   # 存储
+    jwt: 2       # JWT
