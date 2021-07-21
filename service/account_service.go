@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"sync"
 
 	"go-demo/di"
 
@@ -13,13 +14,27 @@ import (
 	"github.com/spf13/viper"
 )
 
+type Account struct {
+}
+
+var once sync.Once
+var accountService Account
+
+func AccountService() *Account {
+	once.Do(func() {
+		accountService = Account{}
+	})
+
+	return &accountService
+}
+
 // CheckUserLogin 登录校验
 // 	先校验JWT, 再校验redis白名单
 // 	校验不通过方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 //	@param c *gin.Context
 //	@return int64
 //	@return error
-func CheckUserLogin(c *gin.Context) (int64, error) {
+func (*Account) CheckUserLogin(c *gin.Context) (int64, error) {
 	tokenString := c.Request.Header.Get("X-Token")
 	if "" == tokenString { // 没有携带token
 		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
