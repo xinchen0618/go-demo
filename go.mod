@@ -1,4 +1,4 @@
-module go-test
+module go-demo
 
 go 1.16
 

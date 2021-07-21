@@ -18,7 +18,7 @@
 
 ```
 - config/               配置
-  - config.yaml         公共配置. 环境配置 config_{RUNTIME_ENV}.yaml, dev环境配置不参与版本控制.
+  - config.yaml         公共配置. 环境配置 config_{RUNTIME_ENV}.yaml, 同键名环境配置覆盖公共配置. dev环境配置不参与版本控制.
   - constants.go        常量定义. Redis key统一在此定义避免冲突.
 - controller/           控制器
 - di                    服务注入
@@ -61,7 +61,7 @@
     - `router/` 路由, API版本在此控制, Major[.Minor], 比如 /v1, /v1.1, API出现向下不兼容且旧版仍需继续使用的情况, ~~比如不升级的旧版APP,~~ 新增Minor版本号. 业务出现结构性变化, 新增Major版本号.
     - `controller/` 用于处理业务. 事务控制尽量放置在这里, 放置在 `service/` 中容易出现事务嵌套的问题.
     - `service/` 用于封装公共的业务逻辑, 为可选.
-    
+
 
 ### 运行
 
@@ -69,7 +69,7 @@
 注意, 是否配置了Go mod代理 `export GOPROXY=https://goproxy.cn,direct`, 是否配置了Go bin路径 `export PATH=$PATH:$HOME/go/bin`.
 
 ```
-cd go-test
+cd go-demo
 go mod download
 go get github.com/cosmtrek/air
 RUNTIME_ENV=testing air

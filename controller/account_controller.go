@@ -11,10 +11,10 @@ import (
 	"sync"
 	"time"
 
-	"go-test/config"
-	"go-test/di"
-	"go-test/service"
-	"go-test/util"
+	"go-demo/config"
+	"go-demo/di"
+	"go-demo/service"
+	"go-demo/util"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -47,7 +47,7 @@ func (AccountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记
 		ExpiresAt: time.Now().Add(loginTtl).Unix(),
 		Id:        strconv.FormatInt(user["user_id"].(int64), 10),
 		IssuedAt:  time.Now().Unix(),
-		Issuer:    "go-test:UserLogin",
+		Issuer:    "go-demo:UserLogin",
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(viper.GetString("jwtSecret")))

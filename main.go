@@ -7,8 +7,8 @@ import (
 	"os"
 	"runtime"
 
-	"go-test/di"
-	"go-test/router"
+	"go-demo/di"
+	"go-demo/router"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"

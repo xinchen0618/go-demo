@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"go-test/di"
+	"go-demo/di"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
