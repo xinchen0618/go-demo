@@ -9,7 +9,7 @@ import (
 func LoadAccount(r *gin.Engine) {
 	accountGroup := r.Group("/account")
 	{
-		accountController := controller.AccountController{}
+		accountController := new(controller.AccountController)
 
 		accountGroup.POST("/v1/login", accountController.PostUserLogin)
 		accountGroup.DELETE("/v1/logout", accountController.DeleteUserLogout)

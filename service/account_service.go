@@ -19,11 +19,11 @@ import (
 type accountService struct {
 }
 
-var once sync.Once
+var onceAccount sync.Once
 var accountServiceInstance *accountService
 
 func AccountService() *accountService {
-	once.Do(func() {
+	onceAccount.Do(func() {
 		accountServiceInstance = new(accountService)
 	})
 
