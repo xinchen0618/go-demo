@@ -14,18 +14,18 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Account struct {
+type accountService struct {
 }
 
 var once sync.Once
-var accountService *Account
+var accountServiceInstance *accountService
 
-func AccountService() *Account {
+func AccountService() *accountService {
 	once.Do(func() {
-		accountService = new(Account)
+		accountServiceInstance = new(accountService)
 	})
 
-	return accountService
+	return accountServiceInstance
 }
 
 // CheckUserLogin 登录校验
@@ -34,7 +34,7 @@ func AccountService() *Account {
 //	@param c *gin.Context
 //	@return int64
 //	@return error
-func (*Account) CheckUserLogin(c *gin.Context) (int64, error) {
+func (*accountService) CheckUserLogin(c *gin.Context) (int64, error) {
 	tokenString := c.Request.Header.Get("X-Token")
 	if "" == tokenString { // 没有携带token
 		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
