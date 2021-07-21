@@ -18,14 +18,14 @@ type Account struct {
 }
 
 var once sync.Once
-var accountService Account
+var accountService *Account
 
 func AccountService() *Account {
 	once.Do(func() {
-		accountService = Account{}
+		accountService = new(Account)
 	})
 
-	return &accountService
+	return accountService
 }
 
 // CheckUserLogin 登录校验
