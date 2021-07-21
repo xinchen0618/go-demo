@@ -15,7 +15,7 @@ import (
 )
 
 // 这里定义结构体目的在于为大量的service做分类
-// 调用者通过service.XxxService()方法获取实例来使用其中的方法, 实例是单例的
+// 调用者通过service.XxxService()方法获取单例实例来使用其中的方法
 type accountService struct {
 }
 
