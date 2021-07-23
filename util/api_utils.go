@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gohouse/gorose/v2"
+	"github.com/shopspring/decimal"
 )
 
 // GetJsonBody 获取Json参数
@@ -159,8 +160,12 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			}
 			return stringValue, nil
 		} else if "float64" == valueType {
-			stringValue := fmt.Sprintf("%v", paramValue)
-			return stringValue, nil
+			decimalValue, err := decimal.NewFromString(fmt.Sprintf("%v", paramValue)) // 解决6位以上数据被转科学记数法的问题
+			if err != nil {
+				c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
+				return nil, errors.New("InvalidParam")
+			}
+			return decimalValue.String(), nil
 		} else {
 			c.JSON(400, gin.H{"status": "InvalidParam", "message": fmt.Sprintf("%s不正确", paramName)})
 			return nil, errors.New("InvalidParam")
