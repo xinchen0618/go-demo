@@ -69,7 +69,7 @@ func (*AccountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再�
 
 func (*AccountController) DeleteUserLogout(c *gin.Context) {
 	// 登录校验
-	userId, err := service.AccountService().CheckUserLogin(c)
+	userId, err := service.AccountService.CheckUserLogin(c)
 	if err != nil {
 		return
 	}

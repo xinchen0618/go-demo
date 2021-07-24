@@ -5,7 +5,6 @@ import (
 	"errors"
 	"strconv"
 	"strings"
-	"sync"
 
 	"go-demo/di"
 
@@ -14,21 +13,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-// 这里定义结构体目的在于为大量的service做分类
-// 调用者通过service.XxxService()方法获取单例实例来使用其中的方法
+// 这里定义一个空结构体目的在于为大量的service方法做分类
 type accountService struct {
 }
 
-var onceAccount sync.Once
-var accountServiceInstance *accountService
-
-func AccountService() *accountService {
-	onceAccount.Do(func() {
-		accountServiceInstance = new(accountService)
-	})
-
-	return accountServiceInstance
-}
+// AccountService 这里不需要实例, 外部通过service.AccountService.Xxx()的形式调用旗下定义的方法
+var AccountService *accountService
 
 // CheckUserLogin 登录校验
 // 	先校验JWT, 再校验redis白名单
