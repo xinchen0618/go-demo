@@ -36,7 +36,7 @@ func (*AccountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再�
 		panic(err)
 	}
 	if 0 == len(user) {
-		c.JSON(400, gin.H{"status": "InvalidUser", "message": "用户名或密码不正确"})
+		c.JSON(400, gin.H{"status": "UserInvalid", "message": "用户名或密码不正确"})
 		return
 	}
 
