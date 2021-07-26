@@ -3,5 +3,5 @@
 # 运行端口
 serverPort: 8080
 
-# JWT密钥
+# JWT密钥, JWT配套有白名单动能不必担心秘钥泄露的问题
 jwtSecret: "Xx4KJQ2AguFL5gWurcRJvVfDC5a2itLi53vFJN9wthYkrxtQbdeRDkWTHzAjnn5n"
