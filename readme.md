@@ -47,7 +47,7 @@
 
 ### 日志
 
-错误日志路径 `/var/log/golang_error.log`
+错误日志路径在`config/`中配置, 默认为`/var/log/golang_error.log`
 
 
 ### RESTful
