@@ -17,7 +17,7 @@ import (
 type accountService struct {
 }
 
-// AccountService 这里不需要实例, 外部通过service.AccountService.Xxx()的形式调用旗下定义的方法
+// AccountService 这里不需要实例化, 外部通过service.XxxService.Xxx()的形式调用旗下定义的方法
 var AccountService *accountService
 
 // CheckUserLogin 登录校验
