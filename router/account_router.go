@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// LoadAccount 这里定义路由, 然后在router.go中统一注册
 func LoadAccount(r *gin.Engine) {
 	accountGroup := r.Group("/account")
 	{
