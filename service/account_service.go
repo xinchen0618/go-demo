@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// 这里定义一个空结构体目的在于为大量的service方法做分类
+// 这里定义一个空结构体用于为大量的service方法做分类
 type accountService struct {
 }
 
