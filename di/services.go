@@ -54,7 +54,7 @@ func Init() {
 		encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 		encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 		encoder := zapcore.NewConsoleEncoder(encoderConfig)
-		zapCore := zapcore.NewCore(encoder, writeSyncer, zapcore.ErrorLevel)
+		zapCore := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(writeSyncer, zapcore.AddSync(os.Stdout)), zapcore.ErrorLevel)
 		logger = zap.New(zapCore, zap.AddStacktrace(zapcore.ErrorLevel))
 
 		/* mysql */

@@ -47,7 +47,7 @@
 
 ### 日志
 
-错误日志路径在`config/`中配置, 默认为`/var/log/golang_error.log`
+错误日志会打印到console, 同时记录到错误日志文件. 错误日志文件路径在`config/`中配置, 默认为`/var/log/golang_error.log`. 注意文件要有读写权限.
 
 
 ### RESTful
