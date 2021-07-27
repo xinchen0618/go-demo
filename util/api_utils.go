@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 
+	"go-demo/di"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gohouse/gorose/v2"
 	"github.com/shopspring/decimal"
@@ -281,4 +283,13 @@ func GetPageItems(query map[string]interface{}) (map[string]interface{}, error) 
 		"items":        items,
 	}
 	return result, nil
+}
+
+// InternalError 服务异常
+//	记录日志并向客户端返回500错误
+//	@param c *gin.Context
+//	@param err error
+func InternalError(c *gin.Context, err error) {
+	di.Logger().Error(err.Error())
+	c.JSON(500, gin.H{"status": "InternalError", "message": "服务异常, 请稍后重试"})
 }

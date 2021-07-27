@@ -2,7 +2,6 @@ package di
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"sync"
 
@@ -10,6 +9,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gohouse/gorose/v2"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // 先定义私有变量存放实例(保证实例不能被外部修改), 然后在Init()中初始化实例(once保证实例只初始化一次), 最后定义公共方法获取实例使用
@@ -19,6 +20,7 @@ var (
 	dbEngine   *gorose.Engin
 	cacheRedis *redis.Client
 	jwtRedis   *redis.Client
+	logger     *zap.Logger
 )
 
 func Init() {
@@ -42,13 +44,18 @@ func Init() {
 			panic(err)
 		}
 
-		/* Log */
+		/* zap Log */
 		logFile, err := os.OpenFile(viper.GetString("errorLog"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0664)
 		if err != nil {
 			panic(err)
 		}
-		log.SetOutput(logFile)
-		log.SetFlags(log.Llongfile | log.Lmicroseconds | log.Ldate)
+		writeSyncer := zapcore.AddSync(logFile)
+		encoderConfig := zap.NewProductionEncoderConfig()
+		encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+		encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
+		encoder := zapcore.NewConsoleEncoder(encoderConfig)
+		zapCore := zapcore.NewCore(encoder, writeSyncer, zapcore.ErrorLevel)
+		logger = zap.New(zapCore, zap.AddStacktrace(zapcore.ErrorLevel))
 
 		/* mysql */
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",
@@ -83,4 +90,8 @@ func CacheRedis() *redis.Client {
 
 func JwtRedis() *redis.Client {
 	return jwtRedis
+}
+
+func Logger() *zap.Logger {
+	return logger
 }

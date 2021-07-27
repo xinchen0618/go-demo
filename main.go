@@ -2,32 +2,25 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
-	"runtime"
 
 	"go-demo/di"
 	"go-demo/router"
+	"go-demo/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
 
 // recovery Panic处理
-// 	主goroutine与业务无关的错误, 使用panic, 记录错误日志并统一向客户端返回500错误
+// 	程序初始化可以使用panic, 其他地方必须避免出现panic
 //	@return gin.HandlerFunc
 func recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
-				// 记录错误日志
-				buf := make([]byte, 2048)
-				n := runtime.Stack(buf, false)
-				stackInfo := fmt.Sprintf("%s", buf[:n])
-				log.Printf("%v\n%v\n", err, stackInfo)
-
-				c.JSON(500, gin.H{"status": "InternalError", "message": "服务异常, 请稍后重试"})
+				util.InternalError(c, err.(error))
 			}
 		}()
 

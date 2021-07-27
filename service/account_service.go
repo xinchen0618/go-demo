@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"go-demo/di"
+	"go-demo/util"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -51,11 +52,13 @@ func (*accountService) CheckUserLogin(c *gin.Context) (int64, error) {
 				c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
 				return 0, errors.New("UserUnauthorized")
 			}
-			panic(err) // redis服务异常
+			util.InternalError(c, err) // redis服务异常
+			return 0, errors.New("InternalError")
 		}
 		userId, err := strconv.ParseInt(claims["jti"].(string), 10, 64)
 		if err != nil {
-			panic(err)
+			util.InternalError(c, err)
+			return 0, errors.New("InternalError")
 		}
 		return userId, nil
 

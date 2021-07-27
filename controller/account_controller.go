@@ -37,7 +37,8 @@ func (*accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再�
 
 	user, err := di.Db().Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": jsonBody["user_name"], "password": jsonBody["password"]}).First()
 	if err != nil {
-		panic(err)
+		util.InternalError(c, err)
+		return
 	}
 	if 0 == len(user) {
 		c.JSON(400, gin.H{"status": "UserInvalid", "message": "用户名或密码不正确"})
@@ -56,16 +57,19 @@ func (*accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再�
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(viper.GetString("jwtSecret")))
 	if err != nil {
-		panic(err)
+		util.InternalError(c, err)
+		return
 	}
 	// redis登录白名单
 	tokenAtoms := strings.Split(tokenString, ".")
 	payload, err := json.Marshal(claims)
 	if err != nil {
-		panic(err)
+		util.InternalError(c, err)
+		return
 	}
 	if err = di.JwtRedis().Set(context.Background(), "jwt:"+claims.Id+":"+tokenAtoms[2], payload, loginTtl).Err(); err != nil {
-		panic(err)
+		util.InternalError(c, err)
+		return
 	}
 
 	c.JSON(200, gin.H{"user_id": user["user_id"], "token": tokenString})
@@ -82,7 +86,8 @@ func (*accountController) DeleteUserLogout(c *gin.Context) {
 	tokenString := c.Request.Header.Get("X-Token")
 	tokenAtoms := strings.Split(tokenString, ".")
 	if err := di.JwtRedis().Del(context.Background(), "jwt:"+strconv.FormatInt(userId, 10)+":"+tokenAtoms[2]).Err(); err != nil {
-		panic(err)
+		util.InternalError(c, err)
+		return
 	}
 
 	c.JSON(204, gin.H{})
@@ -132,12 +137,14 @@ func (*accountController) GetUsersById(c *gin.Context) {
 	key := fmt.Sprintf(config.RedisUserInfo, userId)
 	userStr, err := di.CacheRedis().Get(context.Background(), key).Result()
 	if err != nil && "redis: nil" != err.Error() {
-		panic(err)
+		util.InternalError(c, err)
+		return
 	}
 	if userStr != "" {
 		var user gorose.Data
 		if err = json.Unmarshal([]byte(userStr), &user); err != nil {
-			panic(err)
+			util.InternalError(c, err)
+			return
 		}
 
 		c.JSON(200, user)
@@ -146,7 +153,8 @@ func (*accountController) GetUsersById(c *gin.Context) {
 
 	user, err := di.Db().Table("t_users").Where(gorose.Data{"user_id": userId}).First()
 	if err != nil {
-		panic(err)
+		util.InternalError(c, err)
+		return
 	}
 	if 0 == len(user) {
 		c.JSON(404, gin.H{"status": "UserNotFound", "message": "用户不存在"})
@@ -154,10 +162,12 @@ func (*accountController) GetUsersById(c *gin.Context) {
 	}
 	userBytes, err := json.Marshal(user)
 	if err != nil {
-		panic(err)
+		util.InternalError(c, err)
+		return
 	}
 	if err = di.CacheRedis().Set(context.Background(), key, userBytes, time.Second*30).Err(); err != nil {
-		panic(err)
+		util.InternalError(c, err)
+		return
 	}
 
 	c.JSON(200, user)
