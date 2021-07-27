@@ -54,8 +54,8 @@ func Init() {
 		encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 		encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 		encoder := zapcore.NewConsoleEncoder(encoderConfig)
-		zapCore := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(writeSyncer, zapcore.AddSync(os.Stdout)), zapcore.ErrorLevel)
-		logger = zap.New(zapCore, zap.AddStacktrace(zapcore.ErrorLevel))
+		zapCore := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(writeSyncer, zapcore.AddSync(os.Stdout)), zapcore.DebugLevel)
+		logger = zap.New(zapCore, zap.AddStacktrace(zapcore.ErrorLevel)) // 错误日志记录栈信息
 
 		/* mysql */
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",
