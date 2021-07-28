@@ -8,6 +8,7 @@
 - Redis     go-redis    https://github.com/go-redis/redis
 - 登录      jwt-go      https://github.com/dgrijalva/jwt-go
 - 日志      zap         https://github.com/uber-go/zap
+- 优雅停止  endless     https://github.com/fvbock/endless
 
 
 ###  编码规范
@@ -68,12 +69,30 @@
 
 ### 运行
 
-开发&测试环境使用Air实时热重载. 
-注意, 是否配置了Go mod代理 `export GOPROXY=https://goproxy.cn,direct`, 是否配置了Go bin路径 `export PATH=$PATH:$HOME/go/bin`.
+- 开发&测试环境使用Air实时热重载
+  
+  注意, 是否配置了Go mod代理 `export GOPROXY=https://goproxy.cn,direct`, 是否配置了Go bin路径 `export PATH=$PATH:$HOME/go/bin`.
 
 ```
 cd go-demo
 go mod download
 go get github.com/cosmtrek/air
 RUNTIME_ENV=testing air
+```
+
+- 预发布&生产执行编译好的程序
+  
+  实际上会提前编译好直接部署到机器上
+
+```
+# 启动
+cd go-demo
+go build  
+(RUNTIME_ENV=prod ./go-demo &> /dev/null &)
+
+# 优雅重启
+kill -SIGHUP $(ps aux | grep -v grep | grep go-demo | awk '{print $2}')
+
+# 优雅停止
+kill -SIGINT $(ps aux | grep -v grep | grep go-demo | awk '{print $2}')
 ```

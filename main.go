@@ -9,6 +9,7 @@ import (
 	"go-demo/router"
 	"go-demo/util"
 
+	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
@@ -54,7 +55,7 @@ func main() {
 	// 初始化Di
 	di.Init()
 
-	// Run gin
+	// 实例化gin
 	runtimeEnv := os.Getenv("RUNTIME_ENV")
 	if runtimeEnv == "" || runtimeEnv == "prod" || runtimeEnv == "stage" {
 		gin.SetMode(gin.ReleaseMode)
@@ -65,11 +66,11 @@ func main() {
 	r.Use(recovery())
 	// 跨域处理
 	r.Use(cors())
-
 	// 加载路由
 	router.Init(r)
 
-	if err := r.Run(fmt.Sprintf(":%d", viper.GetInt64("serverPort"))); err != nil {
+	// Run gin
+	if err := endless.ListenAndServe(fmt.Sprintf(":%d", viper.GetInt64("serverPort")), r); err != nil {
 		panic(err)
 	}
 }
