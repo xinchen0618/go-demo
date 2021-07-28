@@ -11,7 +11,6 @@ import (
 	"sync"
 	"time"
 
-	"go-demo/config"
 	"go-demo/di"
 	"go-demo/service"
 	"go-demo/util"
@@ -133,40 +132,9 @@ func (*accountController) GetUsersById(c *gin.Context) {
 		return
 	}
 
-	// cache
-	key := fmt.Sprintf(config.RedisUserInfo, userId)
-	userStr, err := di.CacheRedis().Get(context.Background(), key).Result()
-	if err != nil && "redis: nil" != err.Error() {
-		util.InternalError(c, err)
-		return
-	}
-	if userStr != "" {
-		var user gorose.Data
-		if err = json.Unmarshal([]byte(userStr), &user); err != nil {
-			util.InternalError(c, err)
-			return
-		}
-
-		c.JSON(200, user)
-		return
-	}
-
-	user, err := di.Db().Table("t_users").Where(gorose.Data{"user_id": userId}).First()
-	if err != nil {
-		util.InternalError(c, err)
-		return
-	}
+	user := service.CacheService.Get(di.Db(), "t_users", "user_id", userId.(int64))
 	if 0 == len(user) {
 		c.JSON(404, gin.H{"status": "UserNotFound", "message": "用户不存在"})
-		return
-	}
-	userBytes, err := json.Marshal(user)
-	if err != nil {
-		util.InternalError(c, err)
-		return
-	}
-	if err = di.CacheRedis().Set(context.Background(), key, userBytes, time.Second*30).Err(); err != nil {
-		util.InternalError(c, err)
 		return
 	}
 
