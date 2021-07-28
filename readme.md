@@ -30,6 +30,7 @@
 - router/               Restful路由
   - router.go           路由注册入口. 路由声明按业务分拆到不同文件, 然后统一在此注册.
 - service/              公共业务逻辑
+  - cache_service.go    资源缓存服务
 - util                  工具包
   - api_utils.go        API工具方法
   - tool_utils.go       常用工具方法
