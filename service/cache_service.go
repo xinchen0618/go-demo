@@ -24,7 +24,8 @@ var CacheService *cacheService
 //	@param id int64
 //	@return bool
 func (*cacheService) Set(db gorose.IOrm, table string, primaryKey string, id int64) bool {
-	data, err := db.Table(table).Where(gorose.Data{primaryKey: id}).First()
+	sql := fmt.Sprintf("/*FORCE_MASTER*/ SELECT * FROM %s WHERE %s = %d LIMIT 1", table, primaryKey, id) // 查主库, 解决主从同步延迟的问题
+	data, err := db.Query(sql)
 	if err != nil {
 		di.Logger().Error(err.Error())
 		return false
@@ -32,7 +33,7 @@ func (*cacheService) Set(db gorose.IOrm, table string, primaryKey string, id int
 	if 0 == len(data) {
 		return false
 	}
-	dataBytes, err := json.Marshal(data)
+	dataBytes, err := json.Marshal(data[0])
 	if err != nil {
 		di.Logger().Error(err.Error())
 		return false

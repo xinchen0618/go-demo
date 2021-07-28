@@ -71,7 +71,7 @@
 
 缓存已资源对象为单位. 
 
-- `POST`/`PUT`资源时`service.CacheService.Set()`设置缓存(`POST`可选, `PUT`必选)
+- `POST`/`PUT`资源时`service.CacheService.Set()`设置缓存
 - `GET`资源时`service.CacheService.Get()`获取缓存(缓存不存在时会建立)
 - `DELETE`资源时`service.CacheService.Delete()`删除缓存
 
