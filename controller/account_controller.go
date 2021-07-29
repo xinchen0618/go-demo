@@ -33,18 +33,6 @@ func (*accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再�
 		return
 	}
 
-	go func(userName string) {
-		defer func() {
-			if err := recover(); err != nil {
-				di.Logger().Error(fmt.Sprint(err))
-			}
-		}()
-
-		if "aaa" == userName {
-			panic("aaa panic")
-		}
-	}(jsonBody["user_name"].(string))
-
 	user, err := di.Db().Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": jsonBody["user_name"], "password": jsonBody["password"]}).First()
 	if err != nil {
 		util.InternalError(c, err)
