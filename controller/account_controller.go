@@ -117,12 +117,11 @@ func (*accountController) GetUsers(c *gin.Context) {
 			}()
 			defer wg.Done()
 
-			userCounts, err := di.Db().Table("t_user_counts").Fields("counts").Where(gorose.Data{"user_id": item["user_id"]}).First()
-			if err != nil {
-				di.Logger().Error(err.Error())
-				return
+			userCounts := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"].(int64))
+			item["counts"] = 0
+			if counts, ok := userCounts["counts"]; ok {
+				item["counts"] = counts
 			}
-			item["counts"] = userCounts["counts"]
 		}(item)
 	}
 	wg.Wait()
@@ -206,6 +205,9 @@ func (*accountController) PostUsers(c *gin.Context) {
 				_ = db.Rollback()
 				return
 			}
+
+			service.CacheService.Set(di.Db(), "t_users", "user_id", userId)
+			service.CacheService.Set(di.Db(), "t_user_counts", "user_id", userId)
 		}()
 	}
 
