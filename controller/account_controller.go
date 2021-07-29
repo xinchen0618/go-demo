@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -33,6 +32,18 @@ func (*accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再�
 	if err != nil {
 		return
 	}
+
+	go func(userName string) {
+		defer func() {
+			if err := recover(); err != nil {
+				di.Logger().Error(fmt.Sprint(err))
+			}
+		}()
+
+		if "aaa" == userName {
+			panic("aaa panic")
+		}
+	}(jsonBody["user_name"].(string))
 
 	user, err := di.Db().Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": jsonBody["user_name"], "password": jsonBody["password"]}).First()
 	if err != nil {
@@ -111,11 +122,16 @@ func (*accountController) GetUsers(c *gin.Context) {
 	for _, item := range result["items"].([]gorose.Data) {
 		wg.Add(1)
 		go func(item gorose.Data) {
+			defer func() {
+				if err := recover(); err != nil {
+					di.Logger().Error(fmt.Sprint(err))
+				}
+			}()
 			defer wg.Done()
 
 			userCounts, err := di.Db().Table("t_user_counts").Fields("counts").Where(gorose.Data{"user_id": item["user_id"]}).First()
 			if err != nil {
-				log.Println(err)
+				di.Logger().Error(err.Error())
 				return
 			}
 			item["counts"] = userCounts["counts"]
@@ -157,10 +173,16 @@ func (*accountController) PostUsers(c *gin.Context) {
 	for i := int64(0); i < counts.(int64); i++ {
 		// 多线程写
 		go func() {
+			defer func() {
+				if err := recover(); err != nil {
+					di.Logger().Error(fmt.Sprint(err))
+				}
+			}()
+
 			db := di.Db()
 			err := db.Begin()
 			if err != nil {
-				log.Println(err)
+				di.Logger().Error(err.Error())
 				return
 			}
 
@@ -168,7 +190,7 @@ func (*accountController) PostUsers(c *gin.Context) {
 			userName := strconv.Itoa(rand.Int())
 			user, err := db.Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": userName}).First()
 			if err != nil {
-				log.Println(err)
+				di.Logger().Error(err.Error())
 				_ = db.Rollback()
 				return
 			}
@@ -178,21 +200,21 @@ func (*accountController) PostUsers(c *gin.Context) {
 			} else { // 记录不存在
 				userId, err = db.Table("t_users").Data(gorose.Data{"user_name": userName}).InsertGetId()
 				if err != nil {
-					log.Println(err)
+					di.Logger().Error(err.Error())
 					_ = db.Rollback()
 					return
 				}
 			}
 			sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,1) ON DUPLICATE KEY UPDATE counts = counts + 1"
 			if _, err = db.Execute(sql, userId); err != nil {
-				log.Println(err)
+				di.Logger().Error(err.Error())
 				_ = db.Rollback()
 				return
 			}
 
 			err = db.Commit()
 			if err != nil {
-				log.Println(err)
+				di.Logger().Error(err.Error())
 				_ = db.Rollback()
 				return
 			}

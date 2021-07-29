@@ -15,8 +15,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-// recovery Panic处理
-// 	程序初始化可以使用panic, 其他地方必须避免出现panic
+// recovery 主routine中panic兜底处理
+// 	除程序初始化可以使用panic, 其他地方必须避免出现panic
+//	goroutine中的panic这里是捕获不到的, 要自行recover
 //	@return gin.HandlerFunc
 func recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
