@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -21,7 +22,7 @@ func recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
-				util.InternalError(c, err.(error))
+				util.InternalError(c, errors.New(fmt.Sprint(err)))
 			}
 		}()
 
