@@ -65,7 +65,8 @@ func (*accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再�
 		util.InternalError(c, err)
 		return
 	}
-	if err = di.JwtRedis().Set(context.Background(), "jwt:"+claims.Id+":"+tokenAtoms[2], payload, loginTtl).Err(); err != nil {
+	key := "jwt:" + claims.Id + ":" + tokenAtoms[2]
+	if err = di.JwtRedis().Set(context.Background(), key, payload, loginTtl).Err(); err != nil {
 		util.InternalError(c, err)
 		return
 	}
@@ -83,7 +84,8 @@ func (*accountController) DeleteUserLogout(c *gin.Context) {
 	// 删除对应redis白名单记录
 	tokenString := c.Request.Header.Get("X-Token")
 	tokenAtoms := strings.Split(tokenString, ".")
-	if err := di.JwtRedis().Del(context.Background(), "jwt:"+strconv.FormatInt(userId, 10)+":"+tokenAtoms[2]).Err(); err != nil {
+	key := "jwt:" + strconv.FormatInt(userId, 10) + ":" + tokenAtoms[2]
+	if err := di.JwtRedis().Del(context.Background(), key).Err(); err != nil {
 		util.InternalError(c, err)
 		return
 	}

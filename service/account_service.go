@@ -46,7 +46,8 @@ func (*accountService) CheckUserLogin(c *gin.Context) (int64, error) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// redis白名单校验
 		tokenAtoms := strings.Split(tokenString, ".")
-		_, err := di.JwtRedis().Get(context.Background(), "jwt:"+claims["jti"].(string)+":"+tokenAtoms[2]).Result()
+		key := "jwt:" + claims["jti"].(string) + ":" + tokenAtoms[2]
+		_, err := di.JwtRedis().Get(context.Background(), key).Result()
 		if err != nil {
 			if "redis: nil" == err.Error() {
 				c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
