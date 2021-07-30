@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"go-demo/config"
-	"go-demo/di"
 	"time"
 
+	"go-demo/config"
+	"go-demo/di"
+
+	"github.com/go-redis/redis/v8"
 	"github.com/gohouse/gorose/v2"
 )
 
@@ -60,13 +62,15 @@ func (*cacheService) Get(db gorose.IOrm, table string, primaryKey string, id int
 	key := fmt.Sprintf(config.RedisResourceInfo, table, id)
 	dataCache, err := di.CacheRedis().Get(context.Background(), key).Result()
 	if err != nil {
-		if "redis: nil" == err.Error() { // 缓存不存在
+		if redis.Nil == err { // 缓存不存在
 			if CacheService.Set(db, table, primaryKey, id) {
 				return CacheService.Get(db, table, primaryKey, id)
 			} else {
 				return gorose.Data{}
 			}
 		}
+		di.Logger().Error(err.Error())
+		return gorose.Data{}
 	}
 	var dataMap gorose.Data // 缓存存在
 	err = json.Unmarshal([]byte(dataCache), &dataMap)

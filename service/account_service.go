@@ -11,6 +11,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 )
 
@@ -49,7 +50,7 @@ func (*accountService) CheckUserLogin(c *gin.Context) (int64, error) {
 		key := "jwt:" + claims["jti"].(string) + ":" + tokenAtoms[2]
 		_, err := di.JwtRedis().Get(context.Background(), key).Result()
 		if err != nil {
-			if "redis: nil" == err.Error() {
+			if redis.Nil == err {
 				c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
 				return 0, errors.New("UserUnauthorized")
 			}
