@@ -71,7 +71,7 @@
 
 - 资源缓存
 
-  缓存已资源对象为单位. 
+  缓存以资源对象为单位. 
 
   - `POST`/`PUT`资源时`service.CacheService.Set()`设置缓存
   - `GET`资源时`service.CacheService.Get()`获取缓存(缓存不存在时会建立)
