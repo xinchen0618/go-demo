@@ -102,6 +102,7 @@
 
   针对业务设计的缓存. key统一在`config/constants.go`中定义.
 
+
 ### 运行
 
 - 开发&测试环境使用Air实时热重载
@@ -115,7 +116,7 @@ go get github.com/cosmtrek/air
 RUNTIME_ENV=testing air
 ```
 
-- 预发布&生产执行编译好的程序
+- 预发布&生产环境执行编译好的程序
   
   实际上会提前编译好直接部署到机器上.
 
