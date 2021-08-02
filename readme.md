@@ -67,6 +67,27 @@
     - `service/` 用于封装公共的业务逻辑, 为可选.
 
 
+### 登录
+
+- 登录流程
+
+  - 校验账户信息
+  - 生成JWT Token
+  - 以 `jwt:<userId>:<JWT Signature>`的格式记录入redis白名单
+  - JWT Token返回给客户端
+
+- 校验登录
+
+  - 客户端请求时Header携带JWT Token `Authorization: Bearer <token>`
+  - 校验JWT Token
+  - 校验redis白名单
+  
+- 退出登录
+ 
+  - 校验登录
+  - 删除对应redis白名单
+
+
 ### 缓存
 
 - 资源缓存

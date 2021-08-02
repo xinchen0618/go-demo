@@ -30,11 +30,12 @@ var AccountService *accountService
 //	@return int64
 //	@return error
 func (*accountService) CheckUserLogin(c *gin.Context) (int64, error) {
-	tokenString := c.Request.Header.Get("X-Token")
-	if "" == tokenString { // 没有携带token
+	tokenString := c.Request.Header.Get("Authorization") // Authorization: Bearer <token>
+	if !strings.HasPrefix(tokenString, "Bearer ") {
 		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
 		return 0, errors.New("UserUnauthorized")
 	}
+	tokenString = tokenString[7:]
 
 	// JWT
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -44,8 +45,7 @@ func (*accountService) CheckUserLogin(c *gin.Context) (int64, error) {
 		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
 		return 0, errors.New("UserUnauthorized")
 	}
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		// redis白名单校验
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid { // redis白名单校验
 		tokenAtoms := strings.Split(tokenString, ".")
 		key := "jwt:" + claims["jti"].(string) + ":" + tokenAtoms[2]
 		_, err := di.JwtRedis().Get(context.Background(), key).Result()
