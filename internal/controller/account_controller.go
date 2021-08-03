@@ -4,20 +4,20 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go-demo/config/di"
+	"go-demo/internal/service"
+	"go-demo/pkg/ginx"
 	"math/rand"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	"go-demo/di"
-	"go-demo/service"
-	"go-demo/util"
-
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/gohouse/gorose/v2"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 // 这里定义一个空结构体用于为大量的controller方法做分类
@@ -28,14 +28,14 @@ type accountController struct {
 var AccountController *accountController
 
 func (*accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
-	jsonBody, err := util.GetJsonBody(c, []string{"user_name:用户名:string:+", "password:密码:string:+"})
+	jsonBody, err := ginx.GetJsonBody(c, []string{"user_name:用户名:string:+", "password:密码:string:+"})
 	if err != nil {
 		return
 	}
 
 	user, err := di.Db().Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": jsonBody["user_name"], "password": jsonBody["password"]}).First()
 	if err != nil {
-		util.InternalError(c, err)
+		ginx.InternalError(c, err)
 		return
 	}
 	if 0 == len(user) {
@@ -55,19 +55,19 @@ func (*accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再�
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(viper.GetString("jwtSecret")))
 	if err != nil {
-		util.InternalError(c, err)
+		ginx.InternalError(c, err)
 		return
 	}
 	// redis登录白名单
 	tokenAtoms := strings.Split(tokenString, ".")
 	payload, err := json.Marshal(claims)
 	if err != nil {
-		util.InternalError(c, err)
+		ginx.InternalError(c, err)
 		return
 	}
 	key := "jwt:" + claims.Id + ":" + tokenAtoms[2]
 	if err = di.JwtRedis().Set(context.Background(), key, payload, loginTtl).Err(); err != nil {
-		util.InternalError(c, err)
+		ginx.InternalError(c, err)
 		return
 	}
 
@@ -86,7 +86,7 @@ func (*accountController) DeleteUserLogout(c *gin.Context) {
 	tokenAtoms := strings.Split(tokenString, ".")
 	key := "jwt:" + strconv.FormatInt(userId, 10) + ":" + tokenAtoms[2]
 	if err := di.JwtRedis().Del(context.Background(), key).Err(); err != nil {
-		util.InternalError(c, err)
+		ginx.InternalError(c, err)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (*accountController) DeleteUserLogout(c *gin.Context) {
 }
 
 func (*accountController) GetUsers(c *gin.Context) {
-	result, err := util.GetPageItems(map[string]interface{}{
+	result, err := ginx.GetPageItems(map[string]interface{}{
 		"ginContext": c,
 		"db":         di.Db(),
 		"select":     "user_id,user_name,money,created_at,updated_at",
@@ -114,7 +114,7 @@ func (*accountController) GetUsers(c *gin.Context) {
 		go func(item gorose.Data) {
 			defer func() {
 				if err := recover(); err != nil {
-					di.Logger().Error(fmt.Sprint(err))
+					zap.L().Error(fmt.Sprint(err))
 				}
 			}()
 			defer wg.Done()
@@ -132,7 +132,7 @@ func (*accountController) GetUsers(c *gin.Context) {
 }
 
 func (*accountController) GetUsersById(c *gin.Context) {
-	userId, err := util.FilterParam(c, "用户id", c.Param("user_id"), "+int", false)
+	userId, err := ginx.FilterParam(c, "用户id", c.Param("user_id"), "+int", false)
 	if err != nil {
 		return
 	}
@@ -147,7 +147,7 @@ func (*accountController) GetUsersById(c *gin.Context) {
 }
 
 func (*accountController) PostUsers(c *gin.Context) {
-	jsonBody, err := util.GetJsonBody(c, []string{"counts:数量:+int:*"})
+	jsonBody, err := ginx.GetJsonBody(c, []string{"counts:数量:+int:*"})
 	if err != nil {
 		return
 	}
@@ -164,14 +164,14 @@ func (*accountController) PostUsers(c *gin.Context) {
 		go func() {
 			defer func() {
 				if err := recover(); err != nil {
-					di.Logger().Error(fmt.Sprint(err))
+					zap.L().Error(fmt.Sprint(err))
 				}
 			}()
 
 			db := di.Db()
 			err := db.Begin()
 			if err != nil {
-				di.Logger().Error(err.Error())
+				zap.L().Error(err.Error())
 				return
 			}
 
@@ -179,7 +179,7 @@ func (*accountController) PostUsers(c *gin.Context) {
 			userName := strconv.Itoa(rand.Int())
 			user, err := db.Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": userName}).First()
 			if err != nil {
-				di.Logger().Error(err.Error())
+				zap.L().Error(err.Error())
 				_ = db.Rollback()
 				return
 			}
@@ -189,21 +189,21 @@ func (*accountController) PostUsers(c *gin.Context) {
 			} else { // 记录不存在
 				userId, err = db.Table("t_users").Data(gorose.Data{"user_name": userName}).InsertGetId()
 				if err != nil {
-					di.Logger().Error(err.Error())
+					zap.L().Error(err.Error())
 					_ = db.Rollback()
 					return
 				}
 			}
 			sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,1) ON DUPLICATE KEY UPDATE counts = counts + 1"
 			if _, err = db.Execute(sql, userId); err != nil {
-				di.Logger().Error(err.Error())
+				zap.L().Error(err.Error())
 				_ = db.Rollback()
 				return
 			}
 
 			err = db.Commit()
 			if err != nil {
-				di.Logger().Error(err.Error())
+				zap.L().Error(err.Error())
 				_ = db.Rollback()
 				return
 			}

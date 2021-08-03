@@ -1,7 +1,7 @@
 package router
 
 import (
-	"go-demo/controller"
+	"go-demo/internal/controller"
 
 	"github.com/gin-gonic/gin"
 )

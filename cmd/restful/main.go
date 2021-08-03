@@ -3,12 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
+	"go-demo/config"
+	"go-demo/internal/router"
+	"go-demo/pkg/ginx"
 	"net/http"
 	"os"
-
-	"go-demo/di"
-	"go-demo/router"
-	"go-demo/util"
 
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
@@ -23,7 +22,7 @@ func recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
-				util.InternalError(c, errors.New(fmt.Sprint(err)))
+				ginx.InternalError(c, errors.New(fmt.Sprint(err)))
 			}
 		}()
 
@@ -36,10 +35,9 @@ func recovery() gin.HandlerFunc {
 func cors() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		if context.Request.Header.Get("Origin") != "" {
-			context.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-			context.Header("Access-Control-Allow-Origin", "*") // 设置允许访问所有域
+			context.Header("Access-Control-Allow-Origin", context.Request.Header.Get("Origin"))
 			context.Header("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS")
-			context.Header("Access-Control-Allow-Headers", "X-Token, Authorization, Content-Length, Accept, Origin, Host, Connection, Accept-Encoding, Accept-Language, DNT, Keep-Alive, User-Agent, If-Modified-Since, Cache-Control, Content-Type, Pragma")
+			context.Header("Access-Control-Allow-Headers", "Authorization, Content-Length, Accept, Origin, Host, Connection, Accept-Encoding, Accept-Language, DNT, Keep-Alive, User-Agent, If-Modified-Since, Cache-Control, Content-Type, Pragma")
 			context.Header("Access-Control-Max-Age", "1728000")
 			context.Header("Access-Control-Allow-Credentials", "false")
 
@@ -54,8 +52,8 @@ func cors() gin.HandlerFunc {
 }
 
 func main() {
-	// 初始化Di
-	di.Init()
+	// 初始化配置
+	config.Init()
 
 	// 实例化gin
 	runtimeEnv := os.Getenv("RUNTIME_ENV")
