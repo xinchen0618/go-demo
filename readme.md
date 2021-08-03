@@ -36,7 +36,7 @@
   - config_testing.yaml 测试环境配置
   - constants.go        常量定义. Redis key统一在此定义避免冲突.
   - init.go             配置初始化. cmd中的应用都应首先调用此中Init()方法初始化配置.
-- internal/             内部应用代码库
+- internal/             内部应用代码
   - action/             Cli action
   - controller/         RESTful控制器
   - router/             RESTful路由
@@ -106,7 +106,7 @@ RESTful参考 <a href="https://www.vinaysahni.com/best-practices-for-a-pragmatic
   注意, 是否配置了Go mod代理 `export GOPROXY=https://goproxy.cn,direct`, 是否安装了Air `go get github.com/cosmtrek/air`, 是否配置了Go bin路径 `export PATH=$PATH:$HOME/go/bin`.
 
 ```
-cd go-demo/cmd/restful
+cd cmd/restful
 RUNTIME_ENV=testing air
 ```
 
@@ -116,7 +116,7 @@ RUNTIME_ENV=testing air
 
 ```
 # 启动
-cd go-demo/cmd/restful
+cd cmd/restful
 go build  
 (RUNTIME_ENV=prod ./restful &> /dev/null &)
 
@@ -130,10 +130,16 @@ kill -SIGINT $(ps aux | grep -v grep | grep restful | awk '{print $2}')
 
 ### Cli
 
-Cli按业务维度分两级. 使用方式形如
+`cmd/cli/main.go`中定义Cli路由, 按业务维度分两级.
+
+- 流程
+
+`cmd/cli/main.go` -> `internal/action/` [-> `internal/service/`]
+
+- 使用, 形如
 
 ```
-cd go-demo/cmd/cli
+cd cmd/cli
 go build
 ./cli <task> <action> [param]
 ```
@@ -143,7 +149,7 @@ go build
 
 - 资源缓存
 
-  缓存以资源对象为单位. 
+  以资源对象为单位. 
 
   - `POST`/`PUT`资源时`service.CacheService.Set()`设置缓存
   - `GET`资源时`service.CacheService.Get()`获取缓存(缓存不存在时会建立)
