@@ -75,9 +75,9 @@ RESTful参考 <a href="https://www.vinaysahni.com/best-practices-for-a-pragmatic
 
 `cmd/restful/main.go` -> `internal/router/` -> `internal/controller/` [-> `internal/service/`]
 
-    - `internal/router/` 路由, API版本在此控制, Major[.Minor], 比如 /v1, /v1.1, API出现向下不兼容且旧版仍需继续使用的情况, ~~比如不升级的旧版APP,~~ 新增Minor版本号. 业务出现结构性变化, 新增Major版本号.
-    - `internal/controller/` 用于处理业务, 事务控制尽量放置在这里, 放置在 `internal/service/` 中容易出现事务嵌套的问题.
-    - `internal/service/` 用于封装公共的业务逻辑, 为可选.
+- `internal/router/` 路由, API版本在此控制, Major[.Minor], 比如 /v1, /v1.1, API出现向下不兼容且旧版仍需继续使用的情况, ~~比如不升级的旧版APP,~~ 新增Minor版本号. 业务出现结构性变化, 新增Major版本号.
+- `internal/controller/` 用于处理业务, 事务控制尽量放置在这里, 放置在 `internal/service/` 中容易出现事务嵌套的问题.
+- `internal/service/` 用于封装公共的业务逻辑, 为可选.
   
 #### 登录
 
