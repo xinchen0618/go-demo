@@ -17,7 +17,7 @@ func Init() {
 	configOnce.Do(func() {
 		/* 配置 */
 		viper.SetConfigName("config") // name of config file (without extension)
-		viper.SetConfigType("yaml")   // REQUIRED if the config file does not have the extension in the name
+		viper.SetConfigType("yml")    // REQUIRED if the config file does not have the extension in the name
 		wd, err := os.Getwd()
 		if err != nil {
 			panic(err)

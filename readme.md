@@ -31,9 +31,9 @@
   - restful/            RESTful API   
 - config/               配置
   - di/                 服务注入
-  - config.yaml         公共配置. 环境配置 config_{RUNTIME_ENV}.yaml, 同键名环境配置覆盖公共配置. dev环境配置不参与版本控制.
-  - config_prod.yaml    生产环境配置
-  - config_testing.yaml 测试环境配置
+  - config.yml          公共配置. 环境配置 config_{RUNTIME_ENV}.yml, 同键名环境配置覆盖公共配置. dev环境配置不参与版本控制.
+  - config_prod.yml     生产环境配置
+  - config_testing.yml  测试环境配置
   - constants.go        常量定义. Redis key统一在此定义避免冲突.
   - init.go             配置初始化. cmd中的应用都应首先调用此中Init()方法初始化配置.
 - internal/             内部应用代码
@@ -101,13 +101,13 @@
 
 #### 运行
 
-- 开发&测试环境使用Air实时热重载
+- 开发&测试环境使用gowatch实时热重载
 
-  注意, 是否配置了Go mod代理 `export GOPROXY=https://goproxy.cn,direct`, 是否安装了Air `go get github.com/cosmtrek/air`, 是否配置了Go bin路径 `export PATH=$PATH:$HOME/go/bin`.
+  注意, 是否配置了Go mod代理 `export GOPROXY=https://goproxy.cn,direct`, 是否安装了gowatch `go get github.com/silenceper/gowatch`, 是否配置了Go bin路径 `export PATH=$PATH:$HOME/go/bin`.
 
 ```
 cd cmd/restful
-RUNTIME_ENV=testing air
+RUNTIME_ENV=testing gowatch
 ```
 
 - 预发布&生产环境执行编译好的程序

@@ -13,6 +13,7 @@ require (
 	github.com/gohouse/gorose/v2 v2.1.12
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/shopspring/decimal v1.2.0
 	github.com/spf13/cast v1.4.0 // indirect
 	github.com/spf13/viper v1.8.1
@@ -22,4 +23,5 @@ require (
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.18.1
 	google.golang.org/protobuf v1.27.1 // indirect
+	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 )
