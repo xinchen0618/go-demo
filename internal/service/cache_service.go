@@ -23,9 +23,9 @@ var CacheService *cacheService
 //	@param db gorose.IOrm
 //	@param table string
 //	@param primaryKey string
-//	@param id int64
+//	@param id interface{} 整数
 //	@return bool
-func (*cacheService) Set(db gorose.IOrm, table string, primaryKey string, id int64) bool {
+func (*cacheService) Set(db gorose.IOrm, table string, primaryKey string, id interface{}) bool {
 	sql := fmt.Sprintf("/*FORCE_MASTER*/ SELECT * FROM %s WHERE %s = %d LIMIT 1", table, primaryKey, id) // 查主库, 解决主从同步延迟的问题
 	data, err := db.Query(sql)
 	if err != nil {
@@ -56,9 +56,9 @@ func (*cacheService) Set(db gorose.IOrm, table string, primaryKey string, id int
 //	@param db gorose.IOrm
 //	@param table string
 //	@param primaryKey string
-//	@param id int64
+//	@param id interface{} 整数
 //	@return gorose.Data
-func (*cacheService) Get(db gorose.IOrm, table string, primaryKey string, id int64) gorose.Data {
+func (*cacheService) Get(db gorose.IOrm, table string, primaryKey string, id interface{}) gorose.Data {
 	key := fmt.Sprintf(config.RedisResourceInfo, table, id)
 	dataCache, err := di.CacheRedis().Get(context.Background(), key).Result()
 	if err != nil {
@@ -85,9 +85,9 @@ func (*cacheService) Get(db gorose.IOrm, table string, primaryKey string, id int
 // Delete 删除资源缓存
 //	@receiver *cacheService
 //	@param table string
-//	@param id int64
+//	@param id interface{} 整数
 //	@return bool
-func (*cacheService) Delete(table string, id int64) bool {
+func (*cacheService) Delete(table string, id interface{}) bool {
 	key := fmt.Sprintf(config.RedisResourceInfo, table, id)
 	err := di.CacheRedis().Del(context.Background(), key).Err()
 	if err != nil {

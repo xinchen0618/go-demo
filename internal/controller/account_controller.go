@@ -119,7 +119,7 @@ func (*accountController) GetUsers(c *gin.Context) {
 			}()
 			defer wg.Done()
 
-			userCounts := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"].(int64))
+			userCounts := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"])
 			item["counts"] = 0
 			if counts, ok := userCounts["counts"]; ok {
 				item["counts"] = counts
