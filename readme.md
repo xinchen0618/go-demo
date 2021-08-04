@@ -35,7 +35,7 @@
   - config_prod.yml     生产环境配置
   - config_testing.yml  测试环境配置
   - constants.go        常量定义. Redis key统一在此定义避免冲突.
-  - init.go             配置初始化. cmd中的应用都应首先调用此中Init()方法初始化配置.
+  - init.go             配置初始化. cmd/中的应用都应首先调用此中Init()方法初始化配置.
 - internal/             内部应用代码
   - action/             Cli action
   - controller/         RESTful控制器
@@ -62,7 +62,7 @@
 
 ### 日志
 
-错误日志会打印到console, 同时记录到错误日志文件. 错误日志文件路径在`config/`中配置, 默认为`/var/log/golang_error.log`. 注意文件要有读写权限.
+错误日志会记录到日志文件, 同时打印到console. 错误日志文件路径在`config/`中配置, 默认为`/var/log/golang_error.log`. 注意文件要有读写权限.
 
 
 ### RESTful
