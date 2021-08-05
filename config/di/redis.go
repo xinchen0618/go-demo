@@ -2,10 +2,10 @@ package di
 
 import (
 	"fmt"
+	"go-demo/config"
 	"sync"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/spf13/viper"
 )
 
 // 缓存redis
@@ -17,9 +17,9 @@ var (
 func CacheRedis() *redis.Client {
 	cacheRedisOnce.Do(func() {
 		cacheRedis = redis.NewClient(&redis.Options{
-			Addr:     fmt.Sprintf("%s:%d", viper.Get("redis.host"), viper.Get("redis.port")),
-			Password: viper.GetString("redis.auth"),
-			DB:       viper.GetInt("redis.index.cache"),
+			Addr:     fmt.Sprintf("%s:%d", config.Get("redis_host"), config.Get("redis_port")),
+			Password: config.GetString("redis_auth"),
+			DB:       config.GetInt("redis_index_cache"),
 		})
 	})
 
@@ -35,9 +35,9 @@ var (
 func JwtRedis() *redis.Client {
 	jwtRedisOnce.Do(func() {
 		jwtRedis = redis.NewClient(&redis.Options{
-			Addr:     fmt.Sprintf("%s:%d", viper.Get("redis.host"), viper.Get("redis.port")),
-			Password: viper.GetString("redis.auth"),
-			DB:       viper.GetInt("redis.index.jwt"),
+			Addr:     fmt.Sprintf("%s:%d", config.Get("redis_host"), config.Get("redis_port")),
+			Password: config.GetString("redis_auth"),
+			DB:       config.GetInt("redis_index_jwt"),
 		})
 	})
 

@@ -1,7 +1,0 @@
-# 生产环境配置
-
-# 运行端口
-serverPort: 8081
-
-# JWT密钥, JWT配套有白名单动能不必担心秘钥泄露的问题
-jwtSecret: "btRZ5QHXX9VjfYhfGGHdCTcWiwQ6WFJXq9ZCwdqZwzk2ZfhceM9K3V5UGKsYLd9m"

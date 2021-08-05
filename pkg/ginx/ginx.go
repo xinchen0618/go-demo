@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"go-demo/config/di"
 	"math"
 	"reflect"
 	"strconv"
@@ -13,7 +14,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gohouse/gorose/v2"
 	"github.com/shopspring/decimal"
-	"go.uber.org/zap"
 )
 
 // GetJsonBody 获取Json参数
@@ -290,6 +290,6 @@ func GetPageItems(query map[string]interface{}) (map[string]interface{}, error) 
 //	@param c *gin.Context
 //	@param err error
 func InternalError(c *gin.Context, err error) {
-	zap.L().Error(err.Error())
+	di.Logger().Error(err.Error())
 	c.JSON(500, gin.H{"status": "InternalError", "message": "服务异常, 请稍后重试"})
 }

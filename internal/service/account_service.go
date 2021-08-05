@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"go-demo/config"
 	"go-demo/config/di"
 	"go-demo/pkg/ginx"
 	"strconv"
@@ -11,7 +12,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
-	"github.com/spf13/viper"
 )
 
 // 这里定义一个空结构体用于为大量的service方法做分类
@@ -38,7 +38,7 @@ func (*accountService) CheckUserLogin(c *gin.Context) (int64, error) {
 
 	// JWT
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return []byte(viper.GetString("jwtSecret")), nil
+		return []byte(config.GetString("jwt_secret")), nil
 	})
 	if err != nil {
 		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})

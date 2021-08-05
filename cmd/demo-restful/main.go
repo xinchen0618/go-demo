@@ -11,7 +11,6 @@ import (
 
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 )
 
 // recovery 主routine中panic兜底处理
@@ -52,9 +51,6 @@ func cors() gin.HandlerFunc {
 }
 
 func main() {
-	// 初始化配置
-	config.Init()
-
 	// 实例化gin
 	runtimeEnv := os.Getenv("RUNTIME_ENV")
 	if runtimeEnv == "" || runtimeEnv == "prod" || runtimeEnv == "stage" {
@@ -70,7 +66,7 @@ func main() {
 	router.Init(r)
 
 	// Run gin
-	if err := endless.ListenAndServe(fmt.Sprintf(":%d", viper.GetInt64("serverPort")), r); err != nil {
+	if err := endless.ListenAndServe(fmt.Sprintf(":%d", config.Get("server_port")), r); err != nil {
 		panic(err)
 	}
 }

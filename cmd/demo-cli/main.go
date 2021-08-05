@@ -1,7 +1,6 @@
 package main
 
 import (
-	"go-demo/config"
 	"go-demo/internal/action"
 	"log"
 	"os"
@@ -25,9 +24,6 @@ func main() {
 			},
 		},
 	}
-
-	// 初始化配置
-	config.Init()
 
 	err := app.Run(os.Args)
 	if err != nil {

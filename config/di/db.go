@@ -2,12 +2,11 @@ package di
 
 import (
 	"fmt"
+	"go-demo/config"
 	"sync"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gohouse/gorose/v2"
-	"github.com/spf13/viper"
-	"go.uber.org/zap"
 )
 
 // mysql
@@ -19,12 +18,12 @@ var (
 func Db() gorose.IOrm {
 	dbOnce.Do(func() {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",
-			viper.Get("mysql.username"), viper.Get("mysql.password"), viper.Get("mysql.host"),
-			viper.Get("mysql.port"), viper.Get("mysql.dbname"), viper.Get("mysql.charset"))
+			config.Get("mysql_username"), config.Get("mysql_password"), config.Get("mysql_host"),
+			config.Get("mysql_port"), config.Get("mysql_dbname"), config.Get("mysql_charset"))
 		var err error
 		dbEngine, err = gorose.Open(&gorose.Config{Driver: "mysql", Dsn: dsn, SetMaxOpenConns: 100, SetMaxIdleConns: 100})
 		if err != nil {
-			zap.L().Error(err.Error())
+			Logger().Error(err.Error())
 		}
 	})
 

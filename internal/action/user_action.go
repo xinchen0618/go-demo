@@ -7,7 +7,6 @@ import (
 
 	"github.com/gohouse/gorose/v2"
 	"github.com/urfave/cli/v2"
-	"go.uber.org/zap"
 )
 
 // 这里定义一个空结构体用于为大量的action方法做分类
@@ -28,19 +27,19 @@ func (*userAction) InitPosition(c *cli.Context) error {
 	}
 	countsInt, err := strconv.Atoi(counts)
 	if err != nil {
-		zap.L().Error(err.Error())
+		di.Logger().Error(err.Error())
 		return err
 	}
 
 	users, err := di.Db().Table("t_users").Fields("user_id").Limit(countsInt).Order("user_id").Get()
 	if err != nil {
-		zap.L().Error(err.Error())
+		di.Logger().Error(err.Error())
 		return err
 	}
 	for key, user := range users {
 		_, err = di.Db().Table("t_users").Where(gorose.Data{"user_id": user["user_id"]}).Data(gorose.Data{"position": 1024 * (key + 1)}).Update()
 		if err != nil {
-			zap.L().Error(err.Error())
+			di.Logger().Error(err.Error())
 			return err
 		}
 	}
