@@ -1,5 +1,3 @@
 watch_paths:
   - "../.."
-output: "./tmp/demo"
-watch_exts:
-  - ".yml"
+output: "./tmp/demo-restful"
