@@ -63,25 +63,25 @@
 
 - 日志文件
 
-错误日志会记录到日志文件, 同时打印到console. 错误日志文件路径在`config/`中配置, 默认为`/var/log/golang_error.log`. 注意文件要有读写权限.
+  错误日志会记录到日志文件, 同时打印到console. 错误日志文件路径在`config/`中配置, 默认为`/var/log/golang_error.log`. 注意文件要有读写权限.
 
 - 使用
 
-`di.Logger.Error()`, `di.Logger.Warn()`, `di.Logger.Info()`
+  `di.Logger.Error()`, `di.Logger.Warn()`, `di.Logger.Info()`
 
 ### 配置
 
 - 为什么放弃使用`Viper`
   
-编译后的可执行文件, 放在任何机器的任何位置都可以直接运行, 不受YAML、TOML等配置文件位置的制约.
+  编译后的可执行文件, 放在任何机器的任何位置都可以直接运行, 不受YAML、TOML等配置文件位置的制约.
 
 - 多环境配置
   
-环境配置 config_<RUNTIME_ENV>.go, 同键名环境配置覆盖公共配置. dev环境配置不参与版本控制.
+  环境配置 config_<RUNTIME_ENV>.go, 同键名环境配置覆盖公共配置. dev环境配置不参与版本控制.
 
 - 使用
 
-`config.Get()`/`config.GetXxx()`
+  `config.Get()`/`config.GetXxx()`
 
 ### RESTful
 
@@ -123,27 +123,27 @@
 
   注意, 是否配置了Go mod代理 `export GOPROXY=https://goproxy.cn,direct`, 是否安装了gowatch `go get github.com/silenceper/gowatch`, 是否配置了Go bin路径 `export PATH=$PATH:$HOME/go/bin`.
 
-```
-cd cmd/demo-restful
-RUNTIME_ENV=testing gowatch
-```
+  ```
+  cd cmd/demo-restful
+  RUNTIME_ENV=testing gowatch
+  ```
 
 - 预发布&生产环境执行编译好的程序
 
   实际上会提前编译好, 直接将可执行文件部署到机器上, 使用supervisor执行.
 
-```
-# 启动
-cd cmd/demo-restful
-go build  
-(RUNTIME_ENV=prod ./demo-restful &> /dev/null &)
+  ```
+  # 启动
+  cd cmd/demo-restful
+  go build  
+  (RUNTIME_ENV=prod ./demo-restful &> /dev/null &)
 
-# 优雅重启
-kill -SIGHUP $(ps aux | grep -v grep | grep demo-restful | awk '{print $2}')
+  # 优雅重启
+  kill -SIGHUP $(ps aux | grep -v grep | grep demo-restful | awk '{print $2}')
 
-# 优雅停止
-kill -SIGINT $(ps aux | grep -v grep | grep demo-restful | awk '{print $2}')
-```
+  # 优雅停止
+  kill -SIGINT $(ps aux | grep -v grep | grep demo-restful | awk '{print $2}')
+  ```
 
 
 ### Cli
@@ -152,15 +152,15 @@ kill -SIGINT $(ps aux | grep -v grep | grep demo-restful | awk '{print $2}')
 
 - 流程
 
-`cmd/demo-cli/main.go` -> `internal/action/` [-> `internal/service/`]
+  `cmd/demo-cli/main.go` -> `internal/action/` [-> `internal/service/`]
 
 - 使用, 形如
 
-```
-cd cmd/demo-cli
-go build
-./demo-cli <task> <action> [param]
-```
+  ```
+  cd cmd/demo-cli
+  go build
+  ./demo-cli <task> <action> [param]
+  ```
 
 
 ### 缓存
