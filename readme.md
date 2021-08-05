@@ -67,7 +67,7 @@
 
 - 使用
 
-  `di.Logger.Error()`, `di.Logger.Warn()`, `di.Logger.Info()`
+  `di.Logger().Error()`, `di.Logger().Warn()`, `di.Logger().Info()`
 
 ### 配置
 
