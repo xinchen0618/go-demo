@@ -151,14 +151,14 @@ func (*accountController) PostUsers(c *gin.Context) {
 		return
 	}
 
-	counts, ok := jsonBody["counts"]
-	if !ok {
-		counts = 100
+	var counts int64 = 100
+	if _, ok := jsonBody["counts"]; ok {
+		counts = jsonBody["counts"].(int64)
 	}
 
 	startTime := time.Now().UnixNano()
 
-	for i := int64(0); i < counts.(int64); i++ {
+	for i := int64(0); i < counts; i++ {
 		// 多线程写
 		go func() {
 			defer func() {
@@ -182,7 +182,7 @@ func (*accountController) PostUsers(c *gin.Context) {
 				_ = db.Rollback()
 				return
 			}
-			userId := int64(0)
+			var userId int64
 			if len(user) > 0 { // 记录存在
 				userId = user["user_id"].(int64)
 			} else { // 记录不存在
