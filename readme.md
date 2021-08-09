@@ -9,6 +9,7 @@
 - 日志      zap         https://github.com/uber-go/zap
 - 优雅停止  endless      https://github.com/fvbock/endless
 - 命令行    urfave/cli   https://github.com/urfave/cli
+- 计划任务  gocron       https://github.com/go-co-op/gocron
 
 
 ###  规范
@@ -27,6 +28,7 @@
 ```
 - cmd/                  项目入口
   - demo-cli/           命令行
+  - demo-cron/          计划任务
   - demo-restful/       RESTful API   
 - config/               配置
   - di/                 服务注入
@@ -36,7 +38,8 @@
   - config_testing.go   测试环境配置
   - constants.go        常量定义. Redis key统一在此定义避免冲突.
 - internal/             内部应用代码
-  - action/             Cli action
+  - action/             命令行action
+  - cron                计划任务  
   - controller/         RESTful控制器
   - router/             RESTful路由
     - router.go         路由注册入口. 路由声明按业务分拆到不同文件, 然后统一在此注册.
@@ -94,8 +97,8 @@
 `cmd/demo-restful/main.go` -> `internal/router/` -> `internal/controller/` [-> `internal/service/`]
 
 - `internal/router/` 路由, API版本在此控制, Major[.Minor], 比如 /v1, /v1.1, API出现向下不兼容且旧版仍需继续使用的情况, ~~比如不升级的旧版APP,~~ 新增Minor版本号. 业务出现结构性变化, 新增Major版本号.
-- `internal/controller/` 用于处理业务, 事务控制尽量放置在这里, 放置在 `internal/service/` 中容易出现事务嵌套的问题.
-- `internal/service/` 用于封装公共的业务逻辑, 为可选.
+- `internal/controller/` 处理业务, 事务控制尽量放置在这里, 放置在 `internal/service/` 中容易出现事务嵌套的问题.
+- `internal/service/` 公共业务逻辑封装, 为可选.
   
 #### 登录
 
@@ -148,19 +151,38 @@
 
 ### Cli
 
-`cmd/demo-cli/main.go`中定义Cli路由, 按业务维度分两级.
+#### 流程
 
-- 流程
+`cmd/demo-cli/main.go` -> `internal/action/` [-> `internal/service/`]
 
-  `cmd/demo-cli/main.go` -> `internal/action/` [-> `internal/service/`]
+- `cmd/demo-cli/main.go`中定义Cli路由, 按业务维度分两级.
+- `internal/action/` 执行逻辑.
 
-- 使用, 形如
+#### 使用
 
-  ```
-  cd cmd/demo-cli
-  go build
-  ./demo-cli <task> <action> [param]
-  ```
+```
+cd cmd/demo-cli
+go build
+RUNTIME_ENV=testing ./demo-cli <task> <action> [param]
+```
+
+
+### Cron
+
+#### 流程
+
+`cmd/demo-cron/main.go` -> `internal/task/` [-> `internal/service/`]  
+
+ - `cmd/demo-cron/main.go` 定义计划任务.
+ - `internal/action/` 执行逻辑.
+
+#### 启动
+
+```
+cd cmd/demo-cron
+go build
+(RUNTIME_ENV=testing ./demo-cron &> /dev/nul &)
+```
 
 
 ### 缓存
