@@ -25,7 +25,7 @@ var CacheService *cacheService
 //	@param id interface{} 整数
 //	@return bool
 func (*cacheService) Set(db gorose.IOrm, table string, primaryKey string, id interface{}) bool {
-	sql := fmt.Sprintf("/*FORCE_MASTER*/ SELECT * FROM %s WHERE %s = %d LIMIT 1", table, primaryKey, id) // 查主库, 解决主从同步延迟的问题
+	sql := fmt.Sprintf("/*FORCE_MASTER*/ SELECT * FROM %s WHERE %s = %d LIMIT 1", table, primaryKey, id) // 查主库, 避免主从同步延迟的问题
 	data, err := db.Query(sql)
 	if err != nil {
 		di.Logger().Error(err.Error())
