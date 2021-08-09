@@ -2,14 +2,14 @@
 
 ### 技术栈
 
-- 路由      Gin         https://github.com/gin-gonic/gin
-- Mysql     GoRose     https://github.com/gohouse/gorose
-- Redis     go-redis   https://github.com/go-redis/redis
-- 登录      jwt-go      https://github.com/dgrijalva/jwt-go
-- 日志      zap         https://github.com/uber-go/zap
-- 优雅停止  endless      https://github.com/fvbock/endless
-- 命令行    urfave/cli   https://github.com/urfave/cli
-- 计划任务  gocron       https://github.com/go-co-op/gocron
+- API       Gin          https://github.com/gin-gonic/gin
+- Mysql     GoRose       https://github.com/gohouse/gorose
+- Redis     go-redis     https://github.com/go-redis/redis
+- 登录      jwt-go        https://github.com/dgrijalva/jwt-go
+- 日志      zap           https://github.com/uber-go/zap
+- 优雅停止   endless      https://github.com/fvbock/endless
+- 命令行     urfave/cli   https://github.com/urfave/cli
+- 计划任务   gocron       https://github.com/go-co-op/gocron
 
 
 ###  规范
@@ -27,9 +27,9 @@
 
 ```
 - cmd/                  项目入口
+  - demo-api/           API   
   - demo-cli/           命令行
   - demo-cron/          计划任务
-  - demo-restful/       RESTful API   
 - config/               配置
   - di/                 服务注入
   - config.go           配置实现
@@ -40,8 +40,8 @@
 - internal/             内部应用代码
   - action/             命令行action
   - cron                计划任务  
-  - controller/         RESTful控制器
-  - router/             RESTful路由
+  - controller/         API控制器
+  - router/             API路由
     - router.go         路由注册入口. 路由声明按业务分拆到不同文件, 然后统一在此注册.
   - service/            公共业务逻辑
     - cache_service.go  资源缓存服务
@@ -86,15 +86,15 @@
 
   `config.Get()`, `config.GetXxx()`
 
-### RESTful
+### API
 
-#### 指南
+#### 规范
 
-<a href="https://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api" target="_blank">Best Practices for Designing a Pragmatic RESTful API</a>
+遵循RESTful规范, 参考指南<a href="https://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api" target="_blank">Best Practices for Designing a Pragmatic RESTful API</a>
 
 #### 流程
 
-`cmd/demo-restful/main.go` -> `internal/router/` -> `internal/controller/` [-> `internal/service/`]
+`cmd/demo-api/main.go` -> `internal/router/` -> `internal/controller/` [-> `internal/service/`]
 
 - `internal/router/` 路由, API版本在此控制, Major[.Minor], 比如 /v1, /v1.1, API出现向下不兼容且旧版仍需继续使用的情况, ~~比如不升级的旧版APP,~~ 新增Minor版本号. 业务出现结构性变化, 新增Major版本号.
 - `internal/controller/` 处理业务, 事务控制尽量放置在这里, 放置在 `internal/service/` 中容易出现事务嵌套的问题.
@@ -127,7 +127,7 @@
   注意, 是否配置了Go mod代理 `export GOPROXY=https://goproxy.cn,direct`, 是否安装了gowatch `go get github.com/silenceper/gowatch`, 是否配置了Go bin路径 `export PATH=$PATH:$HOME/go/bin`.
 
   ```
-  cd cmd/demo-restful
+  cd cmd/demo-api
   RUNTIME_ENV=testing gowatch
   ```
 
@@ -137,15 +137,15 @@
 
   ```
   # 启动
-  cd cmd/demo-restful
+  cd cmd/demo-api
   go build  
-  (RUNTIME_ENV=prod ./demo-restful &> /dev/null &)
+  (RUNTIME_ENV=prod ./demo-api &> /dev/null &)
 
   # 优雅重启
-  kill -SIGHUP $(ps aux | grep -v grep | grep demo-restful | awk '{print $2}')
+  kill -SIGHUP $(ps aux | grep -v grep | grep demo-api | awk '{print $2}')
 
   # 优雅停止
-  kill -SIGINT $(ps aux | grep -v grep | grep demo-restful | awk '{print $2}')
+  kill -SIGINT $(ps aux | grep -v grep | grep demo-api | awk '{print $2}')
   ```
 
 
@@ -171,10 +171,10 @@ RUNTIME_ENV=testing ./demo-cli <task> <action> [param]
 
 #### 流程
 
-`cmd/demo-cron/main.go` -> `internal/task/` [-> `internal/service/`]  
+`cmd/demo-cron/main.go` -> `internal/cron/` [-> `internal/service/`]  
 
  - `cmd/demo-cron/main.go` 定义计划任务.
- - `internal/action/` 执行逻辑.
+ - `internal/cron/` 执行逻辑.
 
 #### 启动
 
