@@ -62,6 +62,7 @@ func main() {
 	r.Use(recovery())
 	// 跨域处理
 	r.Use(cors())
+
 	// 加载路由
 	router.Init(r)
 
