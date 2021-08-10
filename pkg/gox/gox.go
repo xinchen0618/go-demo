@@ -1,6 +1,11 @@
 // Package gox golang增强方法
 package gox
 
+import (
+	"fmt"
+	"go-demo/config/di"
+)
+
 // InSlice 元素是否在切片中
 //	支持int64/string/float64类型
 //	@param needle interface{}
@@ -27,7 +32,9 @@ func InSlice(needle interface{}, haystack interface{}) bool {
 			}
 		}
 	default:
+		di.Logger().Error(fmt.Sprintf("func InSlice no handled type: %T", needle))
 		return false
 	}
+
 	return false
 }
