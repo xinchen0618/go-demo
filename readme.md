@@ -97,7 +97,7 @@
 `cmd/demo-api/main.go` -> `internal/router/` -> `internal/controller/` [-> `internal/service/`]
 
 - `internal/router/` 路由, API版本在此控制, Major[.Minor], 比如 /v1, /v1.1, API出现向下不兼容且旧版仍需继续使用的情况, ~~比如不升级的旧版APP,~~ 新增Minor版本号. 业务出现结构性变化, 新增Major版本号.
-- `internal/controller/` 处理业务, 事务控制尽量放置在这里, 放置在 `internal/service/` 中容易出现事务嵌套的问题.
+- `internal/controller/` 业务处理, 事务控制尽量放置在这里, 放置在 `internal/service/` 中容易出现事务嵌套的问题.
 - `internal/service/` 公共业务逻辑封装, 为可选.
   
 #### 登录
@@ -155,7 +155,7 @@
 
 `cmd/demo-cli/main.go` -> `internal/action/` [-> `internal/service/`]
 
-- `cmd/demo-cli/main.go`中定义Cli路由, 按业务维度分两级.
+- `cmd/demo-cli/main.go` 定义Cli路由, 按业务维度分两级.
 - `internal/action/` 执行逻辑.
 
 #### 使用
