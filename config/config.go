@@ -42,3 +42,19 @@ func GetString(key string) string {
 		return ""
 	}
 }
+
+func GetStringSlice(key string) []string {
+	if value := Get(key); value != nil {
+		return value.([]string)
+	} else {
+		return []string{}
+	}
+}
+
+func GetIntSlice(key string) []int {
+	if value := Get(key); value != nil {
+		return value.([]int)
+	} else {
+		return []int{}
+	}
+}

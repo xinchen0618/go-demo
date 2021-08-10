@@ -2,6 +2,7 @@ package config
 
 // 公共配置
 func init() {
+	// 配置value支持string/int/[]string/[]int
 	configure["common"] = map[string]interface{}{
 		// 错误日志路径
 		"error_log": "/var/log/golang_error.log",
