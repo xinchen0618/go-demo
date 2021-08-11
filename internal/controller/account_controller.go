@@ -93,14 +93,14 @@ func (*accountController) DeleteUserLogout(c *gin.Context) {
 }
 
 func (*accountController) GetUsers(c *gin.Context) {
-	result, err := ginx.GetPageItems(map[string]interface{}{
-		"ginContext": c,
-		"db":         di.Db(),
-		"select":     "user_id,user_name,money,created_at,updated_at",
-		"from":       "t_users",
-		"where":      "user_id > ?",
-		"bindParams": []interface{}{5},
-		"orderBy":    "user_id DESC",
+	result, err := ginx.GetPageItems(ginx.PageQuery{
+		GinContext: c,
+		Db:         di.Db(),
+		Select:     "user_id,user_name,money,created_at,updated_at",
+		From:       "t_users",
+		Where:      "user_id > ?",
+		BindParams: []interface{}{5},
+		OrderBy:    "user_id DESC",
 	})
 	if err != nil {
 		return

@@ -16,6 +16,18 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+type PageQuery struct {
+	GinContext *gin.Context
+	Db         gorose.IOrm
+	Select     string
+	From       string
+	Where      string
+	BindParams []interface{}
+	GroupBy    string
+	Having     string
+	OrderBy    string
+}
+
 // GetJsonBody 获取Json参数
 //	参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 // 	@param c *gin.Context
@@ -221,35 +233,33 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 
 // GetPageItems 获取分页数据
 // 	出现异常时方法会向客户端返回4xx错误, 调用方法捕获到error直接结束业务逻辑即可
-// 	@param query map[string]interface{} {"ginContext": *gin.Context, "db": gorose.IOrm, "select": string, "from": string, "where": string, "groupBy" => string, "having" => string, "orderBy": string}
+// 	@param pageQuery PageQuery
 //	@return map[string]interface{} {"page": int64, "per_page": int64, "total_page": int64, "total_counts": int64, "items": []gorose.Data}
 //	@return error
-func GetPageItems(query map[string]interface{}) (map[string]interface{}, error) {
-	queries, err := GetQueries(query["ginContext"].(*gin.Context), []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
+func GetPageItems(pageQuery PageQuery) (map[string]interface{}, error) {
+	queries, err := GetQueries(pageQuery.GinContext, []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
 	if err != nil {
 		return nil, err
 	}
 
-	bindParams, ok := query["bindParams"].([]interface{}) // 参数绑定
-	if !ok {
-		bindParams = []interface{}{}
+	bindParams := []interface{}{}
+	if pageQuery.BindParams != nil {
+		bindParams = pageQuery.BindParams
 	}
 
-	where := query["where"].(string)
+	where := pageQuery.Where
 
 	var countSql string
-	groupBy, ok := query["groupBy"].(string) // GROUP BY存在总记录数计算方式会不同
-	if ok {
-		where += " GROUP BY " + groupBy
-		having, ok := query["having"].(string)
-		if ok {
-			where += " HAVING " + having
+	if pageQuery.GroupBy != "" { // GROUP BY存在总记录数计算方式会不同
+		where += " GROUP BY " + pageQuery.GroupBy
+		if pageQuery.Having != "" {
+			where += " HAVING " + pageQuery.Having
 		}
-		countSql = fmt.Sprintf("SELECT COUNT(*) AS counts FROM (SELECT %s FROM %s WHERE %s) AS t", query["select"], query["from"], where)
+		countSql = fmt.Sprintf("SELECT COUNT(*) AS counts FROM (SELECT %s FROM %s WHERE %s) AS t", pageQuery.Select, pageQuery.From, where)
 	} else {
-		countSql = fmt.Sprintf("SELECT COUNT(*) AS counts FROM %s WHERE %s", query["from"], where)
+		countSql = fmt.Sprintf("SELECT COUNT(*) AS counts FROM %s WHERE %s", pageQuery.From, where)
 	}
-	counts, err := query["db"].(gorose.IOrm).Query(countSql, bindParams...) // 计算总记录数
+	counts, err := pageQuery.Db.Query(countSql, bindParams...) // 计算总记录数
 	if err != nil {
 		panic(err)
 	}
@@ -264,14 +274,13 @@ func GetPageItems(query map[string]interface{}) (map[string]interface{}, error) 
 		return result, nil
 	}
 
-	sql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", query["select"], query["from"], where)
-	orderBy, ok := query["orderBy"]
-	if ok {
-		sql += fmt.Sprintf(" ORDER BY %s", orderBy)
+	sql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", pageQuery.Select, pageQuery.From, where)
+	if pageQuery.OrderBy != "" {
+		sql += fmt.Sprintf(" ORDER BY %s", pageQuery.OrderBy)
 	}
 	offset := (queries["page"].(int64) - 1) * queries["per_page"].(int64)
 	sql += fmt.Sprintf(" LIMIT %d, %d", offset, queries["per_page"])
-	items, err := query["db"].(gorose.IOrm).Query(sql, bindParams...)
+	items, err := pageQuery.Db.Query(sql, bindParams...)
 	if err != nil {
 		panic(err)
 	}
