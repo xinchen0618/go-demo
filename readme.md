@@ -84,7 +84,7 @@
 
 - 使用
 
-  `config.Get()`, `config.GetXxx()`
+  `config.Get()`, `config.GetInt()`, `config.GetString()`, `config.GetIntSlice()`, `config.GetStringSlice()`
 
 ### API
 
