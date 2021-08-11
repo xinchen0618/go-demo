@@ -200,7 +200,8 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 	if EnumMark := paramType[0:1]; "[" == EnumMark {
 		var enum []interface{}
 		if err := json.Unmarshal([]byte(paramType), &enum); err != nil {
-			panic(err)
+			InternalError(c, err)
+			return nil, errors.New("InternalError")
 		}
 		for _, value := range enum {
 			enumType := reflect.TypeOf(enum[0]).String()
@@ -215,7 +216,8 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			} else if "string" == valueType {
 				floatValue, err := strconv.ParseFloat(paramValue.(string), 64)
 				if err != nil {
-					panic(err)
+					InternalError(c, err)
+					return nil, errors.New("InternalError")
 				}
 				return floatValue, nil
 			} else {
@@ -273,7 +275,8 @@ func GetPageItems(pageQuery PageQuery) (PageItems, error) {
 	}
 	countsData, err := pageQuery.Db.Query(countSql, bindParams...) // 计算总记录数
 	if err != nil {
-		panic(err)
+		InternalError(pageQuery.GinContext, err)
+		return PageItems{}, errors.New("InternalError")
 	}
 	counts := countsData[0]["counts"].(int64)
 	if 0 == counts { // 没有数据
@@ -295,7 +298,8 @@ func GetPageItems(pageQuery PageQuery) (PageItems, error) {
 	sql += fmt.Sprintf(" LIMIT %d, %d", offset, perPage)
 	items, err := pageQuery.Db.Query(sql, bindParams...)
 	if err != nil {
-		panic(err)
+		InternalError(pageQuery.GinContext, err)
+		return PageItems{}, errors.New("InternalError")
 	}
 	result := PageItems{
 		Page:        page,
