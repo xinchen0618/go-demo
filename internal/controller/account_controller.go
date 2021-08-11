@@ -24,9 +24,9 @@ type accountController struct {
 }
 
 // AccountController 这里不需要实例化, router通过controller.XxxController.Xxx的形式引用旗下定义的方法
-var AccountController *accountController
+var AccountController accountController
 
-func (*accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
+func (accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 	jsonBody, err := ginx.GetJsonBody(c, []string{"user_name:用户名:string:+", "password:密码:string:+"})
 	if err != nil {
 		return
@@ -73,7 +73,7 @@ func (*accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再�
 	c.JSON(200, gin.H{"user_id": user["user_id"], "token": tokenString})
 }
 
-func (*accountController) DeleteUserLogout(c *gin.Context) {
+func (accountController) DeleteUserLogout(c *gin.Context) {
 	// 登录校验
 	userId, err := service.AccountService.CheckUserLogin(c)
 	if err != nil {
@@ -92,7 +92,7 @@ func (*accountController) DeleteUserLogout(c *gin.Context) {
 	c.JSON(204, gin.H{})
 }
 
-func (*accountController) GetUsers(c *gin.Context) {
+func (accountController) GetUsers(c *gin.Context) {
 	pageItems, err := ginx.GetPageItems(ginx.PageQuery{
 		GinContext: c,
 		Db:         di.Db(),
@@ -130,7 +130,7 @@ func (*accountController) GetUsers(c *gin.Context) {
 	c.JSON(200, pageItems)
 }
 
-func (*accountController) GetUsersById(c *gin.Context) {
+func (accountController) GetUsersById(c *gin.Context) {
 	userId, err := ginx.FilterParam(c, "用户id", c.Param("user_id"), "+int", false)
 	if err != nil {
 		return
@@ -145,7 +145,7 @@ func (*accountController) GetUsersById(c *gin.Context) {
 	c.JSON(200, user)
 }
 
-func (*accountController) PostUsers(c *gin.Context) {
+func (accountController) PostUsers(c *gin.Context) {
 	jsonBody, err := ginx.GetJsonBody(c, []string{"counts:数量:+int:*"})
 	if err != nil {
 		return

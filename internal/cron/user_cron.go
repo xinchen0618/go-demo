@@ -11,12 +11,12 @@ type userCron struct {
 }
 
 // UserCron 这里不需要实例化, 计划任务通过cron.XxxCron.Xxx的形式引用旗下定义的方法
-var UserCron *userCron
+var UserCron userCron
 
 // InitVip
 //	@receiver *userCron
 //	@param counts int
-func (*userCron) InitVip(counts int) {
+func (userCron) InitVip(counts int) {
 	userIds, err := di.Db().Table("t_users").Where(gorose.Data{"is_vip": 0}).OrderBy("user_id").Limit(counts).Pluck("user_id")
 	if err != nil {
 		di.Logger().Error(err.Error())

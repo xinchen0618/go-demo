@@ -19,7 +19,7 @@ type accountService struct {
 }
 
 // AccountService 这里不需要实例化, 外部通过service.XxxService.Xxx()的形式调用旗下定义的方法
-var AccountService *accountService
+var AccountService accountService
 
 // CheckUserLogin 登录校验
 // 	先校验JWT, 再校验redis白名单
@@ -28,7 +28,7 @@ var AccountService *accountService
 //	@param c *gin.Context
 //	@return int64
 //	@return error
-func (*accountService) CheckUserLogin(c *gin.Context) (int64, error) {
+func (accountService) CheckUserLogin(c *gin.Context) (int64, error) {
 	tokenString := c.Request.Header.Get("Authorization") // Authorization: Bearer <token>
 	if !strings.HasPrefix(tokenString, "Bearer ") {
 		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
