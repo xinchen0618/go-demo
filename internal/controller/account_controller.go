@@ -93,7 +93,7 @@ func (*accountController) DeleteUserLogout(c *gin.Context) {
 }
 
 func (*accountController) GetUsers(c *gin.Context) {
-	result, err := ginx.GetPageItems(ginx.PageQuery{
+	pageItems, err := ginx.GetPageItems(ginx.PageQuery{
 		GinContext: c,
 		Db:         di.Db(),
 		Select:     "user_id,user_name,money,created_at,updated_at",
@@ -108,7 +108,7 @@ func (*accountController) GetUsers(c *gin.Context) {
 
 	// 多线程读
 	var wg sync.WaitGroup
-	for _, item := range result["items"].([]gorose.Data) {
+	for _, item := range pageItems.Items {
 		wg.Add(1)
 		go func(item gorose.Data) {
 			defer func() {
@@ -127,7 +127,7 @@ func (*accountController) GetUsers(c *gin.Context) {
 	}
 	wg.Wait()
 
-	c.JSON(200, result)
+	c.JSON(200, pageItems)
 }
 
 func (*accountController) GetUsersById(c *gin.Context) {
