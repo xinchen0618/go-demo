@@ -18,7 +18,7 @@ import (
 
 // PageQuery 分页参数
 type PageQuery struct {
-	GinContext *gin.Context
+	GinCtx     *gin.Context
 	Db         gorose.IOrm
 	Select     string
 	From       string
@@ -249,7 +249,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 //	@return PageItems
 //	@return error
 func GetPageItems(pageQuery PageQuery) (PageItems, error) {
-	queries, err := GetQueries(pageQuery.GinContext, []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
+	queries, err := GetQueries(pageQuery.GinCtx, []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
 	if err != nil {
 		return PageItems{}, err
 	}
@@ -275,7 +275,7 @@ func GetPageItems(pageQuery PageQuery) (PageItems, error) {
 	}
 	countsData, err := pageQuery.Db.Query(countSql, bindParams...) // 计算总记录数
 	if err != nil {
-		InternalError(pageQuery.GinContext, err)
+		InternalError(pageQuery.GinCtx, err)
 		return PageItems{}, errors.New("InternalError")
 	}
 	counts := countsData[0]["counts"].(int64)
@@ -298,7 +298,7 @@ func GetPageItems(pageQuery PageQuery) (PageItems, error) {
 	sql += fmt.Sprintf(" LIMIT %d, %d", offset, perPage)
 	items, err := pageQuery.Db.Query(sql, bindParams...)
 	if err != nil {
-		InternalError(pageQuery.GinContext, err)
+		InternalError(pageQuery.GinCtx, err)
 		return PageItems{}, errors.New("InternalError")
 	}
 	result := PageItems{

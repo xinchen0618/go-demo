@@ -94,7 +94,7 @@ func (accountController) DeleteUserLogout(c *gin.Context) {
 
 func (accountController) GetUsers(c *gin.Context) {
 	pageItems, err := ginx.GetPageItems(ginx.PageQuery{
-		GinContext: c,
+		GinCtx:     c,
 		Db:         di.Db(),
 		Select:     "user_id,user_name,money,created_at,updated_at",
 		From:       "t_users",
