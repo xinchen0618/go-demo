@@ -56,7 +56,7 @@
 
 环境变量 `RUNTIME_ENV` 指定执行环境. 默认为生产环境. 参考 <a href="https://en.wikipedia.org/wiki/Deployment_environment" target="_blank">Deployment environment</a>
 
-- `dev`       开发环境
+- `dev`       开发环境. 开发人员的个人环境.
 - `testing`   测试环境
 - `stage`     预发布环境
 - `prod`      生产环境
@@ -76,7 +76,7 @@
 
 - 为什么放弃使用`Viper`
 
-  仅需编译后的可执行文件, 部署在任何位置, 都可以直接运行, 不受YAML、TOML等配置文件位置的制约.
+  为了仅部署编译后的可执行文件, 就可直接运行, 不受YAML、TOML等配置文件位置的制约.
 
 - 多环境配置
   
@@ -124,7 +124,7 @@
 
 - 开发&测试环境使用gowatch实时热重载
 
-  注意, 是否配置了Go mod代理 `export GOPROXY=https://goproxy.cn,direct`, 是否安装了gowatch `go get github.com/silenceper/gowatch`, 是否配置了Go bin路径 `export PATH=$PATH:$HOME/go/bin`.
+  注意, 是否配置了Go mod代理 `go env -w GOPROXY=https://goproxy.cn,direct`, 是否安装了gowatch `go get github.com/silenceper/gowatch`, 是否配置了Go bin路径 `export PATH=$PATH:$HOME/go/bin`.
 
   ```
   cd cmd/demo-api
