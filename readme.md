@@ -47,7 +47,7 @@
   - service/            公共业务逻辑
     - cache_service.go  资源缓存服务
 - pkg/                  外部应用可以使用的库代码
-  - ginx/               gin增强方法
+  - ginx/               gin增强方法. 此包中出现error会向客户端返回4xx/500错误, 调用时捕获到error直接结束业务逻辑即可.
   - gox/                golang增强方法
 - go.mod                包管理  
 ```

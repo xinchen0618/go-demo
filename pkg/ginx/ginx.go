@@ -1,4 +1,5 @@
 // Package ginx gin增强方法
+//	此包中出现error会向客户端返回4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
 package ginx
 
 import (
@@ -39,7 +40,6 @@ type PageItems struct {
 }
 
 // GetJsonBody 获取Json参数
-//	参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 // 	@param c *gin.Context
 // 	@param patterns []string ["paramKey:paramName:paramType:paramPattern"] paramPattern +必填不可为空, *选填可为空, ?选填不可为空
 //	@return map[string]interface{}
@@ -85,7 +85,6 @@ func GetJsonBody(c *gin.Context, patterns []string) (map[string]interface{}, err
 }
 
 // GetQueries 获取Query参数
-//	参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 // 	@param c *gin.Context
 // 	@param patterns []string ["paramKey:paramName:paramType:defaultValue"] defaultValue为required时参数必填
 //	@return map[string]interface{}
@@ -120,7 +119,6 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, erro
 }
 
 // FilterParam 校验参数类型
-//	参数异常时方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
 // 	@param c *gin.Context
 // 	@param paramName string
 // 	@param paramValue interface{}
@@ -244,7 +242,6 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 }
 
 // GetPageItems 获取分页数据
-// 	出现异常时方法会向客户端返回4xx错误, 调用方法捕获到error直接结束业务逻辑即可
 // 	@param pageQuery PageQuery
 //	@return PageItems
 //	@return error
