@@ -31,12 +31,13 @@
   - demo-cli/           命令行
   - demo-cron/          计划任务
 - config/               配置
+  - consts              常量定义
+    - redis_key.go      Redis key统一在此定义避免冲突
   - di/                 服务注入
   - config.go           配置实现
   - config_common.go    公共配置
   - config_prod.go      生产环境配置
   - config_testing.go   测试环境配置
-  - constants.go        常量定义. Redis key统一在此定义避免冲突.
 - internal/             内部应用代码
   - action/             命令行action
   - cron                计划任务  
@@ -197,4 +198,4 @@ go build
 
 - 业务缓存
 
-  针对业务设计的缓存. key统一在`config/constants.go`中定义.
+  针对业务设计的缓存. key统一在`config/consts/redis_key.go`中定义.

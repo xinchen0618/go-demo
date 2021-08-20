@@ -38,7 +38,7 @@ func (accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记
 		return
 	}
 	if 0 == len(user) {
-		c.JSON(400, gin.H{"status": "UserInvalid", "message": "用户名或密码不正确"})
+		c.JSON(400, gin.H{"code": "UserInvalid", "message": "用户名或密码不正确"})
 		return
 	}
 
@@ -138,7 +138,7 @@ func (accountController) GetUsersById(c *gin.Context) {
 
 	user := service.CacheService.Get(di.Db(), "t_users", "user_id", userId.(int64))
 	if 0 == len(user) {
-		c.JSON(404, gin.H{"status": "UserNotFound", "message": "用户不存在"})
+		c.JSON(404, gin.H{"code": "UserNotFound", "message": "用户不存在"})
 		return
 	}
 

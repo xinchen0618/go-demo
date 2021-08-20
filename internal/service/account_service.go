@@ -31,7 +31,7 @@ var AccountService accountService
 func (accountService) CheckUserLogin(c *gin.Context) (int64, error) {
 	tokenString := c.Request.Header.Get("Authorization") // Authorization: Bearer <token>
 	if !strings.HasPrefix(tokenString, "Bearer ") {
-		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
+		c.JSON(401, gin.H{"code": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
 		return 0, errors.New("UserUnauthorized")
 	}
 	tokenString = tokenString[7:]
@@ -41,7 +41,7 @@ func (accountService) CheckUserLogin(c *gin.Context) (int64, error) {
 		return []byte(config.GetString("jwt_secret")), nil
 	})
 	if err != nil {
-		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
+		c.JSON(401, gin.H{"code": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
 		return 0, errors.New("UserUnauthorized")
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid { // redis白名单校验
@@ -50,7 +50,7 @@ func (accountService) CheckUserLogin(c *gin.Context) (int64, error) {
 		_, err := di.JwtRedis().Get(context.Background(), key).Result()
 		if err != nil {
 			if redis.Nil == err {
-				c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
+				c.JSON(401, gin.H{"code": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
 				return 0, errors.New("UserUnauthorized")
 			}
 			ginx.InternalError(c, err) // redis服务异常
@@ -64,7 +64,7 @@ func (accountService) CheckUserLogin(c *gin.Context) (int64, error) {
 		return userId, nil
 
 	} else {
-		c.JSON(401, gin.H{"status": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
+		c.JSON(401, gin.H{"code": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
 		return 0, errors.New("UserUnauthorized")
 	}
 }
