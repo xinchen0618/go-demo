@@ -14,13 +14,13 @@
 
 ###  规范
 
-- 项目布局  
+- 项目布局 
   
-  Standard Go Project Layout  https://github.com/golang-standards/project-layout
+  <a href="https://github.com/golang-standards/project-layout" target="_blank">Standard Go Project Layout</a>
   
-- 编码规范  
+- 编码规范 
   
-  Uber Go 语言编码规范 https://github.com/xxjwxc/uber_go_guide_cn
+  <a href="https://github.com/xxjwxc/uber_go_guide_cn" target="_blank">Uber Go 语言编码规范</a>
 
 
 ### 目录结构
@@ -186,7 +186,13 @@ go build
 ```
 
 
-### 缓存
+### Redis
+
+#### 规范
+
+<a href="https://developer.aliyun.com/article/531067" target="_blank">阿里云Redis开发规范</a>
+
+#### 缓存
 
 - 资源缓存
 
