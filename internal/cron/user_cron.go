@@ -10,7 +10,7 @@ import (
 type userCron struct {
 }
 
-// UserCron 这里不需要实例化, 计划任务通过cron.XxxCron.Xxx的形式引用旗下定义的方法
+// UserCron 这里仅需struct零值, 计划任务通过cron.XxxCron.Xxx的形式引用旗下定义的方法
 var UserCron userCron
 
 // InitVip

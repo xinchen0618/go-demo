@@ -13,7 +13,7 @@ import (
 type userAction struct {
 }
 
-// UserAction 这里不需要实例化, cli通过action.XxxAction.Xxx的形式引用旗下定义的方法
+// UserAction 这里仅需struct零值, cli通过action.XxxAction.Xxx的形式引用旗下定义的方法
 var UserAction userAction
 
 // InitPosition

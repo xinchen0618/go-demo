@@ -23,7 +23,7 @@ import (
 type accountController struct {
 }
 
-// AccountController 这里不需要实例化, router通过controller.XxxController.Xxx的形式引用旗下定义的方法
+// AccountController 这里仅需struct零值, router通过controller.XxxController.Xxx的形式引用旗下定义的方法
 var AccountController accountController
 
 func (accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
