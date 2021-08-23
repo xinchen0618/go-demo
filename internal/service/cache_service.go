@@ -39,7 +39,7 @@ func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id inte
 		di.Logger().Error(err.Error())
 		return false
 	}
-	key := fmt.Sprintf(consts.CacheResourceInfo, table, id)
+	key := fmt.Sprintf(consts.CacheResource, table, id)
 	err = di.CacheRedis().Set(context.Background(), key, dataBytes, time.Hour*24*30).Err()
 	if err != nil {
 		di.Logger().Error(err.Error())
@@ -58,7 +58,7 @@ func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id inte
 //	@param id interface{} 整数
 //	@return gorose.Data
 func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id interface{}) gorose.Data {
-	key := fmt.Sprintf(consts.CacheResourceInfo, table, id)
+	key := fmt.Sprintf(consts.CacheResource, table, id)
 	dataCache, err := di.CacheRedis().Get(context.Background(), key).Result()
 	if err != nil {
 		if redis.Nil == err { // 缓存不存在
@@ -87,7 +87,7 @@ func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id inte
 //	@param id interface{} 整数
 //	@return bool
 func (cacheService) Delete(table string, id interface{}) bool {
-	key := fmt.Sprintf(consts.CacheResourceInfo, table, id)
+	key := fmt.Sprintf(consts.CacheResource, table, id)
 	err := di.CacheRedis().Del(context.Background(), key).Err()
 	if err != nil {
 		di.Logger().Error(err.Error())
