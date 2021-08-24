@@ -18,7 +18,7 @@ import (
 type accountService struct {
 }
 
-// AccountService 这里仅需struct零值, 外部通过service.XxxService.Xxx()的形式调用旗下定义的方法
+// AccountService 这里仅需结构体零值, 外部通过service.XxxService.Xxx()的形式调用旗下定义的方法
 var AccountService accountService
 
 // CheckUserLogin 登录校验
