@@ -3,6 +3,7 @@ package di
 import (
 	"fmt"
 	"go-demo/config"
+	"os"
 	"sync"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -23,7 +24,14 @@ func Db() gorose.IOrm {
 		var err error
 		dbEngine, err = gorose.Open(&gorose.Config{Driver: "mysql", Dsn: dsn, SetMaxOpenConns: 100, SetMaxIdleConns: 100})
 		if err != nil {
-			Logger().Error(err.Error())
+			panic(err)
+		}
+
+		if "dev" == os.Getenv("RUNTIME_ENV") || "testing" == os.Getenv("RUNTIME_ENV") {
+			dbEngine.SetLogger(gorose.NewLogger(&gorose.LogOption{
+				FilePath:     "./tmp",
+				EnableSqlLog: true,
+			}))
 		}
 	})
 
