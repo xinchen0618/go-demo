@@ -129,14 +129,14 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, erro
 func FilterParam(c *gin.Context, paramName string, paramValue interface{}, paramType string, allowEmpty bool) (interface{}, error) {
 	valueType := reflect.TypeOf(paramValue).String()
 
-	/* 整型 */
+	/* 整型64位 */
 	if "int" == paramType {
 		stringValue, err := FilterParam(c, paramName, paramValue, "string", allowEmpty) // 先统一转字符串再转整型, 这样小数就不允许输入了
 		if err != nil {
 			return nil, err
 		}
 		if "" == stringValue.(string) {
-			return 0, nil
+			return int64(0), nil
 		}
 		intValue, err := strconv.ParseInt(stringValue.(string), 10, 64) // 转整型64位
 		if err != nil {
