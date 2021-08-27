@@ -4,18 +4,19 @@ import (
 	"fmt"
 	"go-demo/config"
 	"os"
-	"sync"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gohouse/gorose/v2"
 	"github.com/golang-module/carbon"
+	"github.com/matryer/resync"
 )
 
 // mysql
 var (
 	dbEngine *gorose.Engin
-	dbOnce   sync.Once
+	dbOnce   resync.Once
+	dbError  error
 )
 
 // print SQL
@@ -44,10 +45,10 @@ func Db() gorose.IOrm {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",
 			config.Get("mysql_username"), config.Get("mysql_password"), config.Get("mysql_host"),
 			config.Get("mysql_port"), config.Get("mysql_dbname"), config.Get("mysql_charset"))
-		var err error
-		dbEngine, err = gorose.Open(&gorose.Config{Driver: "mysql", Dsn: dsn, SetMaxOpenConns: 100, SetMaxIdleConns: 10})
-		if err != nil {
-			panic(err)
+		dbEngine, dbError = gorose.Open(&gorose.Config{Driver: "mysql", Dsn: dsn, SetMaxOpenConns: 100, SetMaxIdleConns: 100})
+		if dbError != nil {
+			Logger().Error(dbError.Error())
+			return
 		}
 
 		// print SQL to console
@@ -55,6 +56,9 @@ func Db() gorose.IOrm {
 			dbEngine.SetLogger(sqlLogger{})
 		}
 	})
+	if dbError != nil {
+		dbOnce.Reset()
+	}
 
 	return dbEngine.NewOrm()
 }
