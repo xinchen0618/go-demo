@@ -23,7 +23,7 @@ func Logger() *zap.Logger {
 		writeSyncer := zapcore.AddSync(logFile)
 		encoderConfig := zap.NewProductionEncoderConfig()
 		encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-		encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
+		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 		encoder := zapcore.NewConsoleEncoder(encoderConfig)
 		zapCore := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(writeSyncer, zapcore.AddSync(os.Stdout)), zapcore.DebugLevel) // 输出到console和文件
 		logger = zap.New(zapCore, zap.AddStacktrace(zapcore.ErrorLevel))                                                              // 错误日志记录栈信息
