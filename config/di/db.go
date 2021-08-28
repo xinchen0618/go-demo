@@ -4,19 +4,19 @@ import (
 	"fmt"
 	"go-demo/config"
 	"os"
+	"sync"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gohouse/gorose/v2"
 	"github.com/golang-module/carbon"
-	"github.com/matryer/resync"
 )
 
-// mysql
+// mysql, 成功仅用初始化一次, 失败允许再次初始化
 var (
 	dbEngine *gorose.Engin
-	dbOnce   resync.Once
-	dbError  error
+	dbMutex  sync.Mutex
+	dbOk     bool
 )
 
 // print SQL
@@ -41,24 +41,24 @@ func (sqlLogger) EnableSlowLog() float64 {
 }
 
 func Db() gorose.IOrm {
-	dbOnce.Do(func() {
+	dbMutex.Lock()
+	if false == dbOk {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",
 			config.Get("mysql_username"), config.Get("mysql_password"), config.Get("mysql_host"),
 			config.Get("mysql_port"), config.Get("mysql_dbname"), config.Get("mysql_charset"))
-		dbEngine, dbError = gorose.Open(&gorose.Config{Driver: "mysql", Dsn: dsn, SetMaxOpenConns: 100, SetMaxIdleConns: 100})
-		if dbError != nil {
-			Logger().Error(dbError.Error())
-			return
+		var err error
+		dbEngine, err = gorose.Open(&gorose.Config{Driver: "mysql", Dsn: dsn, SetMaxOpenConns: 100, SetMaxIdleConns: 100})
+		if err != nil {
+			dbMutex.Unlock()
+			panic(err)
 		}
-
-		// print SQL to console
-		if "dev" == os.Getenv("RUNTIME_ENV") || "testing" == os.Getenv("RUNTIME_ENV") {
+		if "dev" == os.Getenv("RUNTIME_ENV") || "testing" == os.Getenv("RUNTIME_ENV") { // print SQL to console
 			dbEngine.SetLogger(sqlLogger{})
 		}
-	})
-	if dbError != nil {
-		dbOnce.Reset()
+
+		dbOk = true
 	}
+	dbMutex.Unlock()
 
 	return dbEngine.NewOrm()
 }

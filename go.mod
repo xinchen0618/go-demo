@@ -15,7 +15,6 @@ require (
 	github.com/gohouse/gorose/v2 v2.1.12
 	github.com/golang-module/carbon v1.5.3
 	github.com/json-iterator/go v1.1.11 // indirect
-	github.com/matryer/resync v0.0.0-20161211202428-d39c09a11215 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
