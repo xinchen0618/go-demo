@@ -12,7 +12,7 @@ import (
 	"github.com/golang-module/carbon"
 )
 
-// mysql, 成功仅用初始化一次, 失败允许再次初始化
+// mysql, 成功则仅初始化一次, 失败允许再次初始化
 var (
 	dbEngine *gorose.Engin
 	dbMutex  sync.Mutex
