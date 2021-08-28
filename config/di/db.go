@@ -50,7 +50,8 @@ func Db() gorose.IOrm {
 		dbEngine, err = gorose.Open(&gorose.Config{Driver: "mysql", Dsn: dsn, SetMaxOpenConns: 100, SetMaxIdleConns: 100})
 		if err != nil {
 			dbMutex.Unlock()
-			panic(err)
+			Logger().Error(err.Error())
+			return nil
 		}
 		if "dev" == os.Getenv("RUNTIME_ENV") || "testing" == os.Getenv("RUNTIME_ENV") { // print SQL to console
 			dbEngine.SetLogger(sqlLogger{})
