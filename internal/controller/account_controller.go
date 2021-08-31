@@ -75,11 +75,7 @@ func (accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记
 }
 
 func (accountController) DeleteUserLogout(c *gin.Context) {
-	// 登录校验
-	userId, err := service.AccountService.CheckUserLogin(c)
-	if err != nil {
-		return
-	}
+	userId := c.GetInt64("userId")
 
 	// 删除对应redis白名单记录
 	tokenString := c.Request.Header.Get("Authorization")[7:]

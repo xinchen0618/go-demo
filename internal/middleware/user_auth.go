@@ -1,8 +1,7 @@
-package service
+package middleware
 
 import (
 	"context"
-	"errors"
 	"go-demo/config"
 	"go-demo/config/di"
 	"go-demo/pkg/ginx"
@@ -14,25 +13,14 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-// 这里定义一个空结构体用于为大量的service方法做分类
-type accountService struct {
-}
-
-// AccountService 这里仅需结构体零值, 外部通过service.XxxService.Xxx()的形式调用旗下定义的方法
-var AccountService accountService
-
-// CheckUserLogin 登录校验
-// 	先校验JWT, 再校验redis白名单
-// 	校验不通过方法会向客户端返回4xx错误, 调用方法时捕获到error直接结束业务逻辑即可
-//	@receiver *accountService
+// UserAuth 用户登录
 //	@param c *gin.Context
-//	@return int64
-//	@return error
-func (accountService) CheckUserLogin(c *gin.Context) (int64, error) {
+func UserAuth(c *gin.Context) {
 	tokenString := c.Request.Header.Get("Authorization") // Authorization: Bearer <token>
 	if !strings.HasPrefix(tokenString, "Bearer ") {
 		c.JSON(401, gin.H{"code": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
-		return 0, errors.New("UserUnauthorized")
+		c.Abort()
+		return
 	}
 	tokenString = tokenString[7:]
 
@@ -42,7 +30,8 @@ func (accountService) CheckUserLogin(c *gin.Context) (int64, error) {
 	})
 	if err != nil {
 		c.JSON(401, gin.H{"code": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
-		return 0, errors.New("UserUnauthorized")
+		c.Abort()
+		return
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid { // redis白名单校验
 		tokenAtoms := strings.Split(tokenString, ".")
@@ -51,20 +40,25 @@ func (accountService) CheckUserLogin(c *gin.Context) (int64, error) {
 		if err != nil {
 			if redis.Nil == err {
 				c.JSON(401, gin.H{"code": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
-				return 0, errors.New("UserUnauthorized")
+				c.Abort()
+				return
 			}
 			ginx.InternalError(c, err) // redis服务异常
-			return 0, errors.New("InternalError")
+			c.Abort()
+			return
 		}
 		userId, err := strconv.ParseInt(claims["jti"].(string), 10, 64)
 		if err != nil {
 			ginx.InternalError(c, err)
-			return 0, errors.New("InternalError")
+			c.Abort()
+			return
 		}
-		return userId, nil
+		c.Set("userId", userId) // 后续的处理函数可以用过c.GetInt64("userId")来获取当前请求的用户信息
+		c.Next()
 
 	} else {
 		c.JSON(401, gin.H{"code": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
-		return 0, errors.New("UserUnauthorized")
+		c.Abort()
+		return
 	}
 }

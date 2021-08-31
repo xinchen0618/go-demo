@@ -44,6 +44,7 @@
   - controller/         API控制器
   - router/             API路由
     - router.go         路由注册入口. 路由声明按业务分拆到不同文件, 然后统一在此注册.
+  - middleware/         API中间件  
   - service/            公共业务逻辑
     - cache_service.go  资源缓存服务
 - pkg/                  外部应用可以使用的库代码
