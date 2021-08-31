@@ -3,7 +3,8 @@ package gox
 
 import (
 	"fmt"
-	"go-demo/config/di"
+
+	"go.uber.org/zap"
 )
 
 // InSlice 元素是否在切片中
@@ -32,7 +33,7 @@ func InSlice(needle interface{}, haystack interface{}) bool {
 			}
 		}
 	default:
-		di.Logger().Error(fmt.Sprintf("func InSlice no handled type: %T", needle))
+		zap.L().Error(fmt.Sprintf("func InSlice no handled type: %T", needle))
 		return false
 	}
 

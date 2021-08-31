@@ -67,11 +67,11 @@
 
 - 日志文件
 
-  错误日志会记录到日志文件, 同时打印到console. 错误日志文件路径在`config/`中配置, 默认为`/var/log/golang_error.log`. 注意文件要有读写权限.
+  **错误日志**会记录到日志文件, 同时打印到console. 错误日志文件路径在`config/`中配置, 默认为`/var/log/golang_error.log`. 注意文件要有读写权限.
 
 - 使用
 
-  `di.Logger().Error()`, `di.Logger().Warn()`, `di.Logger().Info()`
+  `zap.L().Error()`, `zap.L().Warn()`, `zap.L().Info()`
 
 ### 配置
 

@@ -10,6 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gohouse/gorose/v2"
 	"github.com/golang-module/carbon"
+	"go.uber.org/zap"
 )
 
 // mysql, 成功则仅初始化一次, 失败允许再次初始化
@@ -51,7 +52,7 @@ func Db() gorose.IOrm {
 			var err error
 			dbEngine, err = gorose.Open(&gorose.Config{Driver: "mysql", Dsn: dsn, SetMaxOpenConns: 100, SetMaxIdleConns: 100})
 			if err != nil {
-				Logger().Error(err.Error())
+				zap.L().Error(err.Error())
 				return
 			}
 			if "dev" == os.Getenv("RUNTIME_ENV") || "testing" == os.Getenv("RUNTIME_ENV") { // print SQL to console

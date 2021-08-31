@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"go-demo/config/di"
 	"math"
 	"reflect"
 	"strconv"
@@ -15,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gohouse/gorose/v2"
 	"github.com/shopspring/decimal"
+	"go.uber.org/zap"
 )
 
 // PageQuery 分页参数
@@ -313,6 +313,6 @@ func GetPageItems(pageQuery PageQuery) (PageItems, error) {
 //	@param c *gin.Context
 //	@param err error
 func InternalError(c *gin.Context, err error) {
-	di.Logger().Error(err.Error())
+	zap.L().Error(err.Error())
 	c.JSON(500, gin.H{"code": "InternalError", "message": "服务异常, 请稍后重试"})
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gohouse/gorose/v2"
+	"go.uber.org/zap"
 )
 
 type cacheService struct {
@@ -28,7 +29,7 @@ func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id inte
 	sql := fmt.Sprintf("/*FORCE_MASTER*/ SELECT * FROM %s WHERE %s = %d LIMIT 1", table, primaryKey, id) // 查主库, 避免主从同步延迟的问题
 	data, err := db.Query(sql)
 	if err != nil {
-		di.Logger().Error(err.Error())
+		zap.L().Error(err.Error())
 		return false
 	}
 	if 0 == len(data) {
@@ -36,13 +37,12 @@ func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id inte
 	}
 	dataBytes, err := json.Marshal(data[0])
 	if err != nil {
-		di.Logger().Error(err.Error())
+		zap.L().Error(err.Error())
 		return false
 	}
 	key := fmt.Sprintf(consts.CacheResource, table, id)
-	err = di.CacheRedis().Set(context.Background(), key, dataBytes, time.Hour*24*30).Err()
-	if err != nil {
-		di.Logger().Error(err.Error())
+	if err = di.CacheRedis().Set(context.Background(), key, dataBytes, time.Hour*24*30).Err(); err != nil {
+		zap.L().Error(err.Error())
 		return false
 	}
 
@@ -68,13 +68,12 @@ func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id inte
 				return gorose.Data{}
 			}
 		}
-		di.Logger().Error(err.Error())
+		zap.L().Error(err.Error())
 		return gorose.Data{}
 	}
 	var dataMap gorose.Data // 缓存存在
-	err = json.Unmarshal([]byte(dataCache), &dataMap)
-	if err != nil {
-		di.Logger().Error(err.Error())
+	if err := json.Unmarshal([]byte(dataCache), &dataMap); err != nil {
+		zap.L().Error(err.Error())
 		return gorose.Data{}
 	}
 
@@ -88,9 +87,8 @@ func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id inte
 //	@return bool
 func (cacheService) Delete(table string, id interface{}) bool {
 	key := fmt.Sprintf(consts.CacheResource, table, id)
-	err := di.CacheRedis().Del(context.Background(), key).Err()
-	if err != nil {
-		di.Logger().Error(err.Error())
+	if err := di.CacheRedis().Del(context.Background(), key).Err(); err != nil {
+		zap.L().Error(err.Error())
 		return false
 	}
 

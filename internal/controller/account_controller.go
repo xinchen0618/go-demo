@@ -17,6 +17,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/gohouse/gorose/v2"
+	"go.uber.org/zap"
 )
 
 // 这里定义一个空结构体用于为大量的controller方法做分类
@@ -113,7 +114,7 @@ func (accountController) GetUsers(c *gin.Context) {
 		go func(item gorose.Data) {
 			defer func() {
 				if err := recover(); err != nil {
-					di.Logger().Error(fmt.Sprint(err))
+					zap.L().Error(fmt.Sprint(err))
 				}
 			}()
 			defer wg.Done()
@@ -163,14 +164,13 @@ func (accountController) PostUsers(c *gin.Context) {
 		go func() {
 			defer func() {
 				if err := recover(); err != nil {
-					di.Logger().Error(fmt.Sprint(err))
+					zap.L().Error(fmt.Sprint(err))
 				}
 			}()
 
 			db := di.Db()
-			err := db.Begin()
-			if err != nil {
-				di.Logger().Error(err.Error())
+			if err := db.Begin(); err != nil {
+				zap.L().Error(err.Error())
 				return
 			}
 
@@ -178,7 +178,7 @@ func (accountController) PostUsers(c *gin.Context) {
 			userName := strconv.Itoa(rand.Int())
 			user, err := db.Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": userName}).First()
 			if err != nil {
-				di.Logger().Error(err.Error())
+				zap.L().Error(err.Error())
 				_ = db.Rollback()
 				return
 			}
@@ -188,21 +188,20 @@ func (accountController) PostUsers(c *gin.Context) {
 			} else { // 记录不存在
 				userId, err = db.Table("t_users").Data(gorose.Data{"user_name": userName}).InsertGetId()
 				if err != nil {
-					di.Logger().Error(err.Error())
+					zap.L().Error(err.Error())
 					_ = db.Rollback()
 					return
 				}
 			}
 			sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,1) ON DUPLICATE KEY UPDATE counts = counts + 1"
 			if _, err = db.Execute(sql, userId); err != nil {
-				di.Logger().Error(err.Error())
+				zap.L().Error(err.Error())
 				_ = db.Rollback()
 				return
 			}
 
-			err = db.Commit()
-			if err != nil {
-				di.Logger().Error(err.Error())
+			if err := db.Commit(); err != nil {
+				zap.L().Error(err.Error())
 				_ = db.Rollback()
 				return
 			}
