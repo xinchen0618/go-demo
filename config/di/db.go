@@ -16,7 +16,7 @@ import (
 // mysql, 成功则仅初始化一次, 失败允许再次初始化
 var (
 	dbEngine *gorose.Engin
-	dbMutex  sync.Mutex
+	dbMu     sync.Mutex
 	dbOk     bool
 )
 
@@ -43,8 +43,8 @@ func (sqlLogger) EnableSlowLog() float64 {
 
 func Db() gorose.IOrm {
 	func() {
-		dbMutex.Lock() // mutex锁与解锁务必成对出现
-		defer dbMutex.Unlock()
+		dbMu.Lock() // mutex锁与解锁务必成对出现
+		defer dbMu.Unlock()
 		if !dbOk {
 			dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",
 				config.Get("mysql_username"), config.Get("mysql_password"), config.Get("mysql_host"),
