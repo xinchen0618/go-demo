@@ -3,15 +3,13 @@ package controller
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"go-demo/config"
 	"go-demo/config/di"
 	"go-demo/internal/service"
 	"go-demo/pkg/ginx"
-	"math/rand"
+	"go-demo/pkg/gox"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -104,25 +102,18 @@ func (accountController) GetUsers(c *gin.Context) {
 	}
 
 	// 多线程读
-	var wg sync.WaitGroup
+	wpg := di.WorkerPool().Group()
 	for _, item := range pageItems.Items {
-		wg.Add(1)
-		go func(item gorose.Data) {
-			defer func() {
-				if err := recover(); err != nil {
-					zap.L().Error(fmt.Sprint(err))
-				}
-			}()
-			defer wg.Done()
-
+		item := item
+		wpg.Submit(func() {
 			userCounts := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"])
 			item["counts"] = 0
 			if counts, ok := userCounts["counts"]; ok {
 				item["counts"] = counts
 			}
-		}(item)
+		})
 	}
-	wg.Wait()
+	wpg.Wait()
 
 	c.JSON(200, pageItems)
 }
@@ -153,25 +144,16 @@ func (accountController) PostUsers(c *gin.Context) {
 		counts = jsonBody["counts"].(int64)
 	}
 
-	startTime := time.Now().UnixNano()
-
 	for i := int64(0); i < counts; i++ {
 		// 多线程写
-		go func() {
-			defer func() {
-				if err := recover(); err != nil {
-					zap.L().Error(fmt.Sprint(err))
-				}
-			}()
-
+		di.WorkerPool().Submit(func() {
 			db := di.Db()
 			if err := db.Begin(); err != nil {
 				zap.L().Error(err.Error())
 				return
 			}
 
-			rand.Seed(time.Now().UnixNano())
-			userName := strconv.Itoa(rand.Int())
+			userName := gox.RandInt64(11111, 99999)
 			user, err := db.Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": userName}).First()
 			if err != nil {
 				zap.L().Error(err.Error())
@@ -204,10 +186,8 @@ func (accountController) PostUsers(c *gin.Context) {
 
 			service.CacheService.Set(di.Db(), "t_users", "user_id", userId)
 			service.CacheService.Set(di.Db(), "t_user_counts", "user_id", userId)
-		}()
+		})
 	}
 
-	timeCost := time.Now().UnixNano() - startTime
-
-	c.JSON(201, gin.H{"time_cost": fmt.Sprintf("%dns", timeCost)})
+	c.JSON(201, gin.H{"counts": counts})
 }

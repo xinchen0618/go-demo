@@ -7,6 +7,9 @@ func init() {
 		// 错误日志路径
 		"error_log": "/var/log/golang_error.log",
 
+		// goroutine池大小
+		"worker_pool": 40960,
+
 		// DB
 		"mysql_host":     "127.0.0.1",
 		"mysql_port":     3306,

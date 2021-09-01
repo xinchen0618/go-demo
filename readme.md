@@ -2,14 +2,15 @@
 
 ### 技术栈
 
-- API       Gin          https://github.com/gin-gonic/gin
-- Mysql     GoRose       https://github.com/gohouse/gorose
-- Redis     go-redis     https://github.com/go-redis/redis
-- 登录      jwt-go        https://github.com/dgrijalva/jwt-go
-- 日志      zap           https://github.com/uber-go/zap
-- 优雅停止   endless      https://github.com/fvbock/endless
-- 命令行     urfave/cli   https://github.com/urfave/cli
-- 计划任务   gocron       https://github.com/go-co-op/gocron
+- API           Gin          https://github.com/gin-gonic/gin
+- Mysql         GoRose       https://github.com/gohouse/gorose
+- Redis         go-redis     https://github.com/go-redis/redis
+- 登录          jwt-go        https://github.com/dgrijalva/jwt-go
+- 日志          zap           https://github.com/uber-go/zap
+- 优雅停止      endless       https://github.com/fvbock/endless
+- 命令行         urfave/cli   https://github.com/urfave/cli
+- 计划任务        gocron       https://github.com/go-co-op/gocron
+- WorkerPool    pond          https://github.com/alitto/pond
 
 
 ###  规范
@@ -34,6 +35,8 @@
   - consts              常量定义
     - redis_key.go      Redis key统一在此定义避免冲突
   - di/                 服务注入
+    - logger.go         日志服务
+    - worker_pool.go    goroutine池服务
   - config.go           配置实现
   - config_common.go    公共配置
   - config_prod.go      生产环境配置
@@ -64,16 +67,6 @@
 - `prod`      生产环境
 
 
-### 日志
-
-- 日志文件
-
-  **错误日志**会记录到日志文件, 同时打印到console. 错误日志文件路径在`config/`中配置, 默认为`/var/log/golang_error.log`. 注意文件要有读写权限.
-
-- 使用
-
-  `zap.L().Error()`, `zap.L().Warn()`, `zap.L().Info()`
-
 ### 配置
 
 - 为什么放弃使用`Viper`
@@ -87,6 +80,39 @@
 - 使用
 
   `config.Get()`, `config.GetInt()`, `config.GetString()`, `config.GetIntSlice()`, `config.GetStringSlice()`
+
+
+### 日志
+
+- 日志文件
+
+  **错误日志**会记录到日志文件, 同时打印到console. 错误日志文件路径在`config/`中配置, 默认为`/var/log/golang_error.log`. 注意文件要有读写权限.
+
+- 使用
+
+  `zap.L().Error()`, `zap.L().Warn()`, `zap.L().Info()`
+
+
+### Worker Pool 
+
+使用Worker Pool(goroutine池)旨在解决"goroutine使用资源上限"和"统一捕获goroutine中panic"的问题
+ 
+#### 使用
+
+- go func
+
+  ```
+  di.WorkerPool().Submit(func)
+  ```
+
+- Wait Group
+  
+  ```
+  wpg := di.WorkerPool().Group()
+  wpg.Submit(func)
+  wpg.Wait()
+  ```
+
 
 ### API
 
