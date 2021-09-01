@@ -41,7 +41,7 @@ func (sqlLogger) EnableSlowLog() float64 {
 }
 
 func Db() gorose.IOrm {
-	err := dbOnce.Do(func() error {
+	_ = dbOnce.Do(func() error {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",
 			config.Get("mysql_username"), config.Get("mysql_password"), config.Get("mysql_host"),
 			config.Get("mysql_port"), config.Get("mysql_dbname"), config.Get("mysql_charset"))
@@ -56,9 +56,6 @@ func Db() gorose.IOrm {
 		}
 		return nil
 	})
-	if err != nil {
-		return nil
-	}
 
 	return dbEngine.NewOrm()
 }
