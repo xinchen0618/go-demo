@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go-demo/config"
 	"go-demo/pkg/gox"
-	"os"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -51,9 +50,10 @@ func Db() gorose.IOrm {
 			zap.L().Error(err.Error())
 			return err
 		}
-		if "dev" == os.Getenv("RUNTIME_ENV") || "testing" == os.Getenv("RUNTIME_ENV") { // print SQL to console
+		if gox.InSlice(config.GetRuntimeEnv(), []string{"dev", "testing"}) { // print SQL to console
 			dbEngine.SetLogger(sqlLogger{})
 		}
+
 		return nil
 	})
 

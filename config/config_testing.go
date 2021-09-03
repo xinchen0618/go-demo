@@ -2,6 +2,10 @@ package config
 
 // 测试环境配置
 func init() {
+	if GetRuntimeEnv() != "testing" {
+		return
+	}
+
 	configure["testing"] = map[string]interface{}{
 		// 运行端口
 		"server_port": 8080,

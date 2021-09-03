@@ -2,6 +2,10 @@ package config
 
 // 生产环境配置
 func init() {
+	if GetRuntimeEnv() != "prod" {
+		return
+	}
+
 	configure["prod"] = map[string]interface{}{
 		// 运行端口
 		"server_port": 8081,

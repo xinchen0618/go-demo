@@ -6,8 +6,8 @@ import (
 	"go-demo/config"
 	"go-demo/internal/router"
 	"go-demo/pkg/ginx"
+	"go-demo/pkg/gox"
 	"net/http"
-	"os"
 
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
@@ -52,8 +52,7 @@ func cors() gin.HandlerFunc {
 
 func main() {
 	// 实例化gin
-	runtimeEnv := os.Getenv("RUNTIME_ENV")
-	if runtimeEnv == "" || runtimeEnv == "prod" || runtimeEnv == "stage" {
+	if gox.InSlice(config.GetRuntimeEnv(), []string{"prod", "stage"}) {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	r := gin.Default()
