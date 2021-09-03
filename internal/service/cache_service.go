@@ -11,12 +11,15 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/gohouse/gorose/v2"
 	"go.uber.org/zap"
+	"golang.org/x/sync/singleflight"
 )
 
 type cacheService struct {
 }
 
 var CacheService cacheService
+
+var sg singleflight.Group
 
 // Set 为资源设置缓存
 //	@receiver *cacheService
@@ -59,25 +62,35 @@ func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id inte
 //	@return gorose.Data
 func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id interface{}) gorose.Data {
 	key := fmt.Sprintf(consts.CacheResource, table, id)
-	dataCache, err := di.CacheRedis().Get(context.Background(), key).Result()
-	if err != nil {
-		if redis.Nil == err { // 缓存不存在
-			if CacheService.Set(db, table, primaryKey, id) {
-				return CacheService.Get(db, table, primaryKey, id)
+	v, _, _ := sg.Do(key, func() (interface{}, error) {
+		dataCache, err := di.CacheRedis().Get(context.Background(), key).Result()
+		if err != nil {
+			if redis.Nil == err { // 缓存不存在
+				if CacheService.Set(db, table, primaryKey, id) {
+					dataCache, err = di.CacheRedis().Get(context.Background(), key).Result()
+					if err != nil {
+						zap.L().Error(err.Error())
+						return gorose.Data{}, err
+					}
+				} else {
+					return gorose.Data{}, nil
+				}
 			} else {
-				return gorose.Data{}
+				zap.L().Error(err.Error())
+				return gorose.Data{}, err
 			}
 		}
-		zap.L().Error(err.Error())
-		return gorose.Data{}
-	}
-	var dataMap gorose.Data // 缓存存在
-	if err := json.Unmarshal([]byte(dataCache), &dataMap); err != nil {
-		zap.L().Error(err.Error())
-		return gorose.Data{}
-	}
 
-	return dataMap
+		var dataMap gorose.Data
+		if err := json.Unmarshal([]byte(dataCache), &dataMap); err != nil {
+			zap.L().Error(err.Error())
+			return gorose.Data{}, err
+		}
+
+		return dataMap, nil
+	})
+
+	return v.(gorose.Data)
 }
 
 // Delete 删除资源缓存
