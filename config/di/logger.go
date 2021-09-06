@@ -8,8 +8,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// 日志服务最为基础, 日志初始化失败, 程序不允许启动
-func init() {
+func init() { // 日志服务最为基础, 日志初始化失败, 程序不允许启动
 	logFile, err := os.OpenFile(config.GetString("error_log"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0664)
 	if err != nil {
 		panic(err)
