@@ -95,7 +95,7 @@
 
 ### Worker Pool 
 
-使用Worker Pool(goroutine池)旨在解决"goroutine使用资源上限"和"统一捕获goroutine中panic"的问题
+使用Worker Pool(goroutine池)旨在解决"goroutine使用资源上限"和"优雅处理goroutine中panic"的问题
  
 #### 使用
 
