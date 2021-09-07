@@ -259,6 +259,9 @@ func GetPageItems(pageQuery PageQuery) (PageItems, error) {
 	}
 
 	where := pageQuery.Where
+	if "" == where {
+		where = "1"
+	}
 
 	var countSql string
 	if pageQuery.GroupBy != "" { // GROUP BY存在总记录数计算方式会不同

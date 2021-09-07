@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"go-demo/config"
 	"go-demo/config/di"
 	"go-demo/internal/service"
@@ -153,7 +154,7 @@ func (accountController) PostUsers(c *gin.Context) {
 				return
 			}
 
-			userName := gox.RandInt64(11111, 99999)
+			userName := fmt.Sprintf("U%d", gox.RandInt64(111111, 999999))
 			user, err := db.Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": userName}).First()
 			if err != nil {
 				zap.L().Error(err.Error())
@@ -171,8 +172,8 @@ func (accountController) PostUsers(c *gin.Context) {
 					return
 				}
 			}
-			sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,1) ON DUPLICATE KEY UPDATE counts = counts + 1"
-			if _, err = db.Execute(sql, userId); err != nil {
+			sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,?) ON DUPLICATE KEY UPDATE counts = counts + 1"
+			if _, err = db.Execute(sql, userId, gox.RandInt64(1, 9)); err != nil {
 				zap.L().Error(err.Error())
 				_ = db.Rollback()
 				return
