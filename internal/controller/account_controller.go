@@ -125,7 +125,7 @@ func (accountController) GetUsersById(c *gin.Context) {
 		return
 	}
 
-	user := service.CacheService.Get(di.Db(), "t_users", "user_id", userId.(int64))
+	user := service.CacheService.Get(di.Db(), "t_users", "user_id", userId)
 	if 0 == len(user) {
 		c.JSON(404, gin.H{"code": "UserNotFound", "message": "用户不存在"})
 		return
