@@ -184,9 +184,6 @@ func (accountController) PostUsers(c *gin.Context) {
 				_ = db.Rollback()
 				return
 			}
-
-			service.CacheService.Set(di.Db(), "t_users", "user_id", userId)
-			service.CacheService.Set(di.Db(), "t_user_counts", "user_id", userId)
 		})
 	}
 

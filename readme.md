@@ -223,11 +223,10 @@ go build
 
 - 资源缓存
 
-  以资源对象为单位. 
+  以资源对象为单位, 使用旁路缓存策略.
 
-  - `POST`/`PUT`资源时`service.CacheService.Set()`设置缓存
   - `GET`资源时`service.CacheService.Get()`获取缓存(缓存不存在时会建立)
-  - `DELETE`资源时`service.CacheService.Delete()`删除缓存
+  - `PUT`/`DELETE`资源时`service.CacheService.Delete()`删除缓存
 
 - 业务缓存
 
