@@ -184,6 +184,8 @@ func (accountController) PostUsers(c *gin.Context) {
 				_ = db.Rollback()
 				return
 			}
+
+			service.CacheService.Delete("t_user_counts", userId)
 		})
 	}
 
