@@ -198,8 +198,8 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 	if EnumMark := paramType[0:1]; "[" == EnumMark {
 		var enum []interface{}
 		if err := json.Unmarshal([]byte(paramType), &enum); err != nil {
-			InternalError(c, err)
-			return nil, errors.New("InternalError")
+			c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
+			return nil, errors.New("ParamInvalid")
 		}
 		for _, value := range enum {
 			enumType := reflect.TypeOf(enum[0]).String()
@@ -214,8 +214,8 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			} else if "string" == valueType {
 				floatValue, err := strconv.ParseFloat(paramValue.(string), 64)
 				if err != nil {
-					InternalError(c, err)
-					return nil, errors.New("InternalError")
+					c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
+					return nil, errors.New("ParamInvalid")
 				}
 				return floatValue, nil
 			} else {
