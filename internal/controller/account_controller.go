@@ -107,7 +107,7 @@ func (accountController) GetUsers(c *gin.Context) {
 	for _, item := range pageItems.Items {
 		item := item
 		wpg.Submit(func() {
-			userCounts := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"])
+			userCounts, _ := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"])
 			item["counts"] = 0
 			if counts, ok := userCounts["counts"]; ok {
 				item["counts"] = counts
@@ -125,7 +125,11 @@ func (accountController) GetUsersById(c *gin.Context) {
 		return
 	}
 
-	user := service.CacheService.Get(di.Db(), "t_users", "user_id", userId)
+	user, err := service.CacheService.Get(di.Db(), "t_users", "user_id", userId)
+	if err != nil {
+		c.JSON(500, gin.H{"code": "InternalError", "message": "服务异常, 请稍后重试"})
+		return
+	}
 	if 0 == len(user) {
 		c.JSON(404, gin.H{"code": "UserNotFound", "message": "用户不存在"})
 		return
