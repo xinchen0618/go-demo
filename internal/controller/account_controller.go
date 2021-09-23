@@ -49,7 +49,7 @@ func (accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记
 		ExpiresAt: time.Now().Add(loginTtl).Unix(),
 		Id:        strconv.FormatInt(user["user_id"].(int64), 10),
 		IssuedAt:  time.Now().Unix(),
-		Issuer:    "go-demo:UserLogin",
+		Issuer:    "account:PostUserLogin",
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(config.GetString("jwt_secret")))

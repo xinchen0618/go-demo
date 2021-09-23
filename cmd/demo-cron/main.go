@@ -9,11 +9,11 @@ import (
 )
 
 func main() {
-	location, err := time.LoadLocation("Asia/Shanghai")
+	loc, err := time.LoadLocation("Asia/Shanghai")
 	if err != nil {
 		zap.L().Error(err.Error())
 	}
-	s := gocron.NewScheduler(location)
+	s := gocron.NewScheduler(loc)
 
 	/* 计划任务路由 */
 	if _, err = s.Cron("*/1 * * * *").Do(cron.UserCron.InitVip, 10); err != nil {

@@ -39,8 +39,7 @@ func (userAction) InitPosition(c *cli.Context) error {
 	}
 	for _, user := range users {
 		userId := user["user_id"].(int64)
-		_, err = di.Db().Table("t_users").Where(gorose.Data{"user_id": userId}).Data(gorose.Data{"position": 1024 * userId}).Update()
-		if err != nil {
+		if _, err = di.Db().Table("t_users").Where(gorose.Data{"user_id": userId}).Data(gorose.Data{"position": 1024 * userId}).Update(); err != nil {
 			zap.L().Error(err.Error())
 			return err
 		}

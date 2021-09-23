@@ -22,8 +22,7 @@ func (userCron) InitVip(counts int) {
 	if err != nil {
 		zap.L().Error(err.Error())
 	}
-	_, err = di.Db().Table("t_users").WhereIn("user_id", userIds.([]interface{})).Update(gorose.Data{"is_vip": 1})
-	if err != nil {
+	if _, err = di.Db().Table("t_users").WhereIn("user_id", userIds.([]interface{})).Update(gorose.Data{"is_vip": 1}); err != nil {
 		zap.L().Error(err.Error())
 	}
 }
