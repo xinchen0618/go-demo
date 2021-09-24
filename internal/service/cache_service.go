@@ -66,33 +66,30 @@ func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id inte
 	v, err, _ := sg.Do(key, func() (interface{}, error) {
 		dataCache, err := di.CacheRedis().Get(context.Background(), key).Result()
 		if err != nil {
-			if redis.Nil == err { // 缓存不存在
-				ok, err := CacheService.Set(db, table, primaryKey, id)
-				if err != nil {
-					return gorose.Data{}, err
-				}
-				if ok { // 设置缓存成功
-					dataCache, err = di.CacheRedis().Get(context.Background(), key).Result()
-					if err != nil {
-						zap.L().Error(err.Error())
-						return gorose.Data{}, err
-					}
-				} else { // 记录不存在
-					return gorose.Data{}, nil
-				}
-
-			} else { // redis异常
+			if err != redis.Nil { // redis异常
+				zap.L().Error(err.Error())
+				return gorose.Data{}, err
+			}
+			// 缓存不存在
+			ok, err := CacheService.Set(db, table, primaryKey, id)
+			if err != nil {
+				return gorose.Data{}, err
+			}
+			if !ok { // 记录不存在
+				return gorose.Data{}, nil
+			}
+			// 设置缓存成功
+			dataCache, err = di.CacheRedis().Get(context.Background(), key).Result()
+			if err != nil {
 				zap.L().Error(err.Error())
 				return gorose.Data{}, err
 			}
 		}
-
 		var dataMap gorose.Data
 		if err := json.Unmarshal([]byte(dataCache), &dataMap); err != nil {
 			zap.L().Error(err.Error())
 			return gorose.Data{}, err
 		}
-
 		return dataMap, nil
 	})
 	if err != nil {
