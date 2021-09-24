@@ -229,7 +229,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 	/* 数组 */
 	if "array" == paramType {
 		if "[]interface {}" == valueType {
-			if 0 == len(paramValue.([]interface{})) {
+			if !allowEmpty && 0 == len(paramValue.([]interface{})) {
 				c.JSON(400, gin.H{"code": "ParamEmpty", "message": fmt.Sprintf("%s不得为空", paramName)})
 				return nil, errors.New("ParamEmpty")
 			}
