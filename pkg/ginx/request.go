@@ -234,10 +234,9 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 				return nil, errors.New("ParamEmpty")
 			}
 			return paramValue, nil
-		} else {
-			c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
-			return nil, errors.New("ParamInvalid")
 		}
+		c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
+		return nil, errors.New("ParamInvalid")
 	}
 
 	/* int64数组 */
