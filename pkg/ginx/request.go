@@ -121,7 +121,7 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, erro
 // 	@param c *gin.Context
 // 	@param paramName string
 // 	@param paramValue interface{}
-// 	@param paramType string int整型64位, +int正整型64位, !-int非负整型64位, string字符串, []枚举(支持数字float64与字符串string混合枚举), array数组
+// 	@param paramType string int整型64位, +int正整型64位, !-int非负整型64位, string字符串, []枚举(支持数字float64与字符串string混合枚举), array数组, []int整型64位数组, []string字符串数组
 // 	@param allowEmpty bool
 //	@return interface{}
 //	@return error
@@ -194,7 +194,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 	}
 
 	/* 枚举, 支持数字float64与字符串string混合枚举 */
-	if EnumMark := paramType[0:1]; "[" == EnumMark {
+	if "[" == paramType[0:1] && "]" != paramType[1:2] {
 		var enum []interface{}
 		if err := json.Unmarshal([]byte(paramType), &enum); err != nil {
 			c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
@@ -229,11 +229,49 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 	/* 数组 */
 	if "array" == paramType {
 		if "[]interface {}" == valueType {
+			if 0 == len(paramValue.([]interface{})) {
+				c.JSON(400, gin.H{"code": "ParamEmpty", "message": fmt.Sprintf("%s不得为空", paramName)})
+				return nil, errors.New("ParamEmpty")
+			}
 			return paramValue, nil
 		} else {
 			c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
 			return nil, errors.New("ParamInvalid")
 		}
+	}
+
+	/* int64数组 */
+	if "[]int" == paramType {
+		arrayValue, err := FilterParam(c, paramName, paramValue, "array", allowEmpty)
+		if err != nil {
+			return nil, err
+		}
+		intSlice := []int64{}
+		for _, item := range arrayValue.([]interface{}) {
+			itemInterface, err := FilterParam(c, paramName, item, "int", false)
+			if err != nil {
+				return nil, err
+			}
+			intSlice = append(intSlice, itemInterface.(int64))
+		}
+		return intSlice, nil
+	}
+
+	/* string数组 */
+	if "[]string" == paramType {
+		arrayValue, err := FilterParam(c, paramName, paramValue, "array", allowEmpty)
+		if err != nil {
+			return nil, err
+		}
+		stringSlice := []string{}
+		for _, item := range arrayValue.([]interface{}) {
+			itemInterface, err := FilterParam(c, paramName, item, "string", false)
+			if err != nil {
+				return nil, err
+			}
+			stringSlice = append(stringSlice, itemInterface.(string))
+		}
+		return stringSlice, nil
 	}
 
 	c.JSON(400, gin.H{"code": "ParamTypeUndefined", "message": fmt.Sprintf("未知数据类型: %s", paramName)})
