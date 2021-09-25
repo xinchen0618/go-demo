@@ -17,9 +17,10 @@ import (
 type cacheService struct {
 }
 
-var CacheService cacheService
-
-var sg singleflight.Group
+var (
+	CacheService cacheService
+	cacheSg      singleflight.Group
+)
 
 // Set 为资源设置缓存
 //	@receiver cacheService
@@ -63,7 +64,7 @@ func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id inte
 //	@return error
 func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id interface{}) (gorose.Data, error) {
 	key := fmt.Sprintf(consts.CacheResource, table, id)
-	v, err, _ := sg.Do(key, func() (interface{}, error) {
+	v, err, _ := cacheSg.Do(key, func() (interface{}, error) {
 		dataCache, err := di.CacheRedis().Get(context.Background(), key).Result()
 		if err != nil {
 			if err != redis.Nil { // redis异常
