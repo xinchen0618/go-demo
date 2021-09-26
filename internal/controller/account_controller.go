@@ -3,7 +3,6 @@ package controller
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"go-demo/config"
 	"go-demo/config/di"
 	"go-demo/internal/service"
@@ -13,10 +12,11 @@ import (
 	"strings"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/gohouse/gorose/v2"
-	"go.uber.org/zap"
 )
 
 // 这里定义一个空结构体用于为大量的controller方法做分类
@@ -139,12 +139,17 @@ func (accountController) GetUsersById(c *gin.Context) {
 }
 
 func (accountController) PostUsers(c *gin.Context) {
-	userName := fmt.Sprintf("QU%d", gox.RandInt64(111111, 999999))
-	if err := service.QueueService.Enqueue("AddUser", map[string]interface{}{"user_name": userName}); err != nil {
+	//userName := fmt.Sprintf("QU%d", gox.RandInt64(111111, 999999))
+	//if err := service.QueueService.Enqueue("AddUser", map[string]interface{}{"user_name": userName}); err != nil {
+	//	zap.L().Error(err.Error())
+	//}
+	//c.JSON(201, gin.H{"user_name": userName})
+
+	userId := gox.RandInt64(111111, 999999)
+	if err := service.QueueService.LowEnqueue("AddUserCounts", map[string]interface{}{"user_id": userId}); err != nil {
 		zap.L().Error(err.Error())
 	}
-
-	c.JSON(201, gin.H{"user_name": userName})
+	c.JSON(201, gin.H{"user_id": userId})
 
 	//jsonBody, err := ginx.GetJsonBody(c, []string{"counts:数量:+int:*"})
 	//if err != nil {
