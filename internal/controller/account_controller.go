@@ -140,13 +140,13 @@ func (accountController) GetUsersById(c *gin.Context) {
 
 func (accountController) PostUsers(c *gin.Context) {
 	//userName := fmt.Sprintf("QU%d", gox.RandInt64(111111, 999999))
-	//if err := service.QueueService.Enqueue("AddUser", map[string]interface{}{"user_name": userName}); err != nil {
+	//if err := service.QueueService.EnqueueIn("AddUser", map[string]interface{}{"user_name": userName}, 5); err != nil {
 	//	zap.L().Error(err.Error())
 	//}
 	//c.JSON(201, gin.H{"user_name": userName})
 
 	userId := gox.RandInt64(111111, 999999)
-	if err := service.QueueService.LowEnqueue("AddUserCounts", map[string]interface{}{"user_id": userId}); err != nil {
+	if err := service.QueueService.LowEnqueueIn("AddUserCounts", map[string]interface{}{"user_id": userId}, 5); err != nil {
 		zap.L().Error(err.Error())
 	}
 	c.JSON(201, gin.H{"user_id": userId})
