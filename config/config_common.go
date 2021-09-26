@@ -10,6 +10,9 @@ func init() {
 		// goroutine池大小
 		"worker_pool": 40960,
 
+		// 消息队列worker数量
+		"queue_worker": 100,
+
 		// DB
 		"mysql_host":     "127.0.0.1",
 		"mysql_port":     3306,
@@ -25,5 +28,6 @@ func init() {
 		"redis_index_cache":   0, // 缓存
 		"redis_index_jwt":     1, // JWT
 		"redis_index_storage": 2, // 存储
+		"redis_index_queue":   3, // 消息队列
 	}
 }
