@@ -11,7 +11,8 @@ func init() {
 		"worker_pool": 40960,
 
 		// 消息队列worker数量
-		"queue_worker": 100,
+		"default_queue_workers": 1000,
+		"low_queue_workers":     3,
 
 		// DB
 		"mysql_host":     "127.0.0.1",
