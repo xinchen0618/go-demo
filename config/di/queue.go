@@ -34,12 +34,11 @@ func QueueServer() *asynq.Server {
 			asynq.RedisClientOpt{Addr: redisAddr, DB: config.GetInt("redis_index_queue")},
 			asynq.Config{
 				// Specify how many concurrent workers to use
-				Concurrency: 10,
+				Concurrency: 100,
 				// Optionally specify multiple queues with different priority.
 				Queues: map[string]int{
-					"critical": 6,
-					"default":  3,
-					"low":      1,
+					"default": 9,
+					"low":     1,
 				},
 				// See the godoc for other configuration options
 			},

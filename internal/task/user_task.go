@@ -18,3 +18,12 @@ func AddUser(ctx context.Context, t *asynq.Task) error {
 	_, err := di.Db().Table("t_users").Data(gorose.Data{"user_name": payload["user_name"]}).Insert()
 	return err
 }
+
+func AddUserCounts(ctx context.Context, t *asynq.Task) error {
+	var payload map[string]interface{}
+	if err := json.Unmarshal(t.Payload(), &payload); err != nil {
+		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
+	}
+	_, err := di.Db().Table("t_user_counts").Data(gorose.Data{"user_id": payload["user_id"]}).Insert()
+	return err
+}

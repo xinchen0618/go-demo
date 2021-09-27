@@ -139,11 +139,18 @@ func (accountController) GetUsersById(c *gin.Context) {
 
 func (accountController) PostUsers(c *gin.Context) {
 	userName := fmt.Sprintf("QU%d", gox.RandInt64(111111, 999999))
-	if err := service.QueueService.EnqueueIn("AddUser", map[string]interface{}{"user_name": userName}, 5); err != nil {
+	if err := service.QueueService.Enqueue("AddUser", map[string]interface{}{"user_name": userName}); err != nil {
 		ginx.InternalError(c, err)
 		return
 	}
 	c.JSON(201, gin.H{"user_name": userName})
+
+	//userId := gox.RandInt64(111111, 999999)
+	//if err := service.QueueService.LowEnqueue("AddUserCounts", map[string]interface{}{"user_id": userId}); err != nil {
+	//	ginx.InternalError(c, err)
+	//	return
+	//}
+	//c.JSON(201, gin.H{"user_id": userId})
 
 	//jsonBody, err := ginx.GetJsonBody(c, []string{"counts:数量:+int:*"})
 	//if err != nil {
