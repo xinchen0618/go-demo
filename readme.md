@@ -11,6 +11,7 @@
 - 命令行         urfave/cli   https://github.com/urfave/cli
 - 计划任务        gocron       https://github.com/go-co-op/gocron
 - WorkerPool    pond          https://github.com/alitto/pond
+- 消息队列       Asynq         https://github.com/hibiken/asynq
 
 
 ###  规范
@@ -31,12 +32,14 @@
   - demo-api/           API   
   - demo-cli/           命令行
   - demo-cron/          计划任务
+  - demo-queue/         消息队列
 - config/               配置
   - consts              常量定义
     - redis_key.go      Redis key统一在此定义避免冲突
   - di/                 服务注入
     - logger.go         日志服务
     - worker_pool.go    goroutine池服务
+    - queue.go          消息队列服务
   - config.go           配置实现
   - config_common.go    公共配置
   - config_prod.go      生产环境配置
@@ -48,8 +51,10 @@
   - router/             API路由
     - router.go         路由注册入口. 路由声明按业务分拆到不同文件, 然后统一在此注册.
   - middleware/         API中间件  
+  - task/               消息队列任务 
   - service/            公共业务逻辑
     - cache_service.go  资源缓存服务
+    - queue_service.go  消息队列服务 
 - pkg/                  外部应用可以使用的库代码
   - ginx/               gin增强方法. 此包中出现error会向客户端返回4xx/500错误, 调用时捕获到error直接结束业务逻辑即可.
   - gox/                golang增强方法
@@ -211,6 +216,32 @@ cd cmd/demo-cron
 go build
 (RUNTIME_ENV=testing ./demo-cron &> /dev/nul &)
 ```
+
+
+### Queue
+
+#### 流程
+
+`cmd/demo-queue/main.go` -> `internal/task/` [-> `internal/service/`]
+
+- `cmd/demo-cron/main.go` 定义队列任务.
+- `internal/task/` 执行逻辑.
+
+#### 使用
+
+- 启动worker
+
+  ```
+  cd cmd/demo-queue
+  go build
+  (RUNTIME_ENV=testing ./demo-queue &> /dev/nul &)
+  ```
+
+- 发送消息任务
+
+  消息队列按任务优先级分两个队列: 默认队列和低优先级队列. 默认队列分配了较多的系统资源, 低优先级队列分配了较少的系统资源.
+
+  默认队列: `service.QueueService.Enqueue()`, `service.QueueService.EnqueueIn()`; 低优先级队列: `service.QueueService.LowEnqueue()`, `service.QueueService.LowEnqueueIn()`
 
 
 ### Redis
