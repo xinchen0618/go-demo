@@ -34,7 +34,7 @@
   - demo-cron/          计划任务
   - demo-queue/         消息队列
 - config/               配置
-  - consts              常量定义
+  - consts/             常量定义
     - redis_key.go      Redis key统一在此定义避免冲突
   - di/                 服务注入
     - logger.go         日志服务
@@ -46,15 +46,15 @@
   - config_testing.go   测试环境配置
 - internal/             内部应用代码
   - action/             命令行action
-  - cron                计划任务  
+  - cron/               计划任务  
   - controller/         API控制器
   - router/             API路由
     - router.go         路由注册入口. 路由声明按业务分拆到不同文件, 然后统一在此注册.
   - middleware/         API中间件  
   - task/               消息队列任务 
   - service/            公共业务逻辑
-    - cache_service.go  资源缓存服务
-    - queue_service.go  消息队列服务 
+    - cache_service.go  资源缓存
+    - queue_service.go  消息队列 
 - pkg/                  外部应用可以使用的库代码
   - ginx/               gin增强方法. 此包中出现error会向客户端返回4xx/500错误, 调用时捕获到error直接结束业务逻辑即可.
   - gox/                golang增强方法
@@ -224,7 +224,7 @@ go build
 
 `cmd/demo-queue/main.go` -> `internal/task/` [-> `internal/service/`]
 
-- `cmd/demo-cron/main.go` 定义队列任务.
+- `cmd/demo-queue/main.go` 定义队列任务.
 - `internal/task/` 执行逻辑.
 
 #### 使用
