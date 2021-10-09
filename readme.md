@@ -98,9 +98,12 @@
   `zap.L().Error()`, `zap.L().Warn()`, `zap.L().Info()`
 
 
-### Worker Pool 
+### WorkerPool 
 
-使用Worker Pool(goroutine池)旨在解决"goroutine使用资源上限"和"优雅处理goroutine中panic"的问题
+使用WorkerPool(Goroutine池)旨在解决两个问题 
+
+- Goroutine使用资源上限 
+- 优雅处理Goroutine中panic
  
 #### 使用
 
@@ -127,11 +130,12 @@
 
 #### 流程
 
-`cmd/demo-api/main.go` -> `internal/router/` -> `internal/controller/` [-> `internal/service/`]
+`cmd/demo-api/main.go` -> `internal/router/` [-> `internal/middleware/`] -> `internal/controller/` [-> `internal/service/`]
 
 - `internal/router/` 路由, API版本在此控制, Major[.Minor], 比如 /v1, /v1.1, API出现向下不兼容且旧版仍需继续使用的情况, ~~比如不升级的旧版APP,~~ 新增Minor版本号. 业务出现结构性变化, 新增Major版本号.
+- `internal/middleware/` 中间件, 可选.
 - `internal/controller/` 业务处理, 事务控制尽量放置在这里, 放置在 `internal/service/` 中容易出现事务嵌套的问题.
-- `internal/service/` 公共业务逻辑封装, 为可选.
+- `internal/service/` 公共业务逻辑封装, 可选.
   
 #### 登录
 
@@ -229,7 +233,7 @@ go build
 
 #### 使用
 
-- 启动worker
+- 启动Worker
 
   ```
   cd cmd/demo-queue
@@ -237,9 +241,15 @@ go build
   (RUNTIME_ENV=testing ./demo-queue &> /dev/nul &)
   ```
 
-- 发送消息任务
+- 优雅停止Worker
 
-  消息队列按任务优先级分两个队列: 默认队列和低优先级队列. 默认队列分配了较多的系统资源, 低优先级队列分配了较少的系统资源.
+  ```
+  kill -TERM $(ps aux | grep -v grep | grep demo-queue | awk '{print $2}')
+  ```
+
+- 发送Job
+
+  消息队列按任务优先级分两个队列: 默认队列, 该队列分配了较多的系统资源, 任务一般发送至此队列; 低优先级队列, 该队列分配了较少的系统资源, 数据量大优先级低的任务发送至此队列
 
   默认队列: `service.QueueService.Enqueue()`, `service.QueueService.EnqueueIn()`; 低优先级队列: `service.QueueService.LowEnqueue()`, `service.QueueService.LowEnqueueIn()`
 

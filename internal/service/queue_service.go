@@ -13,7 +13,7 @@ type queueService struct {
 
 var QueueService queueService
 
-// Enqueue 发送及时消息任务
+// Enqueue 发送及时任务
 //	@receiver queueService
 //	@param taskName string
 //	@param payload map[string]interface{}
@@ -28,7 +28,7 @@ func (queueService) Enqueue(taskName string, payload map[string]interface{}) err
 	return err
 }
 
-// LowEnqueue 发送低优先级及时消息任务
+// LowEnqueue 发送低优先级及时任务
 //	@receiver queueService
 //	@param taskName string
 //	@param payload map[string]interface{}
@@ -43,7 +43,7 @@ func (queueService) LowEnqueue(taskName string, payload map[string]interface{}) 
 	return err
 }
 
-// EnqueueIn 发送延时消息任务
+// EnqueueIn 发送延时任务
 //	@receiver queueService
 //	@param taskName string
 //	@param payload map[string]interface{}
@@ -59,7 +59,7 @@ func (queueService) EnqueueIn(taskName string, payload map[string]interface{}, d
 	return err
 }
 
-// LowEnqueueIn 发送低优先级延时消息任务
+// LowEnqueueIn 发送低优先级延时任务
 //	@receiver queueService
 //	@param taskName string
 //	@param payload map[string]interface{}
