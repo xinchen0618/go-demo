@@ -124,31 +124,38 @@ func (cacheService) Delete(table string, id interface{}) bool {
 //	@return interface{}
 //	@return error
 func (cacheService) GetOrSet(key string, ttl int64, f func() (interface{}, error)) (interface{}, error) {
-	var resultCache string
-	resultCache, err := di.CacheRedis().Get(context.Background(), key).Result()
-	if err != nil {
-		if err != redis.Nil {
-			zap.L().Error(err.Error())
-			return nil, err
-		}
+	result, err, _ := cacheSg.Do(key, func() (interface{}, error) {
+		resultCache, err := di.CacheRedis().Get(context.Background(), key).Result()
+		if err != nil {
+			if err != redis.Nil {
+				zap.L().Error(err.Error())
+				return nil, err
+			}
 
-		// 缓存不存在
-		result, err := f()
-		if err != nil {
-			return nil, err
+			// 缓存不存在
+			result, err := f()
+			if err != nil {
+				return nil, err
+			}
+			resultBytes, err := json.Marshal(result)
+			if err != nil {
+				zap.L().Error(err.Error())
+				return nil, err
+			}
+			if err := di.CacheRedis().Set(context.Background(), key, resultBytes, time.Second*time.Duration(ttl)).Err(); err != nil {
+				zap.L().Error(err.Error())
+				return nil, err
+			}
+			return string(resultBytes), nil
 		}
-		resultBytes, err := json.Marshal(result)
-		if err != nil {
-			return nil, err
-		}
-		if err := di.CacheRedis().Set(context.Background(), key, resultBytes, time.Second*time.Duration(ttl)).Err(); err != nil {
-			return nil, err
-		}
-		resultCache = string(resultBytes)
+		return resultCache, nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	var resultMap interface{}
-	if err := json.Unmarshal([]byte(resultCache), &resultMap); err != nil {
+	if err := json.Unmarshal([]byte(result.(string)), &resultMap); err != nil {
 		zap.L().Error(err.Error())
 		return nil, err
 	}
