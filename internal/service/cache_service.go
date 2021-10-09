@@ -125,6 +125,7 @@ func (cacheService) Delete(table string, id interface{}) bool {
 //	@return error
 func (cacheService) GetOrSet(key string, ttl int64, f func() (interface{}, error)) (interface{}, error) {
 	result, err, _ := cacheSg.Do(key, func() (interface{}, error) {
+		var resultCache string
 		resultCache, err := di.CacheRedis().Get(context.Background(), key).Result()
 		if err != nil {
 			if err != redis.Nil {
@@ -146,18 +147,18 @@ func (cacheService) GetOrSet(key string, ttl int64, f func() (interface{}, error
 				zap.L().Error(err.Error())
 				return nil, err
 			}
-			return string(resultBytes), nil
+			resultCache = string(resultBytes)
 		}
-		return resultCache, nil
+
+		var resultMap interface{}
+		if err := json.Unmarshal([]byte(resultCache), &resultMap); err != nil {
+			zap.L().Error(err.Error())
+			return nil, err
+		}
+		return resultMap, nil
 	})
 	if err != nil {
 		return nil, err
 	}
-
-	var resultMap interface{}
-	if err := json.Unmarshal([]byte(result.(string)), &resultMap); err != nil {
-		zap.L().Error(err.Error())
-		return nil, err
-	}
-	return resultMap, nil
+	return result, nil
 }
