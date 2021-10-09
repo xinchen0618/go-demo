@@ -153,7 +153,7 @@ func (accountController) GetUsersById(c *gin.Context) {
 
 func (accountController) PostUsers(c *gin.Context) {
 	//userName := fmt.Sprintf("QU%d", gox.RandInt64(111111, 999999))
-	//if err := service.QueueService.EnqueueIn("user:AddUser", map[string]interface{}{"user_name": userName}, 30); err != nil {
+	//if err := service.QueueService.EnqueueIn("user:AddUser", map[string]interface{}{"user_name": userName}, 5); err != nil {
 	//	ginx.InternalError(c, err)
 	//	return
 	//}

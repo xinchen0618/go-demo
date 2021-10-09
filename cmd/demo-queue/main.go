@@ -19,7 +19,7 @@ func loggingMiddleware(h asynq.Handler) asynq.Handler {
 			log.Printf("Processing err %q --- %s, %v", t.Type(), t.Payload(), err)
 			return err
 		}
-		log.Printf("Finished processing %q: Elapsed Time = %v", t.Type(), time.Since(start))
+		log.Printf("Finished processing %q --- %s, Elapsed Time = %v", t.Type(), t.Payload(), time.Since(start))
 		return nil
 	})
 }
