@@ -22,7 +22,7 @@ var (
 	cacheSg      singleflight.Group
 )
 
-// Set 为资源设置缓存
+// Set 设置资源缓存
 //	@receiver cacheService
 //	@param db gorose.IOrm
 //	@param table string
@@ -113,4 +113,44 @@ func (cacheService) Delete(table string, id interface{}) bool {
 	}
 
 	return true
+}
+
+// GetOrSet 获取或者设置业务缓存
+//	此方法返回的是json.Unmarshal的数据
+//	@receiver cacheService
+//	@param key string
+//	@param ttl int64 缓存时长(秒)
+//	@param f func() (interface{}, error)
+//	@return interface{}
+//	@return error
+func (cacheService) GetOrSet(key string, ttl int64, f func() (interface{}, error)) (interface{}, error) {
+	var resultCache string
+	resultCache, err := di.CacheRedis().Get(context.Background(), key).Result()
+	if err != nil {
+		if err != redis.Nil {
+			zap.L().Error(err.Error())
+			return nil, err
+		}
+
+		// 缓存不存在
+		result, err := f()
+		if err != nil {
+			return nil, err
+		}
+		resultBytes, err := json.Marshal(result)
+		if err != nil {
+			return nil, err
+		}
+		if err := di.CacheRedis().Set(context.Background(), key, resultBytes, time.Second*time.Duration(ttl)).Err(); err != nil {
+			return nil, err
+		}
+		resultCache = string(resultBytes)
+	}
+
+	var resultMap interface{}
+	if err := json.Unmarshal([]byte(resultCache), &resultMap); err != nil {
+		zap.L().Error(err.Error())
+		return nil, err
+	}
+	return resultMap, nil
 }

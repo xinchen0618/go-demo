@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"go-demo/config"
 	"go-demo/config/di"
 	"go-demo/internal/service"
@@ -11,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -87,32 +90,44 @@ func (accountController) DeleteUserLogout(c *gin.Context) {
 }
 
 func (accountController) GetUsers(c *gin.Context) {
-	pageItems, err := ginx.GetPageItems(ginx.PageQuery{
-		GinCtx:     c,
-		Db:         di.Db(),
-		Select:     "user_id,user_name,money,created_at,updated_at",
-		From:       "t_users",
-		Where:      "user_id > ?",
-		BindParams: []interface{}{5},
-		OrderBy:    "user_id DESC",
+	queries, err := ginx.GetQueries(c, []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
+	if err != nil {
+		return
+	}
+	key := "users:" + gox.Md5Interface(queries)
+	pageItems, err := service.CacheService.GetOrSet(key, 10, func() (interface{}, error) {
+		pageItems, err := ginx.GetPageItems(ginx.PageQuery{
+			GinCtx:     c,
+			Db:         di.Db(),
+			Select:     "user_id,user_name,money,created_at,updated_at",
+			From:       "t_users",
+			Where:      "user_id > ?",
+			BindParams: []interface{}{5},
+			OrderBy:    "user_id DESC",
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		// 多线程读
+		wpg := di.WorkerPool().Group()
+		for _, item := range pageItems.Items {
+			item := item
+			wpg.Submit(func() {
+				userCounts, _ := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"])
+				item["counts"] = 0
+				if counts, ok := userCounts["counts"]; ok {
+					item["counts"] = counts
+				}
+			})
+		}
+		wpg.Wait()
+
+		return pageItems, nil
 	})
 	if err != nil {
 		return
 	}
-
-	// 多线程读
-	wpg := di.WorkerPool().Group()
-	for _, item := range pageItems.Items {
-		item := item
-		wpg.Submit(func() {
-			userCounts, _ := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"])
-			item["counts"] = 0
-			if counts, ok := userCounts["counts"]; ok {
-				item["counts"] = counts
-			}
-		})
-	}
-	wpg.Wait()
 
 	c.JSON(200, pageItems)
 }
@@ -144,66 +159,66 @@ func (accountController) PostUsers(c *gin.Context) {
 	//}
 	//c.JSON(201, gin.H{"user_name": userName})
 
-	userId := gox.RandInt64(111111, 999999)
-	if err := service.QueueService.LowEnqueue("user:AddUserCounts", map[string]interface{}{"user_id": userId}); err != nil {
-		ginx.InternalError(c, err)
-		return
-	}
-	c.JSON(201, gin.H{"user_id": userId})
-
-	//jsonBody, err := ginx.GetJsonBody(c, []string{"counts:数量:+int:*"})
-	//if err != nil {
+	//userId := gox.RandInt64(111111, 999999)
+	//if err := service.QueueService.LowEnqueue("user:AddUserCounts", map[string]interface{}{"user_id": userId}); err != nil {
+	//	ginx.InternalError(c, err)
 	//	return
 	//}
-	//
-	//var counts int64 = 100
-	//if _, ok := jsonBody["counts"]; ok {
-	//	counts = jsonBody["counts"].(int64)
-	//}
-	//
-	//for i := int64(0); i < counts; i++ {
-	//	// 多线程写
-	//	di.WorkerPool().Submit(func() {
-	//		db := di.Db()
-	//		if err := db.Begin(); err != nil {
-	//			zap.L().Error(err.Error())
-	//			return
-	//		}
-	//
-	//		userName := fmt.Sprintf("U%d", gox.RandInt64(111111, 999999))
-	//		user, err := db.Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": userName}).First()
-	//		if err != nil {
-	//			zap.L().Error(err.Error())
-	//			_ = db.Rollback()
-	//			return
-	//		}
-	//		var userId int64
-	//		if len(user) > 0 { // 记录存在
-	//			userId = user["user_id"].(int64)
-	//		} else { // 记录不存在
-	//			userId, err = db.Table("t_users").Data(gorose.Data{"user_name": userName}).InsertGetId()
-	//			if err != nil {
-	//				zap.L().Error(err.Error())
-	//				_ = db.Rollback()
-	//				return
-	//			}
-	//		}
-	//		sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,?) ON DUPLICATE KEY UPDATE counts = counts + 1"
-	//		if _, err = db.Execute(sql, userId, gox.RandInt64(1, 9)); err != nil {
-	//			zap.L().Error(err.Error())
-	//			_ = db.Rollback()
-	//			return
-	//		}
-	//
-	//		if err := db.Commit(); err != nil {
-	//			zap.L().Error(err.Error())
-	//			_ = db.Rollback()
-	//			return
-	//		}
-	//
-	//		service.CacheService.Delete("t_user_counts", userId)
-	//	})
-	//}
-	//
-	//c.JSON(201, gin.H{"counts": counts})
+	//c.JSON(201, gin.H{"user_id": userId})
+
+	jsonBody, err := ginx.GetJsonBody(c, []string{"counts:数量:+int:*"})
+	if err != nil {
+		return
+	}
+
+	var counts int64 = 100
+	if _, ok := jsonBody["counts"]; ok {
+		counts = jsonBody["counts"].(int64)
+	}
+
+	for i := int64(0); i < counts; i++ {
+		// 多线程写
+		di.WorkerPool().Submit(func() {
+			db := di.Db()
+			if err := db.Begin(); err != nil {
+				zap.L().Error(err.Error())
+				return
+			}
+
+			userName := fmt.Sprintf("U%d", gox.RandInt64(111111, 999999))
+			user, err := db.Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": userName}).First()
+			if err != nil {
+				zap.L().Error(err.Error())
+				_ = db.Rollback()
+				return
+			}
+			var userId int64
+			if len(user) > 0 { // 记录存在
+				userId = user["user_id"].(int64)
+			} else { // 记录不存在
+				userId, err = db.Table("t_users").Data(gorose.Data{"user_name": userName}).InsertGetId()
+				if err != nil {
+					zap.L().Error(err.Error())
+					_ = db.Rollback()
+					return
+				}
+			}
+			sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,?) ON DUPLICATE KEY UPDATE counts = counts + 1"
+			if _, err = db.Execute(sql, userId, gox.RandInt64(1, 9)); err != nil {
+				zap.L().Error(err.Error())
+				_ = db.Rollback()
+				return
+			}
+
+			if err := db.Commit(); err != nil {
+				zap.L().Error(err.Error())
+				_ = db.Rollback()
+				return
+			}
+
+			service.CacheService.Delete("t_user_counts", userId)
+		})
+	}
+
+	c.JSON(201, gin.H{"counts": counts})
 }
