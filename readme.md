@@ -262,6 +262,8 @@ go build
 
 #### 缓存
 
+key统一在`config/consts/redis_key.go`中定义.
+
 - 资源缓存
 
   以资源对象为单位, 使用旁路缓存策略.
@@ -271,4 +273,4 @@ go build
 
 - 业务缓存
 
-  针对业务设计的缓存, `service.CacheService.GetOrSet()`获取或设置业务缓存. key统一在`config/consts/redis_key.go`中定义. 
+  针对业务设计的缓存, `service.CacheService.GetOrSet()`获取或设置业务缓存. 
