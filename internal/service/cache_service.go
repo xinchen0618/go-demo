@@ -55,49 +55,50 @@ func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id inte
 }
 
 // Get 获取资源缓存
+//	方法返回的是json.Unmarshal的数据
 //	@receiver cacheService
 //	@param db gorose.IOrm
 //	@param table string
 //	@param primaryKey string
 //	@param id interface{} 整数
-//	@return gorose.Data
+//	@return map[string]interface{}
 //	@return error
-func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id interface{}) (gorose.Data, error) {
+func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id interface{}) (map[string]interface{}, error) {
 	key := fmt.Sprintf(consts.CacheResource, table, id)
 	v, err, _ := cacheSg.Do(key, func() (interface{}, error) {
 		dataCache, err := di.CacheRedis().Get(context.Background(), key).Result()
 		if err != nil {
 			if err != redis.Nil { // redis异常
 				zap.L().Error(err.Error())
-				return gorose.Data{}, err
+				return map[string]interface{}{}, err
 			}
 			// 缓存不存在
 			ok, err := CacheService.Set(db, table, primaryKey, id)
 			if err != nil {
-				return gorose.Data{}, err
+				return map[string]interface{}{}, err
 			}
 			if !ok { // 记录不存在
-				return gorose.Data{}, nil
+				return map[string]interface{}{}, nil
 			}
 			// 设置缓存成功
 			dataCache, err = di.CacheRedis().Get(context.Background(), key).Result()
 			if err != nil {
 				zap.L().Error(err.Error())
-				return gorose.Data{}, err
+				return map[string]interface{}{}, err
 			}
 		}
-		var dataMap gorose.Data
+		var dataMap map[string]interface{}
 		if err := json.Unmarshal([]byte(dataCache), &dataMap); err != nil {
 			zap.L().Error(err.Error())
-			return gorose.Data{}, err
+			return map[string]interface{}{}, err
 		}
 		return dataMap, nil
 	})
 	if err != nil {
-		return gorose.Data{}, err
+		return map[string]interface{}{}, err
 	}
 
-	return v.(gorose.Data), nil
+	return v.(map[string]interface{}), nil
 }
 
 // Delete 删除资源缓存
@@ -116,7 +117,7 @@ func (cacheService) Delete(table string, id interface{}) bool {
 }
 
 // GetOrSet 获取或者设置业务缓存
-//	此方法返回的是json.Unmarshal的数据
+//	方法返回的是json.Unmarshal的数据
 //	@receiver cacheService
 //	@param key string
 //	@param ttl int64 缓存时长(秒)
