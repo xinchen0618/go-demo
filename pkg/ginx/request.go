@@ -13,7 +13,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gohouse/gorose/v2"
-	"github.com/shopspring/decimal"
 )
 
 // PageQuery 分页参数
@@ -181,12 +180,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			}
 			return stringValue, nil
 		} else if "float64" == valueType {
-			decimalValue, err := decimal.NewFromString(fmt.Sprintf("%v", paramValue)) // 解决6位以上数据被转科学记数法的问题
-			if err != nil {
-				c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
-				return nil, errors.New("ParamInvalid")
-			}
-			return decimalValue.String(), nil
+			return strconv.FormatFloat(paramValue.(float64), 'f', -1, 64), nil
 		} else {
 			c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
 			return nil, errors.New("ParamInvalid")
@@ -206,7 +200,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 				return value, nil
 			}
 			if "float64" == valueType {
-				stringValue := fmt.Sprintf("%v", paramValue)
+				stringValue := strconv.FormatFloat(paramValue.(float64), 'f', -1, 64)
 				if stringValue == value {
 					return value, nil
 				}
