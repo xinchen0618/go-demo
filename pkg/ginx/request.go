@@ -195,7 +195,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			return nil, errors.New("ParamInvalid")
 		}
 		for _, value := range enum {
-			enumType := reflect.TypeOf(enum[0]).String()
+			enumType := reflect.TypeOf(value).String()
 			if enumType == valueType && paramValue == value {
 				return value, nil
 			}
@@ -210,7 +210,9 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 					c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
 					return nil, errors.New("ParamInvalid")
 				}
-				return floatValue, nil
+				if floatValue == value {
+					return floatValue, nil
+				}
 			} else {
 				c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
 				return nil, errors.New("ParamInvalid")
