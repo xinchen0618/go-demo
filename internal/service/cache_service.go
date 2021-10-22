@@ -31,7 +31,7 @@ var (
 //	@return bool
 //	@return error
 func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id interface{}) (bool, error) {
-	sql := fmt.Sprintf("/*FORCE_MASTER*/ SELECT * FROM %s WHERE %s = %d LIMIT 1", table, primaryKey, id) // 查主库, 避免主从同步延迟的问题
+	sql := fmt.Sprintf("SELECT * FROM %s WHERE %s = %d LIMIT 1", table, primaryKey, id)
 	data, err := db.Query(sql)
 	if err != nil {
 		zap.L().Error(err.Error())
@@ -46,7 +46,7 @@ func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id inte
 		return false, err
 	}
 	key := fmt.Sprintf(consts.CacheResource, table, id)
-	if err = di.CacheRedis().Set(context.Background(), key, dataBytes, time.Hour*24*30).Err(); err != nil {
+	if err := di.CacheRedis().Set(context.Background(), key, dataBytes, time.Hour*24*30).Err(); err != nil {
 		zap.L().Error(err.Error())
 		return false, err
 	}
@@ -72,6 +72,7 @@ func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id inte
 				zap.L().Error(err.Error())
 				return map[string]interface{}{}, err
 			}
+
 			// 缓存不存在
 			ok, err := CacheService.Set(db, table, primaryKey, id)
 			if err != nil {

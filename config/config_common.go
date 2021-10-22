@@ -7,7 +7,7 @@ func init() {
 		// 错误日志路径
 		"error_log": "/var/log/golang_error.log",
 
-		// goroutine池大小
+		// Goroutine池大小
 		"worker_pool": 40960,
 
 		// DB
