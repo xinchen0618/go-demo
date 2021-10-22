@@ -15,8 +15,11 @@ var (
 
 func QueueClient() *asynq.Client {
 	queueClientOnce.Do(func() {
-		redisAddr := fmt.Sprintf("%s:%d", config.GetString("redis_host"), config.GetInt("redis_port"))
-		queueClient = asynq.NewClient(asynq.RedisClientOpt{Addr: redisAddr, DB: config.GetInt("redis_index_queue")})
+		queueClient = asynq.NewClient(asynq.RedisClientOpt{
+			Addr:     fmt.Sprintf("%s:%d", config.GetString("redis_host"), config.GetInt("redis_port")),
+			DB:       config.GetInt("redis_index_queue"),
+			Password: config.GetString("redis_auth"),
+		})
 	})
 
 	return queueClient
@@ -29,9 +32,12 @@ var (
 
 func QueueServer() *asynq.Server {
 	queueServerOnce.Do(func() {
-		redisAddr := fmt.Sprintf("%s:%d", config.GetString("redis_host"), config.GetInt("redis_port"))
 		queueServer = asynq.NewServer(
-			asynq.RedisClientOpt{Addr: redisAddr, DB: config.GetInt("redis_index_queue")},
+			asynq.RedisClientOpt{
+				Addr:     fmt.Sprintf("%s:%d", config.GetString("redis_host"), config.GetInt("redis_port")),
+				DB:       config.GetInt("redis_index_queue"),
+				Password: config.GetString("redis_auth"),
+			},
 			asynq.Config{
 				// Specify how many concurrent workers to use
 				Concurrency: 100,
