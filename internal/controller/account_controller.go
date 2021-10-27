@@ -209,14 +209,16 @@ func (accountController) PostUsers(c *gin.Context) {
 				_ = db.Rollback()
 				return
 			}
+			if err := service.CacheService.Delete("t_user_counts", userId); err != nil {
+				_ = db.Rollback()
+				return
+			}
 
 			if err := db.Commit(); err != nil {
 				zap.L().Error(err.Error())
 				_ = db.Rollback()
 				return
 			}
-
-			service.CacheService.Delete("t_user_counts", userId)
 		})
 	}
 

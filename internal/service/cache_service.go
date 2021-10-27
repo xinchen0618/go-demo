@@ -46,7 +46,7 @@ func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id inte
 		return false, err
 	}
 	key := fmt.Sprintf(consts.CacheResource, table, id)
-	if err := di.CacheRedis().Set(context.Background(), key, dataBytes, time.Hour*24*30).Err(); err != nil {
+	if err := di.CacheRedis().Set(context.Background(), key, dataBytes, time.Hour*24).Err(); err != nil {
 		zap.L().Error(err.Error())
 		return false, err
 	}
@@ -106,15 +106,15 @@ func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id inte
 //	@receiver *cacheService
 //	@param table string
 //	@param id interface{} 整数
-//	@return bool
-func (cacheService) Delete(table string, id interface{}) bool {
+//	@return error
+func (cacheService) Delete(table string, id interface{}) error {
 	key := fmt.Sprintf(consts.CacheResource, table, id)
 	if err := di.CacheRedis().Del(context.Background(), key).Err(); err != nil {
 		zap.L().Error(err.Error())
-		return false
+		return err
 	}
 
-	return true
+	return nil
 }
 
 // GetOrSet 获取或者设置业务缓存
