@@ -161,7 +161,7 @@
 
 - 开发&测试环境使用gowatch实时热重载
 
-  注意, 是否配置了Go mod代理 `go env -w GOPROXY=https://goproxy.cn,direct`, 是否安装了gowatch `go get github.com/silenceper/gowatch`, 是否配置了Go bin路径 `export PATH=$PATH:$HOME/go/bin`.
+  注意, 是否配置了Go mod代理 `go env -w GOPROXY=https://goproxy.cn,direct`, 是否配置了Go bin路径 `go env -w GOBIN=$HOME/go/bin`, 是否安装了gowatch `go get github.com/silenceper/gowatch`.
 
   ```
   cd cmd/demo-api
