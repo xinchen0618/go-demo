@@ -11,8 +11,7 @@ import (
 )
 
 // 这里定义一个空结构体用于为大量的action方法做分类
-type userAction struct {
-}
+type userAction struct{}
 
 // UserAction 这里仅需结构体零值, cli通过action.XxxAction.Xxx的形式引用旗下定义的方法
 var UserAction userAction

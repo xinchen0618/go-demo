@@ -8,8 +8,7 @@ import (
 )
 
 // 这里定义一个空结构体用于为大量的cron方法做分类
-type userCron struct {
-}
+type userCron struct{}
 
 // UserCron 这里仅需结构体零值, 计划任务通过cron.XxxCron.Xxx的形式引用旗下定义的方法
 var UserCron userCron

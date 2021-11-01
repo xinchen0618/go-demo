@@ -8,8 +8,7 @@ import (
 	"github.com/hibiken/asynq"
 )
 
-type queueService struct {
-}
+type queueService struct{}
 
 var QueueService queueService
 

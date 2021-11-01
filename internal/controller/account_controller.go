@@ -21,8 +21,7 @@ import (
 )
 
 // 这里定义一个空结构体用于为大量的controller方法做分类
-type accountController struct {
-}
+type accountController struct{}
 
 // AccountController 这里仅需结构体零值, router通过controller.XxxController.Xxx的形式引用旗下定义的方法
 var AccountController accountController

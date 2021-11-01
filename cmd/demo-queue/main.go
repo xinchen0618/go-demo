@@ -28,8 +28,8 @@ func main() {
 	// mux maps a type to a handler
 	mux := asynq.NewServeMux()
 	mux.Use(loggingMiddleware)
-	mux.HandleFunc("user:AddUser", task.AddUser)
-	mux.HandleFunc("user:AddUserCounts", task.AddUserCounts)
+	mux.HandleFunc("user:AddUser", task.UserTask.AddUser)
+	mux.HandleFunc("user:AddUserCounts", task.UserTask.AddUserCounts)
 
 	if err := di.QueueServer().Run(mux); err != nil {
 		panic(err)

@@ -14,8 +14,7 @@ import (
 	"golang.org/x/sync/singleflight"
 )
 
-type cacheService struct {
-}
+type cacheService struct{}
 
 var (
 	CacheService cacheService
