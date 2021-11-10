@@ -251,7 +251,7 @@ go build
 
   消息队列按任务优先级分两个队列: 默认队列, 该队列分配了较多的系统资源, 任务一般发送至此队列; 低优先级队列, 该队列分配了较少的系统资源, 数据量大优先级低的任务发送至此队列
 
-  默认队列: `service.QueueService.Enqueue()`, `service.QueueService.EnqueueIn()`; 低优先级队列: `service.QueueService.LowEnqueue()`, `service.QueueService.LowEnqueueIn()`
+  默认队列: 及时消息`service.QueueService.Enqueue()`, 延时消息`service.QueueService.EnqueueIn()`; 低优先级队列: 及时消息`service.QueueService.LowEnqueue()`, 延时消息`service.QueueService.LowEnqueueIn()`
 
 
 ### Redis
