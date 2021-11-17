@@ -8,7 +8,7 @@ func init() {
 		"error_log": "/var/log/golang_error.log",
 
 		// Goroutine池大小
-		"worker_pool": 40960,
+		"worker_pool": 409600,
 
 		// DB
 		"mysql_host":     "127.0.0.1",
