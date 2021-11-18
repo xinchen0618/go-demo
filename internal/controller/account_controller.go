@@ -93,7 +93,12 @@ func (accountController) GetUsers(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	key := "users:" + gox.Md5Interface(queries)
+	key, err := gox.Md5x(queries)
+	if err != nil {
+		ginx.InternalError(c, err)
+		return
+	}
+	key = "users:" + key
 	pageItems, err := service.CacheService.GetOrSet(key, 10, func() (interface{}, error) {
 		pageItems, err := ginx.GetPageItems(ginx.PageQuery{
 			GinCtx:     c,

@@ -12,24 +12,25 @@ import (
 // Md5 字符串md5
 //	@param str string
 //	@return string
-func Md5(str string) string {
+//	@return error
+func Md5(s string) (string, error) {
 	h := md5.New()
-	if _, err := io.WriteString(h, str); err != nil {
+	if _, err := io.WriteString(h, s); err != nil {
 		zap.L().Error(err.Error())
-		return ""
+		return "", err
 	}
-	return fmt.Sprintf("%x", h.Sum(nil))
+	return fmt.Sprintf("%x", h.Sum(nil)), nil
 }
 
-// Md5Interface 非String/Number数据md5
-//	先json.Marshal再Md5
+// Md5x 非String/Number数据md5
 //	@param i interface{}
 //	@return string
-func Md5Interface(i interface{}) string {
+//	@return error
+func Md5x(i interface{}) (string, error) {
 	iBytes, err := json.Marshal(i)
 	if err != nil {
 		zap.L().Error(err.Error())
-		return ""
+		return "", err
 	}
 	return Md5(string(iBytes))
 }
