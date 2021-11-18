@@ -270,7 +270,3 @@ key统一在`config/consts/redis_key.go`中定义.
 
   - `GET`资源时`service.CacheService.Get()`获取缓存(缓存不存在时会建立)
   - `PUT`/`DELETE`资源时`service.CacheService.Delete()`删除缓存
-
-- 业务缓存
-
-  针对业务设计的缓存, `service.CacheService.GetOrSet()`获取或设置业务缓存. 

@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"go-demo/config/consts"
 	"go-demo/config/di"
+	"go-demo/pkg/gox"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -39,9 +39,8 @@ func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id inte
 	if 0 == len(data) {
 		return false, nil
 	}
-	dataBytes, err := json.Marshal(data[0])
+	dataBytes, err := gox.GobEncode(data[0])
 	if err != nil {
-		zap.L().Error(err.Error())
 		return false, err
 	}
 	key := fmt.Sprintf(consts.CacheResource, table, id)
@@ -54,7 +53,6 @@ func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id inte
 }
 
 // Get 获取资源缓存
-//	方法返回的是json.Unmarshal的数据
 //	@receiver cacheService
 //	@param db gorose.IOrm
 //	@param table string
@@ -88,8 +86,7 @@ func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id inte
 			}
 		}
 		var dataMap map[string]interface{}
-		if err := json.Unmarshal([]byte(dataCache), &dataMap); err != nil {
-			zap.L().Error(err.Error())
+		if err := gox.GobDecode([]byte(dataCache), &dataMap); err != nil {
 			return map[string]interface{}{}, err
 		}
 		return dataMap, nil
@@ -114,52 +111,4 @@ func (cacheService) Delete(table string, id interface{}) error {
 	}
 
 	return nil
-}
-
-// GetOrSet 获取或者设置业务缓存
-//	方法返回的是json.Unmarshal的数据
-//	@receiver cacheService
-//	@param key string
-//	@param ttl int64 缓存时长(秒)
-//	@param f func() (interface{}, error)
-//	@return interface{}
-//	@return error
-func (cacheService) GetOrSet(key string, ttl int64, f func() (interface{}, error)) (interface{}, error) {
-	result, err, _ := cacheSg.Do(key, func() (interface{}, error) {
-		var resultCache string
-		resultCache, err := di.CacheRedis().Get(context.Background(), key).Result()
-		if err != nil {
-			if err != redis.Nil {
-				zap.L().Error(err.Error())
-				return nil, err
-			}
-
-			// 缓存不存在
-			result, err := f()
-			if err != nil {
-				return nil, err
-			}
-			resultBytes, err := json.Marshal(result)
-			if err != nil {
-				zap.L().Error(err.Error())
-				return nil, err
-			}
-			if err := di.CacheRedis().Set(context.Background(), key, resultBytes, time.Second*time.Duration(ttl)).Err(); err != nil {
-				zap.L().Error(err.Error())
-				return nil, err
-			}
-			resultCache = string(resultBytes)
-		}
-
-		var resultInterface interface{}
-		if err := json.Unmarshal([]byte(resultCache), &resultInterface); err != nil {
-			zap.L().Error(err.Error())
-			return nil, err
-		}
-		return resultInterface, nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
 }

@@ -89,49 +89,32 @@ func (accountController) DeleteUserLogout(c *gin.Context) {
 }
 
 func (accountController) GetUsers(c *gin.Context) {
-	queries, err := ginx.GetQueries(c, []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
-	if err != nil {
-		return
-	}
-	key, err := gox.Md5x(queries)
-	if err != nil {
-		ginx.InternalError(c, err)
-		return
-	}
-	key = "users:" + key
-	pageItems, err := service.CacheService.GetOrSet(key, 10, func() (interface{}, error) {
-		pageItems, err := ginx.GetPageItems(ginx.PageQuery{
-			GinCtx:     c,
-			Db:         di.Db(),
-			Select:     "user_id,user_name,money,created_at,updated_at",
-			From:       "t_users",
-			Where:      "user_id > ?",
-			BindParams: []interface{}{5},
-			OrderBy:    "user_id DESC",
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		// 多线程读
-		wpg := di.WorkerPool().Group()
-		for _, item := range pageItems.Items {
-			item := item
-			wpg.Submit(func() {
-				userCounts, _ := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"])
-				item["counts"] = 0
-				if counts, ok := userCounts["counts"]; ok {
-					item["counts"] = counts
-				}
-			})
-		}
-		wpg.Wait()
-
-		return pageItems, nil
+	pageItems, err := ginx.GetPageItems(ginx.PageQuery{
+		GinCtx:     c,
+		Db:         di.Db(),
+		Select:     "user_id,user_name,money,created_at,updated_at",
+		From:       "t_users",
+		Where:      "user_id > ?",
+		BindParams: []interface{}{5},
+		OrderBy:    "user_id DESC",
 	})
 	if err != nil {
 		return
 	}
+
+	// 多线程读
+	wpg := di.WorkerPool().Group()
+	for _, item := range pageItems.Items {
+		item := item
+		wpg.Submit(func() {
+			userCounts, _ := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"])
+			item["counts"] = 0
+			if counts, ok := userCounts["counts"]; ok {
+				item["counts"] = counts
+			}
+		})
+	}
+	wpg.Wait()
 
 	c.JSON(200, pageItems)
 }
