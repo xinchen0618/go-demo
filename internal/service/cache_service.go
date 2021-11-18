@@ -151,12 +151,12 @@ func (cacheService) GetOrSet(key string, ttl int64, f func() (interface{}, error
 			resultCache = string(resultBytes)
 		}
 
-		var resultMap interface{}
-		if err := json.Unmarshal([]byte(resultCache), &resultMap); err != nil {
+		var resultInterface interface{}
+		if err := json.Unmarshal([]byte(resultCache), &resultInterface); err != nil {
 			zap.L().Error(err.Error())
 			return nil, err
 		}
-		return resultMap, nil
+		return resultInterface, nil
 	})
 	if err != nil {
 		return nil, err
