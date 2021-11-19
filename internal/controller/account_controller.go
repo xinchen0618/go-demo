@@ -64,7 +64,7 @@ func (accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记
 		ginx.InternalError(c, err)
 		return
 	}
-	key := "jwt:" + claims.Id + ":" + tokenAtoms[2]
+	key := fmt.Sprintf(consts.JwtUserLogin, claims.Id, tokenAtoms[2])
 	if err = di.JwtRedis().Set(context.Background(), key, payload, loginTtl).Err(); err != nil {
 		ginx.InternalError(c, err)
 		return

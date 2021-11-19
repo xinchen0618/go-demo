@@ -2,7 +2,9 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"go-demo/config"
+	"go-demo/config/consts"
 	"go-demo/config/di"
 	"go-demo/pkg/ginx"
 	"strconv"
@@ -36,7 +38,7 @@ func UserAuth() gin.HandlerFunc {
 		}
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid { // redis白名单校验
 			tokenAtoms := strings.Split(tokenString, ".")
-			key := "jwt:" + claims["jti"].(string) + ":" + tokenAtoms[2]
+			key := fmt.Sprintf(consts.JwtUserLogin, claims["jti"], tokenAtoms[2])
 			if _, err := di.JwtRedis().Get(context.Background(), key).Result(); err != nil {
 				if redis.Nil == err {
 					c.JSON(401, gin.H{"code": "UserUnauthorized", "message": "用户未登录或登录已过期, 请重新登录"})
