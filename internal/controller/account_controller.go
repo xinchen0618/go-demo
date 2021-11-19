@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-demo/config"
+	"go-demo/config/consts"
 	"go-demo/config/di"
 	"go-demo/internal/service"
 	"go-demo/pkg/ginx"
@@ -13,11 +14,10 @@ import (
 	"strings"
 	"time"
 
-	"go.uber.org/zap"
-
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/gohouse/gorose/v2"
+	"go.uber.org/zap"
 )
 
 // 这里定义一个空结构体用于为大量的controller方法做分类
@@ -89,32 +89,49 @@ func (accountController) DeleteUserLogout(c *gin.Context) {
 }
 
 func (accountController) GetUsers(c *gin.Context) {
-	pageItems, err := ginx.GetPageItems(ginx.PageQuery{
-		GinCtx:     c,
-		Db:         di.Db(),
-		Select:     "user_id,user_name,money,created_at,updated_at",
-		From:       "t_users",
-		Where:      "user_id > ?",
-		BindParams: []interface{}{5},
-		OrderBy:    "user_id DESC",
+	queries, err := ginx.GetQueries(c, []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
+	if err != nil {
+		return
+	}
+	key, err := gox.Md5x(queries)
+	if err != nil {
+		ginx.InternalError(c, err)
+		return
+	}
+	key = fmt.Sprintf(consts.CacheUsers, key)
+	pageItems, err := ginx.GetOrSet(c, key, 10, func() (interface{}, error) {
+		pageItems, err := ginx.GetPageItems(ginx.PageQuery{
+			GinCtx:     c,
+			Db:         di.Db(),
+			Select:     "user_id,user_name,money,created_at,updated_at",
+			From:       "t_users",
+			Where:      "user_id > ?",
+			BindParams: []interface{}{5},
+			OrderBy:    "user_id DESC",
+		})
+		if err != nil {
+			return ginx.PageItems{}, err
+		}
+
+		// 多线程读
+		wpg := di.WorkerPool().Group()
+		for _, item := range pageItems.Items {
+			item := item
+			wpg.Submit(func() {
+				userCounts, _ := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"])
+				item["counts"] = 0
+				if counts, ok := userCounts["counts"]; ok {
+					item["counts"] = counts
+				}
+			})
+		}
+		wpg.Wait()
+
+		return pageItems, nil
 	})
 	if err != nil {
 		return
 	}
-
-	// 多线程读
-	wpg := di.WorkerPool().Group()
-	for _, item := range pageItems.Items {
-		item := item
-		wpg.Submit(func() {
-			userCounts, _ := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"])
-			item["counts"] = 0
-			if counts, ok := userCounts["counts"]; ok {
-				item["counts"] = counts
-			}
-		})
-	}
-	wpg.Wait()
 
 	c.JSON(200, pageItems)
 }

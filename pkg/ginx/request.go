@@ -3,16 +3,21 @@
 package ginx
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"go-demo/config/di"
 	"math"
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"github.com/gohouse/gorose/v2"
+	"golang.org/x/sync/singleflight"
 )
 
 // PageQuery 分页参数
@@ -36,6 +41,10 @@ type PageItems struct {
 	TotalCounts int64         `json:"total_counts"`
 	Items       []gorose.Data `json:"items"`
 }
+
+var (
+	cacheSg singleflight.Group
+)
 
 // GetJsonBody 获取Json参数
 // 	@param c *gin.Context
@@ -339,6 +348,54 @@ func GetPageItems(pageQuery PageQuery) (PageItems, error) {
 		TotalPages:  int64(math.Ceil(float64(counts) / float64(perPage))),
 		TotalCounts: counts,
 		Items:       items,
+	}
+	return result, nil
+}
+
+// GetOrSet 获取或者设置业务缓存
+//	方法返回的是json.Unmarshal的数据
+//	@receiver cacheService
+//	@param key string
+//	@param ttl int64 缓存时长(秒)
+//	@param f func() (interface{}, error)
+//	@return interface{}
+//	@return error
+func GetOrSet(c *gin.Context, key string, ttl int64, f func() (interface{}, error)) (interface{}, error) {
+	result, err, _ := cacheSg.Do(key, func() (interface{}, error) {
+		var resultCache string
+		resultCache, err := di.CacheRedis().Get(context.Background(), key).Result()
+		if err != nil {
+			if err != redis.Nil {
+				InternalError(c, err)
+				return nil, err
+			}
+
+			// 缓存不存在
+			result, err := f()
+			if err != nil {
+				return nil, err
+			}
+			resultBytes, err := json.Marshal(result)
+			if err != nil {
+				InternalError(c, err)
+				return nil, err
+			}
+			if err := di.CacheRedis().Set(context.Background(), key, resultBytes, time.Second*time.Duration(ttl)).Err(); err != nil {
+				InternalError(c, err)
+				return nil, err
+			}
+			resultCache = string(resultBytes)
+		}
+
+		var resultInterface interface{}
+		if err := json.Unmarshal([]byte(resultCache), &resultInterface); err != nil {
+			InternalError(c, err)
+			return nil, err
+		}
+		return resultInterface, nil
+	})
+	if err != nil {
+		return nil, err
 	}
 	return result, nil
 }
