@@ -356,11 +356,11 @@ func GetPageItems(pageQuery PageQuery) (PageItems, error) {
 //	方法返回的是json.Unmarshal的数据
 //	@receiver cacheService
 //	@param key string
-//	@param ttl int64 缓存时长(秒)
+//	@param ttl time.Duration 缓存时长
 //	@param f func() (interface{}, error)
 //	@return interface{}
 //	@return error
-func GetOrSet(c *gin.Context, key string, ttl int64, f func() (interface{}, error)) (interface{}, error) {
+func GetOrSet(c *gin.Context, key string, ttl time.Duration, f func() (interface{}, error)) (interface{}, error) {
 	result, err, _ := cacheSg.Do(key, func() (interface{}, error) {
 		var resultCache string
 		resultCache, err := di.CacheRedis().Get(context.Background(), key).Result()
@@ -380,7 +380,7 @@ func GetOrSet(c *gin.Context, key string, ttl int64, f func() (interface{}, erro
 				InternalError(c, err)
 				return nil, err
 			}
-			if err := di.CacheRedis().Set(context.Background(), key, resultBytes, time.Second*time.Duration(ttl)).Err(); err != nil {
+			if err := di.CacheRedis().Set(context.Background(), key, resultBytes, ttl).Err(); err != nil {
 				InternalError(c, err)
 				return nil, err
 			}
