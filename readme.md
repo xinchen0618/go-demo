@@ -273,4 +273,4 @@ key统一在`config/consts/redis_key.go`中定义.
 
 - API业务缓存
 
-  针对API业务设计的缓存, `ginx.GetOrSet()`获取或设置业务缓存. 
+  针对API业务设计的缓存, `ginx.GetOrSetCache()`获取或设置业务缓存. 

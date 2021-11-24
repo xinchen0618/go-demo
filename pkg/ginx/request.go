@@ -352,7 +352,7 @@ func GetPageItems(pageQuery PageQuery) (PageItems, error) {
 	return result, nil
 }
 
-// GetOrSet 获取或者设置业务缓存
+// GetOrSetCache 获取或者设置业务缓存
 //	方法返回的是json.Unmarshal的数据
 //	@receiver cacheService
 //	@param key string
@@ -360,7 +360,7 @@ func GetPageItems(pageQuery PageQuery) (PageItems, error) {
 //	@param f func() (interface{}, error)
 //	@return interface{}
 //	@return error
-func GetOrSet(c *gin.Context, key string, ttl time.Duration, f func() (interface{}, error)) (interface{}, error) {
+func GetOrSetCache(c *gin.Context, key string, ttl time.Duration, f func() (interface{}, error)) (interface{}, error) {
 	result, err, _ := cacheSg.Do(key, func() (interface{}, error) {
 		var resultCache string
 		resultCache, err := di.CacheRedis().Get(context.Background(), key).Result()

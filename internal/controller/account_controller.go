@@ -99,7 +99,7 @@ func (accountController) GetUsers(c *gin.Context) {
 		return
 	}
 	key = fmt.Sprintf(consts.CacheUsers, key)
-	pageItems, err := ginx.GetOrSet(c, key, 10*time.Second, func() (interface{}, error) {
+	pageItems, err := ginx.GetOrSetCache(c, key, 10*time.Second, func() (interface{}, error) {
 		pageItems, err := ginx.GetPageItems(ginx.PageQuery{
 			GinCtx:     c,
 			Db:         di.Db(),
