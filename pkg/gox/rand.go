@@ -6,6 +6,7 @@ import (
 )
 
 // RandInt64 生成区间随机数
+//	左闭右开区间[min, max)
 //	@param min int64
 //	@param max int64
 //	@return int64
