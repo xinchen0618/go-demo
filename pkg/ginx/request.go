@@ -75,7 +75,7 @@ func GetJsonBody(c *gin.Context, patterns []string) (map[string]interface{}, err
 		paramValue, ok := jsonBody[patternAtoms[0]]
 		if !ok {
 			if required {
-				c.JSON(400, gin.H{"code": "ParamEmpty", "message": fmt.Sprintf("%s不得为空", patternAtoms[1])})
+				Error(c, 400, "ParamEmpty", fmt.Sprintf("%s不得为空", patternAtoms[1]))
 				return nil, errors.New("ParamEmpty")
 			} else {
 				continue
@@ -109,7 +109,7 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, erro
 		paramValue := c.Query(patternAtoms[0])
 		if "" == paramValue {
 			if "required" == patternAtoms[3] { // 必填
-				c.JSON(400, gin.H{"code": "ParamEmpty", "message": fmt.Sprintf("%s不得为空", patternAtoms[1])})
+				Error(c, 400, "ParamEmpty", fmt.Sprintf("%s不得为空", patternAtoms[1]))
 				return nil, errors.New("ParamEmpty")
 			} else {
 				paramValue = patternAtoms[3]
@@ -147,7 +147,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 		}
 		intValue, err := strconv.ParseInt(stringValue.(string), 10, 64) // 转整型64位
 		if err != nil {
-			c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
+			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
 		}
 		return intValue, nil
@@ -160,7 +160,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			return nil, err
 		}
 		if intValue.(int64) <= 0 {
-			c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
+			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
 		}
 		return intValue, nil
@@ -173,7 +173,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			return nil, err
 		}
 		if intValue.(int64) < 0 {
-			c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
+			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
 		}
 		return intValue, nil
@@ -184,14 +184,14 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 		if "string" == valueType {
 			stringValue := strings.TrimSpace(paramValue.(string))
 			if "" == stringValue && !allowEmpty {
-				c.JSON(400, gin.H{"code": "ParamEmpty", "message": fmt.Sprintf("%s不得为空", paramName)})
+				Error(c, 400, "ParamEmpty", fmt.Sprintf("%s不得为空", paramName))
 				return nil, errors.New("ParamEmpty")
 			}
 			return stringValue, nil
 		} else if "float64" == valueType {
 			return strconv.FormatFloat(paramValue.(float64), 'f', -1, 64), nil
 		} else {
-			c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
+			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
 		}
 	}
@@ -200,7 +200,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 	if "[" == paramType[0:1] && "]" != paramType[1:2] {
 		var enum []interface{}
 		if err := json.Unmarshal([]byte(paramType), &enum); err != nil {
-			c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
+			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
 		}
 		for _, value := range enum {
@@ -216,18 +216,18 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			} else if "string" == valueType {
 				floatValue, err := strconv.ParseFloat(paramValue.(string), 64)
 				if err != nil {
-					c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
+					Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 					return nil, errors.New("ParamInvalid")
 				}
 				if floatValue == value {
 					return floatValue, nil
 				}
 			} else {
-				c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
+				Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 				return nil, errors.New("ParamInvalid")
 			}
 		}
-		c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
+		Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 		return nil, errors.New("ParamInvalid")
 	}
 
@@ -235,12 +235,12 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 	if "array" == paramType {
 		if "[]interface {}" == valueType {
 			if !allowEmpty && 0 == len(paramValue.([]interface{})) {
-				c.JSON(400, gin.H{"code": "ParamEmpty", "message": fmt.Sprintf("%s不得为空", paramName)})
+				Error(c, 400, "ParamEmpty", fmt.Sprintf("%s不得为空", paramName))
 				return nil, errors.New("ParamEmpty")
 			}
 			return paramValue, nil
 		}
-		c.JSON(400, gin.H{"code": "ParamInvalid", "message": fmt.Sprintf("%s不正确", paramName)})
+		Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 		return nil, errors.New("ParamInvalid")
 	}
 
@@ -278,7 +278,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 		return stringSlice, nil
 	}
 
-	c.JSON(400, gin.H{"code": "ParamTypeUndefined", "message": fmt.Sprintf("未知数据类型: %s", paramName)})
+	Error(c, 400, "ParamTypeUndefined", fmt.Sprintf("未知数据类型: %s", paramName))
 	return nil, errors.New("ParamTypeUndefined")
 }
 

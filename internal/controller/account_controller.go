@@ -38,7 +38,7 @@ func (accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记
 		return
 	}
 	if 0 == len(user) {
-		c.JSON(400, gin.H{"code": "UserInvalid", "message": "用户名或密码不正确"})
+		ginx.Error(c, 400, "UserInvalid", "用户名或密码不正确")
 		return
 	}
 
@@ -70,7 +70,7 @@ func (accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记
 		return
 	}
 
-	c.JSON(200, gin.H{"user_id": user["user_id"], "token": tokenString})
+	ginx.Success(c, 200, gin.H{"user_id": user["user_id"], "token": tokenString})
 }
 
 func (accountController) DeleteUserLogout(c *gin.Context) {
@@ -85,7 +85,7 @@ func (accountController) DeleteUserLogout(c *gin.Context) {
 		return
 	}
 
-	c.JSON(204, gin.H{})
+	ginx.Success(c, 204)
 }
 
 func (accountController) GetUsers(c *gin.Context) {
@@ -133,7 +133,7 @@ func (accountController) GetUsers(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, pageItems)
+	ginx.Success(c, 200, pageItems)
 }
 
 func (accountController) GetUsersById(c *gin.Context) {
@@ -144,15 +144,15 @@ func (accountController) GetUsersById(c *gin.Context) {
 
 	user, err := service.CacheService.Get(di.Db(), "t_users", "user_id", userId)
 	if err != nil {
-		c.JSON(500, gin.H{"code": "InternalError", "message": "服务异常, 请稍后重试"})
+		ginx.InternalError(c)
 		return
 	}
 	if 0 == len(user) {
-		c.JSON(404, gin.H{"code": "UserNotFound", "message": "用户不存在"})
+		ginx.Error(c, 404, "UserNotFound", "用户不存在")
 		return
 	}
 
-	c.JSON(200, user)
+	ginx.Success(c, 200, user)
 }
 
 func (accountController) PostUsers(c *gin.Context) {
@@ -161,14 +161,14 @@ func (accountController) PostUsers(c *gin.Context) {
 	//	ginx.InternalError(c, err)
 	//	return
 	//}
-	//c.JSON(201, gin.H{"user_name": userName})
+	//ginx.Success(c, 201, gin.H{"user_name": userName})
 
 	//userId := gox.RandInt64(111111, 999999)
 	//if err := service.QueueService.LowEnqueue("user:AddUserCounts", map[string]interface{}{"user_id": userId}); err != nil {
 	//	ginx.InternalError(c, err)
 	//	return
 	//}
-	//c.JSON(201, gin.H{"user_id": userId})
+	//ginx.Success(c, 201, gin.H{"user_id": userId})
 
 	jsonBody, err := ginx.GetJsonBody(c, []string{"counts:数量:+int:*"})
 	if err != nil {
@@ -226,5 +226,5 @@ func (accountController) PostUsers(c *gin.Context) {
 		})
 	}
 
-	c.JSON(201, gin.H{"counts": counts})
+	ginx.Success(c, 201, gin.H{"counts": counts})
 }
