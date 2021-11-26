@@ -95,7 +95,7 @@
 
 - 使用
 
-  `zap.L().Error()`, `zap.L().Warn()`, `zap.L().Info()`
+  `zap.L().Error()`, `zap.L().Warn()`, `zap.L().Info()` 或者 `di.Logger().Error()`, `di.Logger().Warn()`, `di.Logger().Info()`
 
 
 ### WorkerPool 
