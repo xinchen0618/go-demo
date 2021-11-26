@@ -143,7 +143,7 @@
 
   - 校验账户信息
   - 生成JWT Token
-  - 以 `jwt:<userId>:<JwtSignature>`的格式记录入Redis白名单
+  - 以 `jwt:user:<userId>:<JwtSignature>`的格式记录入Redis白名单
   - JWT Token返回给客户端
 
 - 校验登录

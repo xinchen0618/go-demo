@@ -79,7 +79,7 @@ func (accountController) DeleteUserLogout(c *gin.Context) {
 	// 删除对应redis白名单记录
 	tokenString := c.Request.Header.Get("Authorization")[7:]
 	tokenAtoms := strings.Split(tokenString, ".")
-	key := "jwt:" + strconv.FormatInt(userId, 10) + ":" + tokenAtoms[2]
+	key := fmt.Sprintf(consts.JwtUserLogin, userId, tokenAtoms[2])
 	if err := di.JwtRedis().Del(context.Background(), key).Err(); err != nil {
 		ginx.InternalError(c, err)
 		return
