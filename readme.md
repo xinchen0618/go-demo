@@ -49,7 +49,6 @@
   - cron/               计划任务  
   - controller/         API控制器
   - router/             API路由
-    - router.go         路由注册入口. 路由声明按业务分拆到不同文件, 然后统一在此注册.
   - middleware/         API中间件  
   - task/               消息队列任务 
   - service/            公共业务逻辑

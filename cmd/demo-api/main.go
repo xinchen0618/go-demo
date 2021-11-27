@@ -63,7 +63,7 @@ func main() {
 	r.Use(cors())
 
 	// 加载路由
-	router.Init(r)
+	router.Account(r)
 
 	// Run gin
 	if err := endless.ListenAndServe(fmt.Sprintf(":%d", config.Get("server_port")), r); err != nil {

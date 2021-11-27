@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// LoadAccount 这里定义路由, 然后在router.go中统一注册
-func LoadAccount(r *gin.Engine) {
+// Account 账号模块
+func Account(r *gin.Engine) {
 	accountGroup := r.Group("/account")
 	{
 		accountGroup.POST("/v1/login", controller.AccountController.PostUserLogin)
