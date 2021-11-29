@@ -7,15 +7,12 @@ import (
 	"go-demo/internal/router"
 	"go-demo/pkg/ginx"
 	"go-demo/pkg/gox"
-	"net/http"
 
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 )
 
-// recovery 主routine中panic兜底处理
-// 	除程序初始化可以使用panic, 其他地方必须避免出现panic
-//	goroutine中的panic这里是捕获不到的, 要自行recover
+// recovery 主goroutine中panic兜底处理
 //	@return gin.HandlerFunc
 func recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -24,7 +21,6 @@ func recovery() gin.HandlerFunc {
 				ginx.InternalError(c, errors.New(fmt.Sprint(err)))
 			}
 		}()
-
 		c.Next()
 	}
 }
@@ -32,21 +28,18 @@ func recovery() gin.HandlerFunc {
 // cors 跨域处理
 //	@return gin.HandlerFunc
 func cors() gin.HandlerFunc {
-	return func(context *gin.Context) {
-		if context.Request.Header.Get("Origin") != "" {
-			context.Header("Access-Control-Allow-Origin", context.Request.Header.Get("Origin"))
-			context.Header("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS")
-			context.Header("Access-Control-Allow-Headers", "Authorization, Content-Length, Accept, Origin, Host, Connection, Accept-Encoding, Accept-Language, DNT, Keep-Alive, User-Agent, If-Modified-Since, Cache-Control, Content-Type, Pragma")
-			context.Header("Access-Control-Max-Age", "1728000")
-			context.Header("Access-Control-Allow-Credentials", "false")
-
-			if "OPTIONS" == context.Request.Method {
-				context.JSON(http.StatusOK, gin.H{})
+	return func(c *gin.Context) {
+		if c.Request.Header.Get("Origin") != "" {
+			c.Header("Access-Control-Allow-Origin", c.Request.Header.Get("Origin"))
+			c.Header("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS")
+			c.Header("Access-Control-Allow-Headers", "Authorization, Content-Length, Accept, Origin, Host, Connection, Accept-Encoding, Accept-Language, DNT, Keep-Alive, User-Agent, If-Modified-Since, Cache-Control, Content-Type, Pragma")
+			c.Header("Access-Control-Max-Age", "1728000")
+			c.Header("Access-Control-Allow-Credentials", "false")
+			if "OPTIONS" == c.Request.Method {
+				ginx.Success(c, 200)
 			}
 		}
-
-		//处理请求
-		context.Next()
+		c.Next()
 	}
 }
 
@@ -66,7 +59,8 @@ func main() {
 	router.Account(r)
 
 	// Run gin
-	if err := endless.ListenAndServe(fmt.Sprintf(":%d", config.Get("server_port")), r); err != nil {
+	addr := fmt.Sprintf(":%d", config.Get("server_port"))
+	if err := endless.ListenAndServe(addr, r); err != nil {
 		panic(err)
 	}
 }
