@@ -24,7 +24,8 @@ func Md5(s string) (string, error) {
 	return fmt.Sprintf("%x", h.Sum(nil)), nil
 }
 
-// Md5x 非String/Number数据md5
+// Md5x 非String数据md5
+//	数据会先json.Marshal再Md5
 //	@param i interface{}
 //	@return string
 //	@return error
