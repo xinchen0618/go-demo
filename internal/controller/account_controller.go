@@ -95,7 +95,7 @@ func (accountController) GetUsers(c *gin.Context) {
 	}
 	key, err := gox.Md5x(queries)
 	if err != nil {
-		ginx.InternalError(c, err)
+		ginx.InternalError(c)
 		return
 	}
 	key = fmt.Sprintf(consts.CacheUsers, key)

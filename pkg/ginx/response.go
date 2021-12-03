@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// Success 成功
+// Success 向客户端输出成功信息
 //	@param c *gin.Context
 //	@param httpCode int
 //	@param obj ...interface{}
@@ -17,7 +17,7 @@ func Success(c *gin.Context, httpCode int, obj ...interface{}) {
 	}
 }
 
-// Error 失败
+// Error 向客户端输出失败信息
 //	@param c *gin.Context
 //	@param httpCode int
 //	@param code string
