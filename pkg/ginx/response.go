@@ -29,7 +29,7 @@ func Error(c *gin.Context, httpCode int, code, message string) {
 // InternalError 服务异常
 //	记录日志并向客户端返回500错误
 //	@param c *gin.Context
-//	@param err ...error
+//	@param err ...error 记录错误日志
 func InternalError(c *gin.Context, err ...error) {
 	if len(err) > 0 {
 		zap.L().Error(err[0].Error())
