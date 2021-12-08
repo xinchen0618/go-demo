@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"go-demo/config/consts"
 	"go-demo/config/di"
-	"go-demo/pkg/gox"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gohouse/gorose/v2"
+	"github.com/vmihailenco/msgpack/v5"
 	"go.uber.org/zap"
 	"golang.org/x/sync/singleflight"
 )
@@ -39,7 +39,7 @@ func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id inte
 	if 0 == len(data) {
 		return false, nil
 	}
-	dataBytes, err := gox.GobEncode(data[0])
+	dataBytes, err := msgpack.Marshal(data[0])
 	if err != nil {
 		return false, err
 	}
@@ -86,7 +86,7 @@ func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id inte
 			}
 		}
 		var dataMap map[string]interface{}
-		if err := gox.GobDecode([]byte(dataCache), &dataMap); err != nil {
+		if err := msgpack.Unmarshal([]byte(dataCache), &dataMap); err != nil {
 			return map[string]interface{}{}, err
 		}
 		return dataMap, nil

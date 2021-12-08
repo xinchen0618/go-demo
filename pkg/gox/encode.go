@@ -1,9 +1,7 @@
 package gox
 
 import (
-	"bytes"
 	"crypto/md5"
-	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -36,35 +34,4 @@ func Md5x(i interface{}) (string, error) {
 		return "", err
 	}
 	return Md5(string(iBytes))
-}
-
-// GobEncode Gob编码
-//	@param v interface{}
-//	@return []byte
-//	@return error
-func GobEncode(v interface{}) ([]byte, error) {
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	if err := enc.Encode(v); err != nil {
-		zap.L().Error(err.Error())
-		return []byte{}, err
-	}
-
-	return buf.Bytes(), nil
-}
-
-// GobDecode Gob解码
-//	@param b []byte
-//	@param result interface{}
-//	@return error
-func GobDecode(b []byte, result interface{}) error {
-	buf := bytes.NewBuffer(b)
-	enc := gob.NewDecoder(buf)
-
-	if err := enc.Decode(result); err != nil {
-		zap.L().Error(err.Error())
-		return err
-	}
-
-	return nil
 }
