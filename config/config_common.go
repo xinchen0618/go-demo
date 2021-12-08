@@ -10,6 +10,9 @@ func init() {
 		// Goroutine池大小
 		"worker_pool": 409600,
 
+		// 限流QPS
+		"rate_limit": 40000,
+
 		// DB
 		"mysql_host":     "127.0.0.1",
 		"mysql_port":     3306,

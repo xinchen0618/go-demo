@@ -29,11 +29,10 @@ func recovery() gin.HandlerFunc {
 
 // rateLimitMiddleware 限流
 //	@param fillInterval time.Duration
-//	@param cap int64
 //	@param quantum int64
 //	@return gin.HandlerFunc
-func rateLimit(fillInterval time.Duration, cap, quantum int64) gin.HandlerFunc {
-	bucket := ratelimit.NewBucketWithQuantum(fillInterval, cap, quantum)
+func rateLimit(fillInterval time.Duration, quantum int64) gin.HandlerFunc {
+	bucket := ratelimit.NewBucketWithQuantum(fillInterval, quantum, quantum)
 	return func(c *gin.Context) {
 		if bucket.TakeAvailable(1) < 1 {
 			ginx.Error(c, 429, "TooManyRequests", "服务繁忙, 请稍后重试")
@@ -71,7 +70,7 @@ func main() {
 	// Panic处理
 	r.Use(recovery())
 	// 限流
-	r.Use(rateLimit(time.Second, 40000, 40000))
+	r.Use(rateLimit(time.Second, int64(config.GetInt("rate_limit"))))
 	// 跨域处理
 	r.Use(cors())
 
