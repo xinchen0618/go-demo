@@ -44,7 +44,7 @@ func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id inte
 		return false, err
 	}
 	key := fmt.Sprintf(consts.CacheResource, table, id)
-	if err := di.CacheRedis().Set(context.Background(), key, dataBytes, time.Hour*24).Err(); err != nil {
+	if err := di.CacheRedis().Set(context.Background(), key, dataBytes, 24*time.Hour).Err(); err != nil {
 		zap.L().Error(err.Error())
 		return false, err
 	}
