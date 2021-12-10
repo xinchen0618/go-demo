@@ -43,7 +43,7 @@ func (accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记
 	}
 
 	// JWT
-	loginTtl := 86400 * 30 * time.Second // 登录有效时长
+	loginTtl := 30 * 24 * time.Hour // 登录有效时长
 	claims := &jwt.StandardClaims{
 		Audience:  jsonBody["user_name"].(string),
 		ExpiresAt: time.Now().Add(loginTtl).Unix(),
