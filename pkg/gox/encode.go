@@ -9,7 +9,7 @@ import (
 )
 
 // Md5 字符串md5
-//	@param str string
+//	@param s string
 //	@return string
 func Md5(s string) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(s)))
@@ -26,5 +26,5 @@ func Md5x(i interface{}) (string, error) {
 		zap.L().Error(err.Error())
 		return "", err
 	}
-	return Md5(string(iBytes)), nil
+	return fmt.Sprintf("%x", md5.Sum(iBytes)), nil
 }
