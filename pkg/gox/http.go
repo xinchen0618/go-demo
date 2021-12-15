@@ -27,7 +27,7 @@ func Restful(method, rawUrl string, params map[string]interface{}, headers map[s
 	// 参数
 	var entityParams io.Reader
 	if len(params) > 0 {
-		if InSlice(method, []string{"GET", "DELETE"}) { // 参数在url中
+		if InSlice(method, []string{"GET", "DELETE"}) { // url参数
 			urlParams := url.Values{}
 			Url, err := url.Parse(rawUrl)
 			if err != nil {
@@ -40,7 +40,7 @@ func Restful(method, rawUrl string, params map[string]interface{}, headers map[s
 			Url.RawQuery = urlParams.Encode()
 			rawUrl = Url.String()
 
-		} else { // 参数在body中
+		} else { // entity参数
 			paramBytes, err := json.Marshal(params)
 			if err != nil {
 				zap.L().Error(err.Error())
