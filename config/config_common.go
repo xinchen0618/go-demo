@@ -14,12 +14,14 @@ func init() {
 		"rate_limit": 40000,
 
 		// DB
-		"mysql_host":     "127.0.0.1",
-		"mysql_port":     3306,
-		"mysql_username": "root",
-		"mysql_password": "cx654321",
-		"mysql_dbname":   "test",
-		"mysql_charset":  "utf8mb4",
+		"mysql_host":           "127.0.0.1",
+		"mysql_port":           3306,
+		"mysql_username":       "root",
+		"mysql_password":       "cx654321",
+		"mysql_dbname":         "test",
+		"mysql_charset":        "utf8mb4",
+		"mysql_max_open_conns": 140,
+		"mysql_max_idle_conns": 100,
 
 		// Redis
 		"redis_host":          "127.0.0.1",
