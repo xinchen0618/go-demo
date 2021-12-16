@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Account 账号模块
-func Account(r *gin.Engine) {
+// AccountRouter 账号模块
+func AccountRouter(r *gin.Engine) {
 	accountGroup := r.Group("/account")
 	{
 		accountGroup.POST("/v1/login", controller.AccountController.PostUserLogin)

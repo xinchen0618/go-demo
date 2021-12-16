@@ -75,7 +75,7 @@ func main() {
 	r.Use(cors())
 
 	// 加载路由
-	router.Account(r)
+	router.AccountRouter(r)
 
 	// 未知路由处理
 	r.NoRoute(func(c *gin.Context) {
