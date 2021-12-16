@@ -77,6 +77,12 @@ func main() {
 	// 加载路由
 	router.Account(r)
 
+	// 未知路由处理
+	r.NoRoute(func(c *gin.Context) {
+		ginx.Error(c, 404, "ResourceNotFound", "您请求的资源不存在")
+		return
+	})
+
 	// Run gin
 	addr := fmt.Sprintf(":%d", config.Get("server_port"))
 	if err := endless.ListenAndServe(addr, r); err != nil {
