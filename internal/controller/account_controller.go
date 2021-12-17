@@ -101,13 +101,13 @@ func (accountController) GetUsers(c *gin.Context) {
 	key = fmt.Sprintf(consts.CacheUsers, key)
 	pageItems, err := ginx.GetOrSetCache(c, key, 3*time.Second, func() (interface{}, error) {
 		pageItems, err := ginx.GetPageItems(ginx.PageQuery{
-			GinCtx:     c,
-			Db:         di.Db(),
-			Select:     "user_id,user_name,money,created_at,updated_at",
-			From:       "t_users",
-			Where:      "user_id > ?",
-			BindParams: []interface{}{5},
-			OrderBy:    "user_id DESC",
+			GinCtx: c,
+			Db:     di.Db(),
+			Select: "user_id,user_name,money,created_at,updated_at",
+			From:   "t_users",
+			//Where:      "user_id > ?",
+			//BindParams: []interface{}{5},
+			OrderBy: "user_id DESC",
 		})
 		if err != nil {
 			return ginx.PageItems{}, err
@@ -189,7 +189,7 @@ func (accountController) PostUsers(c *gin.Context) {
 				return
 			}
 
-			userName := fmt.Sprintf("U%d", gox.RandInt64(111111, 999999))
+			userName := fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999))
 			user, err := db.Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": userName}).First()
 			if err != nil {
 				zap.L().Error(err.Error())
