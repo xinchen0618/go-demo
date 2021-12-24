@@ -21,7 +21,7 @@ func init() {
 		"mysql_dbname":         "test",
 		"mysql_charset":        "utf8mb4",
 		"mysql_max_open_conns": 140,
-		"mysql_max_idle_conns": 100,
+		"mysql_max_idle_conns": 50,
 
 		// Redis
 		"redis_host":          "127.0.0.1",
