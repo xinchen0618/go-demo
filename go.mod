@@ -3,7 +3,7 @@ module go-demo
 go 1.17
 
 require (
-	github.com/alitto/pond v1.6.0
+	github.com/alitto/pond v1.6.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-gonic/gin v1.7.7

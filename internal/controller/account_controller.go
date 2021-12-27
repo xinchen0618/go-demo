@@ -175,55 +175,68 @@ func (accountController) PostUsers(c *gin.Context) {
 		return
 	}
 
-	var counts int64 = 100
+	var counts = 100
 	if _, ok := jsonBody["counts"]; ok {
-		counts = jsonBody["counts"].(int64)
+		counts = int(jsonBody["counts"].(int64))
 	}
 
-	for i := int64(0); i < counts; i++ {
-		// 多线程写
-		di.WorkerPool().Submit(func() {
-			db := di.Db()
-			if err := db.Begin(); err != nil {
-				zap.L().Error(err.Error())
-				return
+	perPage := 120
+	doneCounts := 0
+	for {
+		if doneCounts >= counts {
+			break
+		}
+		wpg := di.WorkerPool().Group()
+		for i := 0; i < perPage; i++ {
+			if doneCounts >= counts {
+				break
 			}
+			// 多线程写
+			doneCounts++
+			wpg.Submit(func() {
+				db := di.Db()
+				if err := db.Begin(); err != nil {
+					zap.L().Error(err.Error())
+					return
+				}
 
-			userName := fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999))
-			user, err := db.Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": userName}).First()
-			if err != nil {
-				zap.L().Error(err.Error())
-				_ = db.Rollback()
-				return
-			}
-			var userId int64
-			if len(user) > 0 { // 记录存在
-				userId = user["user_id"].(int64)
-			} else { // 记录不存在
-				userId, err = db.Table("t_users").Data(gorose.Data{"user_name": userName}).InsertGetId()
+				userName := fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999))
+				user, err := db.Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": userName}).First()
 				if err != nil {
 					zap.L().Error(err.Error())
 					_ = db.Rollback()
 					return
 				}
-			}
-			sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,?) ON DUPLICATE KEY UPDATE counts = counts + 1"
-			if _, err = db.Execute(sql, userId, gox.RandInt64(1, 9)); err != nil {
-				zap.L().Error(err.Error())
-				_ = db.Rollback()
-				return
-			}
-			if err := service.CacheService.Delete("t_user_counts", userId); err != nil {
-				_ = db.Rollback()
-				return
-			}
+				var userId int64
+				if len(user) > 0 { // 记录存在
+					userId = user["user_id"].(int64)
+				} else { // 记录不存在
+					userId, err = db.Table("t_users").Data(gorose.Data{"user_name": userName}).InsertGetId()
+					if err != nil {
+						zap.L().Error(err.Error())
+						_ = db.Rollback()
+						return
+					}
+				}
+				sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,?) ON DUPLICATE KEY UPDATE counts = counts + 1"
+				if _, err = db.Execute(sql, userId, gox.RandInt64(1, 9)); err != nil {
+					zap.L().Error(err.Error())
+					_ = db.Rollback()
+					return
+				}
+				if err := service.CacheService.Delete("t_user_counts", userId); err != nil {
+					_ = db.Rollback()
+					return
+				}
 
-			if err := db.Commit(); err != nil {
-				zap.L().Error(err.Error())
-				_ = db.Rollback()
-				return
-			}
-		})
+				if err := db.Commit(); err != nil {
+					zap.L().Error(err.Error())
+					_ = db.Rollback()
+					return
+				}
+			})
+		}
+		wpg.Wait()
 	}
 
 	ginx.Success(c, 201, gin.H{"counts": counts})
