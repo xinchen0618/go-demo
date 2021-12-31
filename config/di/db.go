@@ -41,12 +41,20 @@ var (
 func Db() gorose.IOrm {
 	_ = dbOnce.Do(func() error {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",
-			config.Get("mysql_username"), config.Get("mysql_password"), config.Get("mysql_host"),
-			config.Get("mysql_port"), config.Get("mysql_dbname"), config.Get("mysql_charset"))
+			config.Get("mysql_username"),
+			config.Get("mysql_password"),
+			config.Get("mysql_host"),
+			config.Get("mysql_port"),
+			config.Get("mysql_dbname"),
+			config.Get("mysql_charset"),
+		)
 		var err error
-		dbEngine, err = gorose.Open(&gorose.Config{Driver: "mysql", Dsn: dsn,
+		dbEngine, err = gorose.Open(&gorose.Config{
+			Driver:          "mysql",
+			Dsn:             dsn,
 			SetMaxOpenConns: config.GetInt("mysql_max_open_conns"),
-			SetMaxIdleConns: config.GetInt("mysql_max_idle_conns")})
+			SetMaxIdleConns: config.GetInt("mysql_max_idle_conns"),
+		})
 		if err != nil {
 			panic(err) // 即便这里不panic, 调用者在nil指针上调用db方法也会panic
 		}
