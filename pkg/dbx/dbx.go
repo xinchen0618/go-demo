@@ -25,12 +25,18 @@ func FetchAll(db gorose.IOrm, sql string, params ...interface{}) ([]gorose.Data,
 }
 
 // FetchOne 获取一行记录
+//	查询时会自动添加限制LIMIT 1
 //  @param db gorose.IOrm
 //  @param sql string
 //  @param params ...interface{}
 //  @return gorose.Data
 //  @return error
 func FetchOne(db gorose.IOrm, sql string, params ...interface{}) (gorose.Data, error) {
+	sql = strings.TrimSpace(sql)
+	if !strings.HasSuffix(sql, "LIMIT 1") && !strings.HasSuffix(sql, "limit 1") {
+		sql += " LIMIT 1"
+	}
+
 	rows, err := FetchAll(db, sql, params...)
 	if err != nil {
 		return gorose.Data{}, err
