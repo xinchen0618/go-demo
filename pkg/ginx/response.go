@@ -8,7 +8,7 @@ import (
 // Success 向客户端输出成功信息
 //	@param c *gin.Context
 //	@param httpCode int
-//	@param obj ...interface{}
+//	@param obj ...interface{} 选填, 数据会json编码输出给客户端
 func Success(c *gin.Context, httpCode int, obj ...interface{}) {
 	if len(obj) > 0 {
 		c.JSON(httpCode, obj[0])
@@ -28,7 +28,7 @@ func Error(c *gin.Context, httpCode int, code, message string) {
 
 // InternalError 向客户端输出500错误
 //	@param c *gin.Context
-//	@param err ...error 记录错误日志
+//	@param err ...error 选填, 记录错误日志
 func InternalError(c *gin.Context, err ...error) {
 	if len(err) > 0 {
 		zap.L().Error(err[0].Error())
