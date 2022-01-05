@@ -2,6 +2,7 @@ package cron
 
 import (
 	"go-demo/config/di"
+	"go-demo/pkg/dbx"
 
 	"github.com/gohouse/gorose/v2"
 	"go.uber.org/zap"
@@ -17,11 +18,11 @@ var UserCron userCron
 //	@receiver *userCron
 //	@param counts int
 func (userCron) InitVip(counts int) {
-	userIds, err := di.Db().Table("t_users").Where(gorose.Data{"is_vip": 0}).OrderBy("user_id").Limit(counts).Pluck("user_id")
+	userIds, err := dbx.FetchColumn(di.Db(), "SELECT user_id FROM t_users WHERE is_vip=0 LIMIT ?", counts)
 	if err != nil {
-		zap.L().Error(err.Error())
+		return
 	}
-	if _, err = di.Db().Table("t_users").WhereIn("user_id", userIds.([]interface{})).Update(gorose.Data{"is_vip": 1}); err != nil {
+	if _, err = di.Db().Table("t_users").WhereIn("user_id", userIds).Update(gorose.Data{"is_vip": 1}); err != nil {
 		zap.L().Error(err.Error())
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"go-demo/config/di"
+	"go-demo/pkg/dbx"
 	"math"
 	"reflect"
 	"strconv"
@@ -314,12 +315,12 @@ func GetPageItems(pageQuery PageQuery) (PageItems, error) {
 	} else {
 		countSql = fmt.Sprintf("SELECT COUNT(*) AS counts FROM %s WHERE %s", pageQuery.From, where)
 	}
-	countsData, err := pageQuery.Db.Query(countSql, bindParams...) // 计算总记录数
+	countsData, err := dbx.FetchValue(pageQuery.Db, countSql, bindParams...) // 计算总记录数
 	if err != nil {
-		InternalError(pageQuery.GinCtx, err)
+		InternalError(pageQuery.GinCtx)
 		return PageItems{}, errors.New("InternalError")
 	}
-	counts := countsData[0]["counts"].(int64)
+	counts := countsData.(int64)
 	if 0 == counts { // 没有数据
 		result := PageItems{
 			Page:        page,
@@ -337,9 +338,9 @@ func GetPageItems(pageQuery PageQuery) (PageItems, error) {
 	}
 	offset := (page - 1) * perPage
 	sql += fmt.Sprintf(" LIMIT %d, %d", offset, perPage)
-	items, err := pageQuery.Db.Query(sql, bindParams...)
+	items, err := dbx.FetchAll(pageQuery.Db, sql, bindParams...)
 	if err != nil {
-		InternalError(pageQuery.GinCtx, err)
+		InternalError(pageQuery.GinCtx)
 		return PageItems{}, errors.New("InternalError")
 	}
 	result := PageItems{

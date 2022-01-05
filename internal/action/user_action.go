@@ -3,11 +3,9 @@ package action
 import (
 	"fmt"
 	"go-demo/config/di"
-	"strconv"
+	"go-demo/pkg/dbx"
 
-	"github.com/gohouse/gorose/v2"
 	"github.com/urfave/cli/v2"
-	"go.uber.org/zap"
 )
 
 // 这里定义一个空结构体用于为大量的action方法做分类
@@ -25,21 +23,14 @@ func (userAction) InitPosition(c *cli.Context) error {
 	if "" == counts {
 		counts = "10"
 	}
-	countsInt, err := strconv.Atoi(counts)
-	if err != nil {
-		zap.L().Error(err.Error())
-		return err
-	}
 
-	users, err := di.Db().Table("t_users").Fields("user_id").Where(gorose.Data{"position": 0}).Limit(countsInt).Order("user_id").Get()
+	users, err := dbx.FetchAll(di.Db(), "SELECT user_id FROM t_users WHERE position=0 LIMIT ?", counts)
 	if err != nil {
-		zap.L().Error(err.Error())
 		return err
 	}
 	for _, user := range users {
 		userId := user["user_id"].(int64)
-		if _, err = di.Db().Table("t_users").Where(gorose.Data{"user_id": userId}).Data(gorose.Data{"position": 1024 * userId}).Update(); err != nil {
-			zap.L().Error(err.Error())
+		if _, err := dbx.Update(di.Db(), "t_users", map[string]interface{}{"position": 1024 * userId}, "user_id=?", userId); err != nil {
 			return err
 		}
 	}

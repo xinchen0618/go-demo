@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-demo/config/consts"
 	"go-demo/config/di"
+	"go-demo/pkg/dbx"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -31,15 +32,14 @@ var (
 //	@return error
 func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id interface{}) (bool, error) {
 	sql := fmt.Sprintf("SELECT * FROM %s WHERE %s = %d LIMIT 1", table, primaryKey, id)
-	data, err := db.Query(sql)
+	data, err := dbx.FetchOne(db, sql)
 	if err != nil {
-		zap.L().Error(err.Error())
 		return false, err
 	}
 	if 0 == len(data) {
 		return false, nil
 	}
-	dataBytes, err := msgpack.Marshal(data[0])
+	dataBytes, err := msgpack.Marshal(data)
 	if err != nil {
 		return false, err
 	}

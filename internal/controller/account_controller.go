@@ -8,6 +8,7 @@ import (
 	"go-demo/config/consts"
 	"go-demo/config/di"
 	"go-demo/internal/service"
+	"go-demo/pkg/dbx"
 	"go-demo/pkg/ginx"
 	"go-demo/pkg/gox"
 	"strconv"
@@ -16,7 +17,6 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/gohouse/gorose/v2"
 	"go.uber.org/zap"
 )
 
@@ -32,9 +32,10 @@ func (accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记
 		return
 	}
 
-	user, err := di.Db().Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": jsonBody["user_name"], "password": jsonBody["password"]}).First()
+	sql := "SELECT user_id FROM t_users WHERE user_name=? AND password=? LIMIT 1"
+	user, err := dbx.FetchOne(di.Db(), sql, jsonBody["user_name"], jsonBody["password"])
 	if err != nil {
-		ginx.InternalError(c, err)
+		ginx.InternalError(c)
 		return
 	}
 	if 0 == len(user) {
@@ -201,9 +202,8 @@ func (accountController) PostUsers(c *gin.Context) {
 				}
 
 				userName := fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999))
-				user, err := db.Table("t_users").Fields("user_id").Where(gorose.Data{"user_name": userName}).First()
+				user, err := dbx.FetchOne(db, "SELECT user_id FROM t_users WHERE user_name=?", userName)
 				if err != nil {
-					zap.L().Error(err.Error())
 					_ = db.Rollback()
 					return
 				}
@@ -211,16 +211,14 @@ func (accountController) PostUsers(c *gin.Context) {
 				if len(user) > 0 { // 记录存在
 					userId = user["user_id"].(int64)
 				} else { // 记录不存在
-					userId, err = db.Table("t_users").Data(gorose.Data{"user_name": userName}).InsertGetId()
+					userId, err = dbx.Insert(db, "t_users", map[string]interface{}{"user_name": userName})
 					if err != nil {
-						zap.L().Error(err.Error())
 						_ = db.Rollback()
 						return
 					}
 				}
 				sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,?) ON DUPLICATE KEY UPDATE counts = counts + 1"
-				if _, err = db.Execute(sql, userId, gox.RandInt64(1, 9)); err != nil {
-					zap.L().Error(err.Error())
+				if _, err = dbx.Execute(db, sql, userId, gox.RandInt64(1, 9)); err != nil {
 					_ = db.Rollback()
 					return
 				}

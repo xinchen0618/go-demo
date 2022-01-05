@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-demo/config/di"
+	"go-demo/pkg/dbx"
 
-	"github.com/gohouse/gorose/v2"
 	"github.com/hibiken/asynq"
 )
 
@@ -19,7 +19,8 @@ func (userTask) AddUser(ctx context.Context, t *asynq.Task) error {
 	if err := json.Unmarshal(t.Payload(), &payload); err != nil {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
-	_, err := di.Db().Table("t_users").Data(gorose.Data{"user_name": payload["user_name"]}).Insert()
+
+	_, err := dbx.Insert(di.Db(), "t_users", map[string]interface{}{"user_name": payload["user_name"]})
 	return err
 }
 
@@ -28,6 +29,7 @@ func (userTask) AddUserCounts(ctx context.Context, t *asynq.Task) error {
 	if err := json.Unmarshal(t.Payload(), &payload); err != nil {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
-	_, err := di.Db().Table("t_user_counts").Data(gorose.Data{"user_id": payload["user_id"]}).Insert()
+
+	_, err := dbx.Insert(di.Db(), "t_user_counts", map[string]interface{}{"user_id": payload["user_id"]})
 	return err
 }
