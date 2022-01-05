@@ -24,7 +24,7 @@ func (userAction) InitPosition(c *cli.Context) error {
 		counts = "10"
 	}
 
-	users, err := dbx.FetchAll(di.Db(), "SELECT user_id FROM t_users WHERE position=0 LIMIT ?", counts)
+	users, err := dbx.FetchAll(di.Db(), "SELECT user_id FROM t_users WHERE position=0 ORDER BY user_id LIMIT ?", counts)
 	if err != nil {
 		return err
 	}
