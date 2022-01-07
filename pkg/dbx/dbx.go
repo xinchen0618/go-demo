@@ -50,27 +50,6 @@ func FetchOne(db gorose.IOrm, sql string, params ...interface{}) (gorose.Data, e
 	return rows[0], nil
 }
 
-// Slice2in Slice转IN条件
-// 	Golang SQL驱动不支持IN(?)
-//	使用fmt.Sprint("IN(%s)", Slice2in(s))
-//  @param s interface{}
-//  @return string
-func Slice2in(s interface{}) string {
-	switch s.(type) {
-	// 字符串
-	case []string:
-		cleaned := []string{}
-		for _, v := range s.([]string) {
-			cleaned = append(cleaned, gox.AddSlashes(v))
-		}
-		return "'" + strings.Join(cleaned, "','") + "'"
-
-	// 数字
-	default:
-		return strings.Trim(strings.Join(strings.Fields(fmt.Sprint(s)), ","), "[]")
-	}
-}
-
 // FetchValue 获取一个值
 //  @param db gorose.IOrm
 //  @param sql string
@@ -115,6 +94,27 @@ func FetchColumn(db gorose.IOrm, sql string, params ...interface{}) ([]interface
 	}
 
 	return values, nil
+}
+
+// Slice2in Slice转IN条件
+// 	Golang SQL驱动不支持IN(?)
+//	使用fmt.Sprint("IN(%s)", Slice2in(s))
+//  @param s interface{}
+//  @return string
+func Slice2in(s interface{}) string {
+	switch s.(type) {
+	// 字符串
+	case []string:
+		cleaned := []string{}
+		for _, v := range s.([]string) {
+			cleaned = append(cleaned, gox.AddSlashes(v))
+		}
+		return "'" + strings.Join(cleaned, "','") + "'"
+
+	// 数字
+	default:
+		return strings.Trim(strings.Join(strings.Fields(fmt.Sprint(s)), ","), "[]")
+	}
 }
 
 // Insert 新增记录
