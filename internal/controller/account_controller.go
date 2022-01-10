@@ -17,7 +17,6 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 // 这里定义一个空结构体用于为大量的controller方法做分类
@@ -186,15 +185,14 @@ func (accountController) PostUsers(c *gin.Context) {
 	for i := 0; i < counts; i++ {
 		wps.Submit(func() {
 			db := di.Db()
-			if err := db.Begin(); err != nil {
-				zap.L().Error(err.Error())
+			if err := dbx.Begin(db); err != nil {
 				return
 			}
 
 			userName := fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999))
 			user, err := dbx.FetchOne(db, "SELECT user_id FROM t_users WHERE user_name=?", userName)
 			if err != nil {
-				_ = db.Rollback()
+				dbx.Rollback(db)
 				return
 			}
 			var userId int64
@@ -203,23 +201,21 @@ func (accountController) PostUsers(c *gin.Context) {
 			} else { // 记录不存在
 				userId, err = dbx.Insert(db, "t_users", map[string]interface{}{"user_name": userName})
 				if err != nil {
-					_ = db.Rollback()
+					dbx.Rollback(db)
 					return
 				}
 			}
 			sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,?) ON DUPLICATE KEY UPDATE counts = counts + 1"
 			if _, err = dbx.Execute(db, sql, userId, gox.RandInt64(1, 9)); err != nil {
-				_ = db.Rollback()
+				dbx.Rollback(db)
 				return
 			}
 			if err := service.CacheService.Delete("t_user_counts", userId); err != nil {
-				_ = db.Rollback()
+				dbx.Rollback(db)
 				return
 			}
 
-			if err := db.Commit(); err != nil {
-				zap.L().Error(err.Error())
-				_ = db.Rollback()
+			if err := dbx.Commit(db); err != nil {
 				return
 			}
 		})
