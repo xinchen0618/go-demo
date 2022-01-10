@@ -38,7 +38,7 @@
     - redis_key.go      Redis key统一在此定义避免冲突
   - di/                 服务注入
     - logger.go         日志服务
-    - worker_pool.go    goroutine池服务
+    - worker_pool.go    Goroutine池服务
     - queue.go          消息队列服务
   - config.go           配置实现
   - config_common.go    公共配置
@@ -107,18 +107,37 @@
  
 #### 使用
 
-- go func
+- 公共Goroutine池
 
   ```
-  di.WorkerPool().Submit(func)
+  # go func
+  for i := 0; i < 10; i++ {
+    di.WorkerPool().Submit(func)
+  }
+  
+  # Wait Group
+  wpg := di.WorkerPool().Group()
+  for i := 0; i < 10; i++ {
+    wpg.Submit(func)
+  }
+  wpg.Wait()
   ```
 
-- Wait Group
+- 独享Goroutine池
   
   ```
-  wpg := di.WorkerPool().Group()
-  wpg.Submit(func)
-  wpg.Wait()
+  # go func
+  wps := di.WorkerPoolSeparate(100)
+  for i := 0; i < 10; i++ {
+    wps.Submit(func)
+  }
+  
+  # Wait Group
+  wpsg := di.WorkerPool(100).Group()
+  for i := 0; i < 10; i++ {
+    wpsg.Submit(func)
+  }
+  wpsg.Wait()  
   ```
 
 

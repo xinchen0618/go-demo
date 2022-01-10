@@ -14,7 +14,7 @@ import (
 	"github.com/juju/ratelimit"
 )
 
-// recovery 主goroutine中panic兜底处理
+// recovery 主Goroutine中panic兜底处理
 //	@return gin.HandlerFunc
 func recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
