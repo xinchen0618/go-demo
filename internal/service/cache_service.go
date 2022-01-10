@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"go-demo/config/consts"
 	"go-demo/config/di"
@@ -111,4 +112,52 @@ func (cacheService) Delete(table string, id interface{}) error {
 	}
 
 	return nil
+}
+
+// GetOrSet 获取或设置自定义缓存
+//	方法返回的是json.Unmarshal的数据
+//  @receiver cacheService
+//  @param key string
+//  @param ttl time.Duration
+//  @param f func() (interface{}, error)
+//  @return interface{}
+//  @return error
+func (cacheService) GetOrSet(key string, ttl time.Duration, f func() (interface{}, error)) (interface{}, error) {
+	result, err, _ := cacheSg.Do(key, func() (interface{}, error) {
+		var resultCache string
+		resultCache, err := di.CacheRedis().Get(context.Background(), key).Result()
+		if err != nil {
+			if err != redis.Nil {
+				zap.L().Error(err.Error())
+				return nil, err
+			}
+
+			// 缓存不存在
+			result, err := f()
+			if err != nil {
+				return nil, err
+			}
+			resultBytes, err := json.Marshal(result)
+			if err != nil {
+				zap.L().Error(err.Error())
+				return nil, err
+			}
+			if err := di.CacheRedis().Set(context.Background(), key, resultBytes, ttl).Err(); err != nil {
+				zap.L().Error(err.Error())
+				return nil, err
+			}
+			resultCache = string(resultBytes)
+		}
+
+		var resultInterface interface{}
+		if err := json.Unmarshal([]byte(resultCache), &resultInterface); err != nil {
+			zap.L().Error(err.Error())
+			return nil, err
+		}
+		return resultInterface, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
