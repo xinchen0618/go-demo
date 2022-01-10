@@ -118,8 +118,8 @@ func (accountController) GetUsers(c *gin.Context) {
 		for _, item := range pageItems.Items {
 			item := item
 			wpg.Submit(func() {
-				userCounts, _ := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"])
 				item["counts"] = 0
+				userCounts, _ := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"])
 				if counts, ok := userCounts["counts"]; ok {
 					item["counts"] = counts
 				}
@@ -181,9 +181,9 @@ func (accountController) PostUsers(c *gin.Context) {
 	}
 
 	// 多线程写
-	wps := di.WorkerPoolSeparate(100)
+	wpsg := di.WorkerPoolSeparate(100).Group()
 	for i := 0; i < counts; i++ {
-		wps.Submit(func() {
+		wpsg.Submit(func() {
 			db := di.Db()
 			if err := dbx.Begin(db); err != nil {
 				return
@@ -220,6 +220,7 @@ func (accountController) PostUsers(c *gin.Context) {
 			}
 		})
 	}
+	wpsg.Wait()
 
 	ginx.Success(c, 201, gin.H{"counts": counts})
 }
