@@ -36,11 +36,11 @@ type PageQuery struct {
 
 // PageItems 分页结果
 type PageItems struct {
-	Page        int64         `json:"page"`
-	PerPage     int64         `json:"per_page"`
-	TotalPages  int64         `json:"total_pages"`
-	TotalCounts int64         `json:"total_counts"`
-	Items       []gorose.Data `json:"items"`
+	Page        int64                    `json:"page"`
+	PerPage     int64                    `json:"per_page"`
+	TotalPages  int64                    `json:"total_pages"`
+	TotalCounts int64                    `json:"total_counts"`
+	Items       []map[string]interface{} `json:"items"`
 }
 
 var (
@@ -327,7 +327,7 @@ func GetPageItems(pageQuery PageQuery) (PageItems, error) {
 			PerPage:     perPage,
 			TotalPages:  0,
 			TotalCounts: 0,
-			Items:       []gorose.Data{},
+			Items:       []map[string]interface{}{},
 		}
 		return result, nil
 	}

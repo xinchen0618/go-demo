@@ -1,3 +1,8 @@
+// Package dbx MySQL增/删/改/查/事务操作封装
+//	MySQL=>Golang数据类型映射:
+//		bigint/int/smallint/tinyint => int64,
+//		varchar/char/longtext/text/mediumtext/tinytext/decimal/datetime/timestamp/date/time => string,
+//		float/double => float64,
 package dbx
 
 import (
@@ -13,16 +18,21 @@ import (
 //  @param db gorose.IOrm
 //  @param sql string
 //  @param params ...interface{} 不支持切片
-//  @return []gorose.Data
+//  @return []map[string]interface{}
 //  @return error
-func FetchAll(db gorose.IOrm, sql string, params ...interface{}) ([]gorose.Data, error) {
+func FetchAll(db gorose.IOrm, sql string, params ...interface{}) ([]map[string]interface{}, error) {
 	rows, err := db.Query(sql, params...)
 	if err != nil {
 		zap.L().Error(err.Error())
-		return []gorose.Data{}, err
+		return []map[string]interface{}{}, err
 	}
 
-	return rows, nil
+	result := []map[string]interface{}{}
+	for _, v := range rows {
+		result = append(result, v)
+	}
+
+	return result, nil
 }
 
 // FetchOne 获取一行记录
@@ -30,9 +40,9 @@ func FetchAll(db gorose.IOrm, sql string, params ...interface{}) ([]gorose.Data,
 //  @param db gorose.IOrm
 //  @param sql string
 //  @param params ...interface{}
-//  @return gorose.Data
+//  @return map[string]interface{}
 //  @return error
-func FetchOne(db gorose.IOrm, sql string, params ...interface{}) (gorose.Data, error) {
+func FetchOne(db gorose.IOrm, sql string, params ...interface{}) (map[string]interface{}, error) {
 	sql = strings.TrimSpace(sql)
 	if !strings.HasSuffix(sql, "LIMIT 1") && !strings.HasSuffix(sql, "limit 1") {
 		sql += " LIMIT 1"
@@ -40,11 +50,11 @@ func FetchOne(db gorose.IOrm, sql string, params ...interface{}) (gorose.Data, e
 
 	rows, err := FetchAll(db, sql, params...)
 	if err != nil {
-		return gorose.Data{}, err
+		return map[string]interface{}{}, err
 	}
 
 	if 0 == len(rows) {
-		return gorose.Data{}, nil
+		return map[string]interface{}{}, nil
 	}
 
 	return rows[0], nil
@@ -59,7 +69,7 @@ func FetchOne(db gorose.IOrm, sql string, params ...interface{}) (gorose.Data, e
 func FetchValue(db gorose.IOrm, sql string, params ...interface{}) (interface{}, error) {
 	row, err := FetchOne(db, sql, params...)
 	if err != nil {
-		return gorose.Data{}, err
+		return map[string]interface{}{}, err
 	}
 
 	for _, value := range row {
