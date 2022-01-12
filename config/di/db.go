@@ -1,14 +1,17 @@
 package di
 
 import (
+	"bufio"
 	"fmt"
 	"go-demo/config"
 	"go-demo/pkg/gox"
+	"os"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gohouse/gorose/v2"
 	"github.com/golang-module/carbon"
+	"go.uber.org/zap"
 )
 
 // print SQL
@@ -16,7 +19,20 @@ type sqlLogger struct {
 }
 
 func (sqlLogger) Sql(sqlStr string, runtime time.Duration) {
-	fmt.Printf("[SQL] [%s] %s --- %s\n", carbon.Now().ToDateTimeString(), runtime.String(), sqlStr)
+	file, err := os.OpenFile(config.GetString("sql_log"), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		zap.L().Error(err.Error())
+	}
+	defer file.Close()
+
+	sql := fmt.Sprintf("[SQL] [%s] %s --- %s\n", carbon.Now().ToDateTimeString(), runtime.String(), sqlStr)
+	write := bufio.NewWriter(file)
+	if _, err := write.WriteString(sql); err != nil {
+		zap.L().Error(err.Error())
+	}
+	if err := write.Flush(); err != nil {
+		zap.L().Error(err.Error())
+	}
 }
 func (sqlLogger) Slow(sqlStr string, runtime time.Duration) {
 }
@@ -58,7 +74,8 @@ func Db() gorose.IOrm {
 		if err != nil {
 			panic(err) // 即便这里不panic, 调用者在nil指针上调用db方法也会panic
 		}
-		if gox.InSlice(config.GetRuntimeEnv(), []string{"dev", "testing"}) { // print SQL to console
+
+		if config.GetString("sql_log") != "" {
 			dbEngine.SetLogger(sqlLogger{})
 		}
 

@@ -7,7 +7,7 @@ func init() {
 		// 错误日志路径
 		"error_log": "/var/log/golang_error.log",
 
-		// Goroutine池大小
+		// 公共Goroutine池大小
 		"worker_pool": 409600,
 
 		// 限流QPS
