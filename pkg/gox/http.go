@@ -13,10 +13,10 @@ import (
 	"go.uber.org/zap"
 )
 
-// Restful 发起Restful API请求
+// Restful 发起Restful请求
 //	@param method string
 //	@param rawUrl string
-//	@param params map[string]interface{} url参数或entity参数
+//	@param params map[string]interface{} url参数或entity参数, 若为url参数会进行url转义
 //	@param headers map[string]string
 //	@return body map[string]interface{}
 //	@return httpCode int
