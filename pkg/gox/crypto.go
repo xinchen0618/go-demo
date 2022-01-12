@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"go.uber.org/zap"
 )
@@ -27,4 +28,21 @@ func Md5x(i interface{}) (string, error) {
 		return "", err
 	}
 	return fmt.Sprintf("%x", md5.Sum(iBytes)), nil
+}
+
+// PasswordHash 加密明文
+//  @param password string
+//  @return string 38位16进制字符串
+func PasswordHash(password string) string {
+	salt := strconv.FormatInt(RandInt64(0x100000, 0xffffff), 16)
+	return salt + Md5(password+Md5(password+salt)+salt)
+}
+
+// PasswordVerify 验证明文与密文是否匹配
+//  @param password string
+//  @param hash string
+//  @return bool
+func PasswordVerify(password, passwordHash string) bool {
+	salt := passwordHash[0:6]
+	return passwordHash == salt+Md5(password+Md5(password+salt)+salt)
 }
