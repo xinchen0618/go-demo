@@ -30,7 +30,7 @@ func Md5x(i interface{}) (string, error) {
 	return fmt.Sprintf("%x", md5.Sum(iBytes)), nil
 }
 
-// PasswordHash 加密明文
+// PasswordHash 创建密码的散列
 //  @param password string
 //  @return string 38位16进制字符串
 func PasswordHash(password string) string {
@@ -38,7 +38,7 @@ func PasswordHash(password string) string {
 	return salt + Md5(password+Md5(password+salt)+salt)
 }
 
-// PasswordVerify 验证明文与密文是否匹配
+// PasswordVerify 验证密码与散列是否匹配
 //  @param password string
 //  @param hash string
 //  @return bool
