@@ -73,9 +73,6 @@ func FetchValue(db gorose.IOrm, sql string, params ...interface{}) (interface{},
 	}
 
 	for _, value := range row {
-		if nil == value {
-			return "", nil
-		}
 		return value, nil
 	}
 
