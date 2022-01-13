@@ -11,13 +11,13 @@ import (
 	"go-demo/pkg/dbx"
 	"math"
 	"reflect"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"github.com/gohouse/gorose/v2"
+	"github.com/spf13/cast"
 	"golang.org/x/sync/singleflight"
 )
 
@@ -135,7 +135,7 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, erro
 //	@return interface{}
 //	@return error
 func FilterParam(c *gin.Context, paramName string, paramValue interface{}, paramType string, allowEmpty bool) (interface{}, error) {
-	valueType := reflect.TypeOf(paramValue).String()
+	valueType := reflect.TypeOf(paramValue).String() // 用户输入值类型
 
 	/* 整型64位 */
 	if "int" == paramType {
@@ -146,7 +146,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 		if "" == stringValue.(string) {
 			return int64(0), nil
 		}
-		intValue, err := strconv.ParseInt(stringValue.(string), 10, 64) // 转整型64位
+		intValue, err := cast.ToInt64E(stringValue)
 		if err != nil {
 			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
@@ -190,7 +190,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			}
 			return stringValue, nil
 		} else if "float64" == valueType {
-			return strconv.FormatFloat(paramValue.(float64), 'f', -1, 64), nil
+			return cast.ToString(paramValue), nil
 		} else {
 			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
@@ -200,22 +200,24 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 	/* 枚举, 支持数字float64与字符串string混合枚举 */
 	if "[" == paramType[0:1] && "]" != paramType[1:2] {
 		var enum []interface{}
-		if err := json.Unmarshal([]byte(paramType), &enum); err != nil {
+		if err := json.Unmarshal([]byte(paramType), &enum); err != nil { // 候选值解析到切片
 			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
 		}
-		for _, value := range enum {
-			enumType := reflect.TypeOf(value).String()
+		for _, value := range enum { // 用户输入与候选值逐个比较
+			enumType := reflect.TypeOf(value).String() // 候选值类型
+			// 用户输入类型与候选类型一致
 			if enumType == valueType && paramValue == value {
 				return value, nil
 			}
+			// 用户输入类型与候选类型不一致
 			if "float64" == valueType {
-				stringValue := strconv.FormatFloat(paramValue.(float64), 'f', -1, 64)
+				stringValue := cast.ToString(paramValue)
 				if stringValue == value {
 					return value, nil
 				}
 			} else if "string" == valueType {
-				floatValue, err := strconv.ParseFloat(paramValue.(string), 64)
+				floatValue, err := cast.ToFloat64E(paramValue)
 				if err != nil {
 					Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 					return nil, errors.New("ParamInvalid")

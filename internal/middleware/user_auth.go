@@ -7,12 +7,12 @@ import (
 	"go-demo/config/consts"
 	"go-demo/config/di"
 	"go-demo/pkg/ginx"
-	"strconv"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
+	"github.com/spf13/cast"
 )
 
 // UserAuth 用户登录
@@ -45,12 +45,7 @@ func UserAuth() gin.HandlerFunc {
 				ginx.Error(c, 401, "UserUnauthorized", "用户未登录或登录已过期, 请重新登录")
 				return
 			}
-			userId, err := strconv.ParseInt(claims["jti"].(string), 10, 64)
-			if err != nil {
-				ginx.InternalError(c, err)
-				return
-			}
-			c.Set("userId", userId) // 后续的处理函数可以用过c.GetInt64("userId")来获取当前请求的用户信息
+			c.Set("userId", cast.ToInt64(claims["jti"])) // 后续的处理函数可以用过c.GetInt64("userId")来获取当前请求的用户信息
 			c.Next()
 
 		} else {

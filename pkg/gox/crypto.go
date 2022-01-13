@@ -34,7 +34,7 @@ func Md5x(i interface{}) (string, error) {
 //  @param password string
 //  @return string 38位16进制字符串
 func PasswordHash(password string) string {
-	salt := strconv.FormatInt(RandInt64(0x100000, 0xffffff), 16)
+	salt := strconv.FormatInt(RandInt64(0x100000, 0xffffff), 16) // 6位16进制字符串
 	return salt + Md5(password+Md5(password+salt)+salt)
 }
 

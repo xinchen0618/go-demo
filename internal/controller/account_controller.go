@@ -11,12 +11,12 @@ import (
 	"go-demo/pkg/dbx"
 	"go-demo/pkg/ginx"
 	"go-demo/pkg/gox"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/cast"
 )
 
 // 这里定义一个空结构体用于为大量的controller方法做分类
@@ -47,7 +47,7 @@ func (accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记
 	claims := &jwt.StandardClaims{
 		Audience:  jsonBody["user_name"].(string),
 		ExpiresAt: time.Now().Add(loginTtl).Unix(),
-		Id:        strconv.FormatInt(user["user_id"].(int64), 10),
+		Id:        cast.ToString(user["user_id"]),
 		IssuedAt:  time.Now().Unix(),
 		Issuer:    "account:PostUserLogin",
 	}
