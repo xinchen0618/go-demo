@@ -55,7 +55,7 @@
     - cache_service.go  资源缓存
     - queue_service.go  消息队列 
 - pkg/                  外部应用可以使用的库代码
-  - dbx/                db操作封装
+  - dbx/                db操作封装. MySQL增/删/改/查/事务操作封装
   - ginx/               gin增强方法. 此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
   - gox/                golang增强方法
 - go.mod                包管理  
