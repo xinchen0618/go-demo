@@ -23,7 +23,7 @@ var (
 	cacheSg      singleflight.Group
 )
 
-// Set 设置资源缓存
+// set 设置资源缓存
 //	@receiver cacheService
 //	@param db gorose.IOrm
 //	@param table string
@@ -31,7 +31,7 @@ var (
 //	@param id interface{} 整数
 //	@return bool
 //	@return error
-func (cacheService) Set(db gorose.IOrm, table string, primaryKey string, id interface{}) (bool, error) {
+func (cacheService) set(db gorose.IOrm, table string, primaryKey string, id interface{}) (bool, error) {
 	sql := fmt.Sprintf("SELECT * FROM %s WHERE %s = %d LIMIT 1", table, primaryKey, id)
 	data, err := dbx.FetchOne(db, sql)
 	if err != nil {
@@ -72,7 +72,7 @@ func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id inte
 			}
 
 			// 缓存不存在
-			ok, err := CacheService.Set(db, table, primaryKey, id)
+			ok, err := CacheService.set(db, table, primaryKey, id)
 			if err != nil {
 				return map[string]interface{}{}, err
 			}
@@ -100,15 +100,21 @@ func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id inte
 }
 
 // Delete 删除资源缓存
-//	@receiver *cacheService
-//	@param table string
-//	@param id interface{} 整数
-//	@return error
-func (cacheService) Delete(table string, id interface{}) error {
-	key := fmt.Sprintf(consts.CacheResource, table, id)
-	if err := di.CacheRedis().Del(context.Background(), key).Err(); err != nil {
-		zap.L().Error(err.Error())
-		return err
+//  @receiver cacheService
+//  @param table string
+//  @param ids ...interface{} 整数
+//  @return error
+func (cacheService) Delete(table string, ids ...interface{}) error {
+	if 0 == len(ids) {
+		return nil
+	}
+
+	for _, id := range ids {
+		key := fmt.Sprintf(consts.CacheResource, table, id)
+		if err := di.CacheRedis().Del(context.Background(), key).Err(); err != nil {
+			zap.L().Error(err.Error())
+			return err
+		}
 	}
 
 	return nil
