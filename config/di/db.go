@@ -1,7 +1,6 @@
 package di
 
 import (
-	"bufio"
 	"fmt"
 	"go-demo/config"
 	"go-demo/pkg/gox"
@@ -19,18 +18,13 @@ type sqlLogger struct {
 }
 
 func (sqlLogger) Sql(sqlStr string, runtime time.Duration) {
-	file, err := os.OpenFile(config.GetString("sql_log"), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	f, err := os.OpenFile(config.GetString("sql_log"), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		zap.L().Error(err.Error())
 	}
-	defer file.Close()
+	defer f.Close()
 
-	sql := fmt.Sprintf("[SQL] [%s] %s --- %s\n", carbon.Now().ToDateTimeString(), runtime.String(), sqlStr)
-	write := bufio.NewWriter(file)
-	if _, err := write.WriteString(sql); err != nil {
-		zap.L().Error(err.Error())
-	}
-	if err := write.Flush(); err != nil {
+	if _, err := fmt.Fprintf(f, "[SQL] [%s] %s --- %s\n", carbon.Now().ToDateTimeString(), runtime.String(), sqlStr); err != nil {
 		zap.L().Error(err.Error())
 	}
 }
