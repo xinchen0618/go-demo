@@ -128,7 +128,9 @@
   ```
 
 - 独享Goroutine池
-  
+
+  独享Goroutine池通常起到类似分页处理或者限流的作用  
+
   ```
   # go func
   wps := di.WorkerPoolSeparate(100)
