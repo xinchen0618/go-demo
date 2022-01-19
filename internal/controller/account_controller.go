@@ -89,6 +89,7 @@ func (accountController) DeleteUserLogout(c *gin.Context) {
 }
 
 func (accountController) GetUsers(c *gin.Context) {
+	// API Cache demo
 	queries, err := ginx.GetQueries(c, []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
 	if err != nil {
 		return
@@ -105,7 +106,7 @@ func (accountController) GetUsers(c *gin.Context) {
 			Db:     di.Db(),
 			Select: "user_id,user_name,money,created_at,updated_at",
 			From:   "t_users",
-			//Where:      "user_id > ?",
+			//Where:      "user_id > ?",  // 条件Demo
 			//BindParams: []interface{}{5},
 			OrderBy: "user_id DESC",
 		})
@@ -113,7 +114,7 @@ func (accountController) GetUsers(c *gin.Context) {
 			return ginx.PageItems{}, err
 		}
 
-		// 多线程读
+		// 多线程读Demo
 		wpg := di.WorkerPool().Group()
 		for _, item := range pageItems.Items {
 			item := item
@@ -156,6 +157,7 @@ func (accountController) GetUsersById(c *gin.Context) {
 }
 
 func (accountController) PostUsers(c *gin.Context) {
+	// 延时队列Demo
 	//userName := fmt.Sprintf("QU%d", gox.RandInt64(111111, 999999))
 	//if err := service.QueueService.EnqueueIn("user:AddUser", map[string]interface{}{"user_name": userName}, 5*time.Second); err != nil {
 	//	ginx.InternalError(c)
@@ -163,6 +165,7 @@ func (accountController) PostUsers(c *gin.Context) {
 	//}
 	//ginx.Success(c, 201, gin.H{"user_name": userName})
 
+	// 低优先级队列Demo
 	//userId := gox.RandInt64(111111, 999999)
 	//if err := service.QueueService.LowEnqueue("user:AddUserCounts", map[string]interface{}{"user_id": userId}); err != nil {
 	//	ginx.InternalError(c)
@@ -180,7 +183,7 @@ func (accountController) PostUsers(c *gin.Context) {
 		counts = int(jsonBody["counts"].(int64))
 	}
 
-	// 多线程写
+	// 多线程写Demo
 	wpsg := di.WorkerPoolSeparate(100).Group()
 	for i := 0; i < counts; i++ {
 		wpsg.Submit(func() {
