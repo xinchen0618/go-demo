@@ -89,13 +89,17 @@
 
 ### 日志
 
-- 日志文件
+- 错误日志
 
-  **错误日志**会记录到日志文件, 同时打印到console. 错误日志文件路径在`config/`中配置, 默认为`/var/log/golang_error.log`. 注意文件要有读写权限.
+  **错误日志**会记录到日志文件, 同时打印到console. 错误日志文件路径通过`config/`中`error_log`项配置, 注意文件需要读写权限.
 
-- 使用
+  使用`zap.L().Error()`或者`di.Logger().Error()`记录错误日志.
 
-  `zap.L().Error()`, `zap.L().Warn()`, `zap.L().Info()` 或者 `di.Logger().Error()`, `di.Logger().Warn()`, `di.Logger().Info()`
+  `zap.L().Warn()`, `zap.L().Info()`或者`di.Logger().Warn()`, `di.Logger().Info()`仅将日志打印到console.
+
+- SQL日志
+
+  SQL日志文件路径通过`config/`中`sql_log`项配置, 缺省或为空时不记录日志, 注意文件需要读写权限.
 
 
 ### WorkerPool 
