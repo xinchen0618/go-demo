@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"fmt"
-	"github.com/spf13/cast"
 	"go-demo/config/consts"
 	"go-demo/config/di"
 	"go-demo/pkg/ginx"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/juju/ratelimit"
+	"github.com/spf13/cast"
 )
 
 // QpsLimit 限流QPS
