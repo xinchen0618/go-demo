@@ -4,14 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"go-demo/config"
+	"go-demo/internal/middleware"
 	"go-demo/internal/router"
 	"go-demo/pkg/ginx"
 	"go-demo/pkg/gox"
-	"time"
 
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
-	"github.com/juju/ratelimit"
 )
 
 // recovery 主Goroutine中panic兜底处理
@@ -23,21 +22,6 @@ func recovery() gin.HandlerFunc {
 				ginx.InternalError(c, errors.New(fmt.Sprint(err)))
 			}
 		}()
-		c.Next()
-	}
-}
-
-// rateLimitMiddleware 限流
-//	@param fillInterval time.Duration
-//	@param quantum int64
-//	@return gin.HandlerFunc
-func rateLimit(fillInterval time.Duration, quantum int64) gin.HandlerFunc {
-	bucket := ratelimit.NewBucketWithQuantum(fillInterval, quantum, quantum)
-	return func(c *gin.Context) {
-		if bucket.TakeAvailable(1) < 1 {
-			ginx.Error(c, 429, "TooManyRequests", "服务繁忙, 请稍后重试")
-			return
-		}
 		c.Next()
 	}
 }
@@ -70,7 +54,7 @@ func main() {
 	// Panic处理
 	r.Use(recovery())
 	// 限流
-	r.Use(rateLimit(time.Second, int64(config.GetInt("rate_limit"))))
+	r.Use(middleware.QpsLimit(config.GetInt("qps")))
 	// 跨域处理
 	r.Use(cors())
 

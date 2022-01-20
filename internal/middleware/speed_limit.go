@@ -3,13 +3,30 @@ package middleware
 import (
 	"context"
 	"fmt"
+	"github.com/spf13/cast"
 	"go-demo/config/consts"
 	"go-demo/config/di"
 	"go-demo/pkg/ginx"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/juju/ratelimit"
 )
+
+// QpsLimit 限流QPS
+//	@param qps int
+//	@return gin.HandlerFunc
+func QpsLimit(qps int) gin.HandlerFunc {
+	quantum := cast.ToInt64(qps)
+	bucket := ratelimit.NewBucketWithQuantum(time.Second, quantum, quantum)
+	return func(c *gin.Context) {
+		if bucket.TakeAvailable(1) < 1 {
+			ginx.Error(c, 429, "TooManyRequests", "服务繁忙, 请稍后重试")
+			return
+		}
+		c.Next()
+	}
+}
 
 // SubmitLimit 提交频率限制
 //  主要用于防重
@@ -24,7 +41,7 @@ func SubmitLimit() gin.HandlerFunc {
 		}
 
 		key := fmt.Sprintf(consts.SubmitLimit, id, c.Request.Method, c.Request.URL.Path)
-		ok, err := di.CacheRedis().SetNX(context.Background(), key, 1, 2*time.Second).Result()
+		ok, err := di.CacheRedis().SetNX(context.Background(), key, 1, 2*time.Second).Result() // 2秒/次
 		if err != nil {
 			ginx.InternalError(c, err)
 			return
