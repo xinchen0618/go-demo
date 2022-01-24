@@ -2,6 +2,8 @@ package config
 
 import (
 	"os"
+
+	"github.com/spf13/cast"
 )
 
 // configure["common": interface{}, "<runtimeEnv>": interface{}]
@@ -36,33 +38,17 @@ func Get(key string) interface{} {
 }
 
 func GetInt(key string) int {
-	if value := Get(key); value != nil {
-		return value.(int)
-	} else {
-		return 0
-	}
+	return cast.ToInt(Get(key))
 }
 
 func GetString(key string) string {
-	if value := Get(key); value != nil {
-		return value.(string)
-	} else {
-		return ""
-	}
+	return cast.ToString(Get(key))
 }
 
 func GetStringSlice(key string) []string {
-	if value := Get(key); value != nil {
-		return value.([]string)
-	} else {
-		return []string{}
-	}
+	return cast.ToStringSlice(Get(key))
 }
 
 func GetIntSlice(key string) []int {
-	if value := Get(key); value != nil {
-		return value.([]int)
-	} else {
-		return []int{}
-	}
+	return cast.ToIntSlice(Get(key))
 }
