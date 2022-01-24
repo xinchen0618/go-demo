@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/spf13/cast"
+	"go.uber.org/zap"
 )
 
 // configure["common": interface{}, "<runtimeEnv>": interface{}]
@@ -38,17 +39,33 @@ func Get(key string) interface{} {
 }
 
 func GetInt(key string) int {
-	return cast.ToInt(Get(key))
+	value, err := cast.ToIntE(Get(key))
+	if err != nil {
+		zap.L().Error(err.Error())
+	}
+	return value
 }
 
 func GetString(key string) string {
-	return cast.ToString(Get(key))
+	value, err := cast.ToStringE(Get(key))
+	if err != nil {
+		zap.L().Error(err.Error())
+	}
+	return value
 }
 
 func GetStringSlice(key string) []string {
-	return cast.ToStringSlice(Get(key))
+	value, err := cast.ToStringSliceE(Get(key))
+	if err != nil {
+		zap.L().Error(err.Error())
+	}
+	return value
 }
 
 func GetIntSlice(key string) []int {
-	return cast.ToIntSlice(Get(key))
+	value, err := cast.ToIntSliceE(Get(key))
+	if err != nil {
+		zap.L().Error(err.Error())
+	}
+	return value
 }
