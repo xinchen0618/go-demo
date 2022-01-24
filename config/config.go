@@ -54,6 +54,14 @@ func GetString(key string) string {
 	return value
 }
 
+func GetBool(key string) bool {
+	value, err := cast.ToBoolE(Get(key))
+	if err != nil {
+		zap.L().Error(err.Error())
+	}
+	return value
+}
+
 func GetStringSlice(key string) []string {
 	value, err := cast.ToStringSliceE(Get(key))
 	if err != nil {

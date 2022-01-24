@@ -84,7 +84,7 @@
 
 - 使用
 
-  `config.Get()`, `config.GetInt()`, `config.GetString()`, `config.GetIntSlice()`, `config.GetStringSlice()`
+  `config.Get()`, `config.GetInt()`, `config.GetString()`, `config.GetBool()`, `config.GetIntSlice()`, `config.GetStringSlice()`
 
 
 ### 日志
