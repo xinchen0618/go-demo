@@ -93,7 +93,7 @@
 
   `zap.L(),Error()`, `zap.L().Warn()`, `zap.L().Info()`, `zap.L().Debug()`或者`di.Logger().Error()`, `di.Logger().Warn()`, `di.Logger().Info()`, `di.Logger().Debug()`. 错误日志会记录栈信息.
 
-  日志文件位置通过`config/`中`error_log`项配置, 注意文件需要读写权限. 
+  日志文件路径通过`config/`中`error_log`项配置, 注意文件需要读写权限. 
 
 - SQL日志
 
