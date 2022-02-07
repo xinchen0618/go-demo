@@ -89,13 +89,11 @@
 
 ### 日志
 
-- 错误日志
+- 记录日志
 
-  **错误日志**会记录到日志文件, 同时打印到console. 错误日志文件路径通过`config/`中`error_log`项配置, 注意文件需要读写权限.
+  `zap.L(),Error()`, `zap.L().Warn()`, `zap.L().Info()`, `zap.L().Debug()`或者`di.Logger().Error()`, `di.Logger().Warn()`, `di.Logger().Info()`, `di.Logger().Debug()`. 错误日志会记录栈信息.
 
-  使用`zap.L().Error()`或者`di.Logger().Error()`记录错误日志.
-
-  `zap.L().Warn()`, `zap.L().Info()`或者`di.Logger().Warn()`, `di.Logger().Info()`仅将日志打印到console.
+  日志文件位置通过`config/`中`error_log`项配置, 注意文件需要读写权限. 
 
 - SQL日志
 
