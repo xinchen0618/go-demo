@@ -1,8 +1,8 @@
 // Package dbx MySQL增/删/改/查/事务操作封装
 //	MySQL=>Golang数据类型映射:
 //		bigint/int/smallint/tinyint => int64,
-//		varchar/char/longtext/text/mediumtext/tinytext/decimal/datetime/timestamp/date/time => string,
 //		float/double => float64,
+//		varchar/char/longtext/text/mediumtext/tinytext/decimal/datetime/timestamp/date/time => string,
 package dbx
 
 import (
@@ -190,7 +190,7 @@ func Delete(db gorose.IOrm, table string, where string, params ...interface{}) (
 	return affectedCounts, nil
 }
 
-// Execute 执行SQL语句
+// Execute 执行原生SQL
 //  @param db gorose.IOrm
 //  @param sql string
 //  @param params ...interface{}

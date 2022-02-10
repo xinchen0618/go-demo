@@ -277,6 +277,37 @@ go build
   默认队列: 及时消息`service.QueueService.Enqueue()`, 延时消息`service.QueueService.EnqueueIn()`; 低优先级队列: 及时消息`service.QueueService.LowEnqueue()`, 延时消息`service.QueueService.LowEnqueueIn()`
 
 
+### MySQL
+
+`dbx/` 提供以`map[string]interface{}`类型操作&读取数据库的封装 
+
+#### 数据类型映射
+
+Golang统一映射类型方便操作. MySQL整型(包括无符号)统一映射为`int64`, 浮点型统一映射为`float64`, 其他类型统一映射为`string` 
+
+```
+MySQL=>Golang数据类型映射:
+    bigint/int/smallint/tinyint => int64,
+    float/double => float64,
+    varchar/char/longtext/text/mediumtext/tinytext/decimal/datetime/timestamp/date/time => string,
+```
+
+#### 操作封装
+
+- `FetchAll()` 获取多行记录
+- `FetchOne()` 获取一行记录
+- `FetchValue()` 获取一个值
+- `FetchColumn()` 获取一列值
+- `Slice2in()` Slice转IN条件
+- `Insert()` 新增记录
+- `Update()` 更新记录
+- `Delete()` 删除记录
+- `Execute()` 执行原生SQL
+- `Begin()` 开始事务
+- `Commit()` 提交事务
+- `Rollback()` 回滚事务
+
+
 ### Redis
 
 #### 规范
