@@ -279,11 +279,11 @@ go build
 
 ### MySQL
 
-`dbx/` 提供以`map[string]interface{}`类型操作&读取数据库的封装 
+`dbx/` 提供以`map[string]interface{}`类型操作和读取数据库的封装 
 
 #### 数据类型映射
 
-Golang统一映射类型方便操作. MySQL整型(包括无符号)统一映射为`int64`, 浮点型统一映射为`float64`, 其他类型统一映射为`string` 
+Golang统一映射数据类型方便操作. MySQL整型(包括无符号)统一映射为`int64`, 浮点型统一映射为`float64`, 其他类型统一映射为`string` 
 
 ```
 MySQL=>Golang数据类型映射:
@@ -310,13 +310,13 @@ MySQL=>Golang数据类型映射:
 
 ### Redis
 
+key统一在`config/consts/redis_key.go`中定义.
+
 #### 规范
 
 <a href="https://developer.aliyun.com/article/531067" target="_blank">阿里云Redis开发规范</a>
 
 #### 缓存
-
-key统一在`config/consts/redis_key.go`中定义.
 
 - 资源缓存
 
@@ -328,4 +328,4 @@ key统一在`config/consts/redis_key.go`中定义.
 - 业务缓存
 
   - 自定义缓存, `service.CacheService.GetOrSet()`获取或设置自定义缓存
-  - 针对API业务设计的缓存, `ginx.GetOrSetCache()`获取或设置业务缓存
+  - 针对API业务设计的缓存, `ginx.GetOrSetCache()`获取或设置API业务缓存
