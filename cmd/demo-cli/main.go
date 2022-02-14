@@ -18,7 +18,7 @@ func main() {
 					{
 						Name:   "init-position",
 						Usage:  "初始化用户position字段",
-						Action: action.UserAction.InitPosition,
+						Action: action.User.InitPosition,
 					},
 				},
 			},

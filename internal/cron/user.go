@@ -9,15 +9,15 @@ import (
 )
 
 // 这里定义一个空结构体用于为大量的cron方法做分类
-type userCron struct{}
+type user struct{}
 
-// UserCron 这里仅需结构体零值, 计划任务通过cron.XxxCron.Xxx的形式引用旗下定义的方法
-var UserCron userCron
+// User 这里仅需结构体零值
+var User user
 
 // InitVip
-//	@receiver *userCron
+//	@receiver user
 //	@param counts int
-func (userCron) InitVip(counts int) {
+func (user) InitVip(counts int) {
 	userIds, err := dbx.FetchColumn(di.Db(), "SELECT user_id FROM t_users WHERE is_vip=0 LIMIT ?", counts)
 	if err != nil {
 		return

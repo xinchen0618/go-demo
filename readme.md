@@ -41,9 +41,9 @@
     - worker_pool.go    Goroutine池服务
     - queue.go          消息队列服务
   - config.go           配置实现
-  - config_common.go    公共配置
-  - config_prod.go      生产环境配置
-  - config_testing.go   测试环境配置
+  - common.go           公共配置
+  - prod.go             生产环境配置
+  - testing.go          测试环境配置
 - internal/             内部应用代码
   - action/             命令行action
   - cron/               计划任务  
@@ -52,8 +52,8 @@
   - middleware/         API中间件  
   - task/               消息队列任务 
   - service/            公共业务逻辑
-    - cache_service.go  资源缓存
-    - queue_service.go  消息队列 
+    - cache.go          资源缓存
+    - queue.go          消息队列 
 - pkg/                  外部应用可以使用的库代码
   - dbx/                db操作封装. MySQL增/删/改/查/事务操作封装
   - ginx/               gin增强方法. 此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
@@ -274,7 +274,7 @@ go build
 
   消息队列按任务优先级分两个队列: 默认队列, 该队列分配了较多的系统资源, 任务一般发送至此队列; 低优先级队列, 该队列分配了较少的系统资源, 数据量大优先级低的任务发送至此队列
 
-  默认队列: 及时消息`service.QueueService.Enqueue()`, 延时消息`service.QueueService.EnqueueIn()`; 低优先级队列: 及时消息`service.QueueService.LowEnqueue()`, 延时消息`service.QueueService.LowEnqueueIn()`
+  默认队列: 及时消息`service.Queue.Enqueue()`, 延时消息`service.Queue.EnqueueIn()`; 低优先级队列: 及时消息`service.Queue.LowEnqueue()`, 延时消息`service.Queue.LowEnqueueIn()`
 
 
 ### MySQL
@@ -322,10 +322,10 @@ key统一在`config/consts/redis_key.go`中定义.
 
   以资源对象为单位, 使用旁路缓存策略.
 
-  - `GET`资源时`service.CacheService.Get()`获取缓存(缓存不存在时会建立)
-  - `PUT`/`DELETE`资源时`service.CacheService.Delete()`删除缓存
+  - `GET`资源时`service.Cache.Get()`获取缓存(缓存不存在时会建立)
+  - `PUT`/`DELETE`资源时`service.Cache.Delete()`删除缓存
 
 - 业务缓存
 
-  - 自定义缓存, `service.CacheService.GetOrSet()`获取或设置自定义缓存
+  - 自定义缓存, `service.Cache.GetOrSet()`获取或设置自定义缓存
   - 针对API业务设计的缓存, `ginx.GetOrSetCache()`获取或设置API业务缓存

@@ -20,12 +20,12 @@ import (
 )
 
 // 这里定义一个空结构体用于为大量的controller方法做分类
-type accountController struct{}
+type account struct{}
 
-// AccountController 这里仅需结构体零值, router通过controller.XxxController.Xxx的形式引用旗下定义的方法
-var AccountController accountController
+// Account 这里仅需结构体零值
+var Account account
 
-func (accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
+func (account) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
 	jsonBody, err := ginx.GetJsonBody(c, []string{"user_name:用户名:string:+", "password:密码:string:+"})
 	if err != nil {
 		return
@@ -73,7 +73,7 @@ func (accountController) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记
 	ginx.Success(c, 200, gin.H{"user_id": user["user_id"], "token": tokenString})
 }
 
-func (accountController) DeleteUserLogout(c *gin.Context) {
+func (account) DeleteUserLogout(c *gin.Context) {
 	userId := c.GetInt64("userId")
 
 	// 删除对应redis白名单记录
@@ -88,7 +88,7 @@ func (accountController) DeleteUserLogout(c *gin.Context) {
 	ginx.Success(c, 204)
 }
 
-func (accountController) GetUsers(c *gin.Context) {
+func (account) GetUsers(c *gin.Context) {
 	// API Cache demo
 	queries, err := ginx.GetQueries(c, []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
 	if err != nil {
@@ -100,7 +100,7 @@ func (accountController) GetUsers(c *gin.Context) {
 		return
 	}
 	key = fmt.Sprintf(consts.CacheUsers, key)
-	pageItems, err := ginx.GetOrSetCache(c, key, 3*time.Second, func() (interface{}, error) {
+	pageItemsCache, err := ginx.GetOrSetCache(c, key, 3*time.Second, func() (interface{}, error) {
 		pageItems, err := ginx.GetPageItems(ginx.PageQuery{
 			GinCtx: c,
 			Db:     di.Db(),
@@ -120,7 +120,7 @@ func (accountController) GetUsers(c *gin.Context) {
 			item := item
 			wpg.Submit(func() {
 				item["counts"] = 0
-				userCounts, _ := service.CacheService.Get(di.Db(), "t_user_counts", "user_id", item["user_id"])
+				userCounts, _ := service.Cache.Get(di.Db(), "t_user_counts", "user_id", item["user_id"])
 				if counts, ok := userCounts["counts"]; ok {
 					item["counts"] = counts
 				}
@@ -134,16 +134,16 @@ func (accountController) GetUsers(c *gin.Context) {
 		return
 	}
 
-	ginx.Success(c, 200, pageItems)
+	ginx.Success(c, 200, pageItemsCache)
 }
 
-func (accountController) GetUsersById(c *gin.Context) {
+func (account) GetUsersById(c *gin.Context) {
 	userId, err := ginx.FilterParam(c, "用户id", c.Param("user_id"), "+int", false)
 	if err != nil {
 		return
 	}
 
-	user, err := service.CacheService.Get(di.Db(), "t_users", "user_id", userId)
+	user, err := service.Cache.Get(di.Db(), "t_users", "user_id", userId)
 	if err != nil {
 		ginx.InternalError(c)
 		return
@@ -156,10 +156,10 @@ func (accountController) GetUsersById(c *gin.Context) {
 	ginx.Success(c, 200, user)
 }
 
-func (accountController) PostUsers(c *gin.Context) {
+func (account) PostUsers(c *gin.Context) {
 	// 延时队列Demo
 	//userName := fmt.Sprintf("QU%d", gox.RandInt64(111111, 999999))
-	//if err := service.QueueService.EnqueueIn("user:AddUser", map[string]interface{}{"user_name": userName}, 5*time.Second); err != nil {
+	//if err := service.Queue.EnqueueIn("user:AddUser", map[string]interface{}{"user_name": userName}, 5*time.Second); err != nil {
 	//	ginx.InternalError(c)
 	//	return
 	//}
@@ -167,7 +167,7 @@ func (accountController) PostUsers(c *gin.Context) {
 
 	// 低优先级队列Demo
 	//userId := gox.RandInt64(111111, 999999)
-	//if err := service.QueueService.LowEnqueue("user:AddUserCounts", map[string]interface{}{"user_id": userId}); err != nil {
+	//if err := service.Queue.LowEnqueue("user:AddUserCounts", map[string]interface{}{"user_id": userId}); err != nil {
 	//	ginx.InternalError(c)
 	//	return
 	//}
@@ -213,7 +213,7 @@ func (accountController) PostUsers(c *gin.Context) {
 				dbx.Rollback(db)
 				return
 			}
-			if err := service.CacheService.Delete("t_user_counts", userId); err != nil {
+			if err := service.Cache.Delete("t_user_counts", userId); err != nil {
 				dbx.Rollback(db)
 				return
 			}

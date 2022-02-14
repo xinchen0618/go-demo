@@ -16,22 +16,22 @@ import (
 	"golang.org/x/sync/singleflight"
 )
 
-type cacheService struct{}
+type cache struct{}
 
 var (
-	CacheService cacheService
-	cacheSg      singleflight.Group
+	Cache   cache
+	cacheSg singleflight.Group
 )
 
 // set 设置资源缓存
-//	@receiver cacheService
+//	@receiver cache
 //	@param db gorose.IOrm
 //	@param table string
 //	@param primaryKey string
 //	@param id interface{} 整数
 //	@return bool
 //	@return error
-func (cacheService) set(db gorose.IOrm, table string, primaryKey string, id interface{}) (bool, error) {
+func (cache) set(db gorose.IOrm, table string, primaryKey string, id interface{}) (bool, error) {
 	sql := fmt.Sprintf("SELECT * FROM %s WHERE %s = %d LIMIT 1", table, primaryKey, id)
 	data, err := dbx.FetchOne(db, sql)
 	if err != nil {
@@ -54,14 +54,14 @@ func (cacheService) set(db gorose.IOrm, table string, primaryKey string, id inte
 }
 
 // Get 获取资源缓存
-//	@receiver cacheService
+//	@receiver cache
 //	@param db gorose.IOrm
 //	@param table string
 //	@param primaryKey string
 //	@param id interface{} 整数
 //	@return map[string]interface{}
 //	@return error
-func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id interface{}) (map[string]interface{}, error) {
+func (cache) Get(db gorose.IOrm, table string, primaryKey string, id interface{}) (map[string]interface{}, error) {
 	key := fmt.Sprintf(consts.CacheResource, table, id)
 	v, err, _ := cacheSg.Do(key, func() (interface{}, error) {
 		dataCache, err := di.CacheRedis().Get(context.Background(), key).Result()
@@ -72,7 +72,7 @@ func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id inte
 			}
 
 			// 缓存不存在
-			ok, err := CacheService.set(db, table, primaryKey, id)
+			ok, err := Cache.set(db, table, primaryKey, id)
 			if err != nil {
 				return map[string]interface{}{}, err
 			}
@@ -100,11 +100,11 @@ func (cacheService) Get(db gorose.IOrm, table string, primaryKey string, id inte
 }
 
 // Delete 删除资源缓存
-//  @receiver cacheService
+//  @receiver cache
 //  @param table string
 //  @param ids ...interface{} 整数
 //  @return error
-func (cacheService) Delete(table string, ids ...interface{}) error {
+func (cache) Delete(table string, ids ...interface{}) error {
 	if 0 == len(ids) {
 		return nil
 	}
@@ -122,13 +122,13 @@ func (cacheService) Delete(table string, ids ...interface{}) error {
 
 // GetOrSet 获取或设置自定义缓存
 //	方法返回的是json.Unmarshal的数据
-//  @receiver cacheService
+//  @receiver cache
 //  @param key string
 //  @param ttl time.Duration
 //  @param f func() (interface{}, error)
 //  @return interface{}
 //  @return error
-func (cacheService) GetOrSet(key string, ttl time.Duration, f func() (interface{}, error)) (interface{}, error) {
+func (cache) GetOrSet(key string, ttl time.Duration, f func() (interface{}, error)) (interface{}, error) {
 	result, err, _ := cacheSg.Do(key, func() (interface{}, error) {
 		var resultCache string
 		resultCache, err := di.CacheRedis().Get(context.Background(), key).Result()

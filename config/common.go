@@ -11,7 +11,7 @@ func init() {
 		"worker_pool": 409600,
 
 		// 限流QPS
-		"qps": 40000,
+		"qps_limit": 40000,
 
 		// DB
 		"mysql_host":           "127.0.0.1",

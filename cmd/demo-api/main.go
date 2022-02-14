@@ -20,10 +20,10 @@ func main() {
 	r := gin.Default()
 
 	// panic处理/跨域处理/限流
-	r.Use(middleware.Recovery(), middleware.Cors(), middleware.QpsLimit(config.GetInt("qps")))
+	r.Use(middleware.Recovery(), middleware.Cors(), middleware.QpsLimit(config.GetInt("qps_limit")))
 
 	// 加载路由
-	router.AccountRouter(r)
+	router.Account(r)
 
 	// 未知路由处理
 	r.NoRoute(func(c *gin.Context) {

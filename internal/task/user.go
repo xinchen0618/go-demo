@@ -10,11 +10,11 @@ import (
 	"github.com/hibiken/asynq"
 )
 
-type userTask struct{}
+type user struct{}
 
-var UserTask userTask
+var User user
 
-func (userTask) AddUser(ctx context.Context, t *asynq.Task) error {
+func (user) AddUser(ctx context.Context, t *asynq.Task) error {
 	var payload map[string]interface{}
 	if err := json.Unmarshal(t.Payload(), &payload); err != nil {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
@@ -24,7 +24,7 @@ func (userTask) AddUser(ctx context.Context, t *asynq.Task) error {
 	return err
 }
 
-func (userTask) AddUserCounts(ctx context.Context, t *asynq.Task) error {
+func (user) AddUserCounts(ctx context.Context, t *asynq.Task) error {
 	var payload map[string]interface{}
 	if err := json.Unmarshal(t.Payload(), &payload); err != nil {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)

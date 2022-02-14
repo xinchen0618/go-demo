@@ -9,16 +9,16 @@ import (
 )
 
 // 这里定义一个空结构体用于为大量的action方法做分类
-type userAction struct{}
+type user struct{}
 
-// UserAction 这里仅需结构体零值, cli通过action.XxxAction.Xxx的形式引用旗下定义的方法
-var UserAction userAction
+// User 这里仅需结构体零值
+var User user
 
 // InitPosition
-//	@receiver *userAction
+//	@receiver user
 //	@param c *cli.Context
 //	@return error
-func (userAction) InitPosition(c *cli.Context) error {
+func (user) InitPosition(c *cli.Context) error {
 	counts := c.Args().Get(0)
 	if "" == counts {
 		counts = "10"
