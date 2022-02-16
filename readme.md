@@ -37,9 +37,11 @@
   - consts/             常量定义
     - redis_key.go      Redis key统一在此定义避免冲突
   - di/                 服务注入
+    - db.go             db服务
     - logger.go         日志服务
-    - worker_pool.go    Goroutine池服务
     - queue.go          消息队列服务
+    - redis.go          redis服务
+    - worker_pool.go    Goroutine池服务
   - config.go           配置实现
   - common.go           公共配置
   - prod.go             生产环境配置
