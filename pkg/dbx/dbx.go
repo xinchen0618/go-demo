@@ -107,7 +107,7 @@ func FetchColumn(db gorose.IOrm, sql string, params ...interface{}) ([]interface
 // Slice2in Slice转IN条件
 // 	Golang SQL驱动不支持IN(?)
 //	使用fmt.Sprint("IN(%s)", Slice2in(s))
-//	MySQL查询整型添加引号无影响
+//	MySQL整型字段查询添加引号无影响
 //  @param s interface{}
 //  @return string
 func Slice2in(s interface{}) string {
