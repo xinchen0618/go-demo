@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/gohouse/gorose/v2"
+	"github.com/spf13/cast"
 	"go.uber.org/zap"
 )
 
@@ -106,22 +107,16 @@ func FetchColumn(db gorose.IOrm, sql string, params ...interface{}) ([]interface
 // Slice2in Slice转IN条件
 // 	Golang SQL驱动不支持IN(?)
 //	使用fmt.Sprint("IN(%s)", Slice2in(s))
+//	MySQL查询整型添加引号无影响
 //  @param s interface{}
 //  @return string
 func Slice2in(s interface{}) string {
-	switch s.(type) {
-	// 字符串
-	case []string:
-		cleaned := []string{}
-		for _, v := range s.([]string) {
-			cleaned = append(cleaned, gox.AddSlashes(v))
-		}
-		return "'" + strings.Join(cleaned, "','") + "'"
-
-	// 数字
-	default:
-		return strings.Trim(strings.Join(strings.Fields(fmt.Sprint(s)), ","), "[]")
+	stringSlice := cast.ToStringSlice(s)
+	cleaned := []string{}
+	for _, v := range stringSlice {
+		cleaned = append(cleaned, gox.AddSlashes(v))
 	}
+	return "'" + strings.Join(cleaned, "','") + "'"
 }
 
 // Insert 新增记录

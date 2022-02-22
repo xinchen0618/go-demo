@@ -12,7 +12,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gohouse/gorose/v2 v2.1.12
 	github.com/golang-module/carbon v1.5.5
-	github.com/hibiken/asynq v0.21.0
+	github.com/hibiken/asynq v0.22.1
 	github.com/juju/ratelimit v1.0.1
 	github.com/spf13/cast v1.4.1
 	github.com/urfave/cli/v2 v2.3.0
@@ -49,7 +49,7 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
-	golang.org/x/crypto v0.0.0-20220213190939-1e6e3497d506 // indirect
+	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
