@@ -297,6 +297,9 @@ MySQL => Golang 数据类型映射:
 - `Update()` 更新记录
 - `Delete()` 删除记录
 - `Execute()` 执行原生SQL
+- `Begin()` 手动开始事务. 事务应优先考虑Transaction()闭包操作是否会更加方便
+- `Commit()` 手动提交事务
+- `Rollback()` 手动回滚事务
 
 ### Redis
 
