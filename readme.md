@@ -3,7 +3,7 @@
 ### 技术栈
 
 - API           Gin          https://github.com/gin-gonic/gin
-- Mysql         GoRose       https://github.com/gohouse/gorose
+- MySQL         GoRose       https://github.com/gohouse/gorose
 - Redis         go-redis     https://github.com/go-redis/redis
 - 登录          jwt-go        https://github.com/dgrijalva/jwt-go
 - 日志          zap           https://github.com/uber-go/zap
@@ -78,7 +78,7 @@
 
 - 多环境配置
   
-  环境配置 config_<RUNTIME_ENV>.go, 同键名环境配置覆盖公共配置. dev环境配置不参与版本控制.
+  环境配置 <RUNTIME_ENV>.go, 同键名环境配置覆盖公共配置. dev环境配置不参与版本控制.
 
 - 使用
 
