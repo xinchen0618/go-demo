@@ -128,13 +128,13 @@
   ```
   # go func
   wps := di.WorkerPoolSeparate(100)
-  for i := 0; i < 10; i++ {
+  for i := 0; i < 10000; i++ {
     wps.Submit(func)
   }
   
   # Wait Group
   wpsg := di.WorkerPool(100).Group()
-  for i := 0; i < 10; i++ {
+  for i := 0; i < 10000; i++ {
     wpsg.Submit(func)
   }
   wpsg.Wait()  
