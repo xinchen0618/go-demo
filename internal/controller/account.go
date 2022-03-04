@@ -16,6 +16,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/gohouse/gorose/v2"
 	"github.com/spf13/cast"
 )
 
@@ -89,35 +90,43 @@ func (account) DeleteUserLogout(c *gin.Context) {
 }
 
 func (account) GetUsers(c *gin.Context) {
-	// 条件Demo
-	queries, err := ginx.GetQueries(c, []string{`user_name:用户名:string:""`})
+	// Cache Demo
+	queries, err := ginx.GetQueries(c, []string{`user_name:用户名:string:""`, "page:页码:+int:1", "per_page:页大小:+int:12"})
 	if err != nil {
 		return
 	}
 
-	where := "1"
-	bindParams := []interface{}{}
-
-	userName := queries["user_name"].(string)
-	if userName != "" {
-		where += " AND user_name LIKE ?"
-		bindParams = append(bindParams, fmt.Sprintf("%%%s%%", userName))
+	key, err := gox.Md5x(queries)
+	if err != nil {
+		ginx.InternalError(c)
+		return
 	}
 
-	pageItems, err := ginx.GetPageItems(ginx.PageQuery{
-		GinCtx:     c,
-		Db:         di.Db(),
-		Select:     "user_id,user_name,money,created_at,updated_at",
-		From:       "t_users",
-		Where:      where,
-		BindParams: bindParams,
-		OrderBy:    "user_id DESC",
+	pageItemsCache, err := ginx.GetOrSetCache(c, key, 3*time.Second, func() (interface{}, error) {
+		where := "1"
+		bindParams := []interface{}{}
+
+		userName := queries["user_name"].(string)
+		if userName != "" {
+			where += " AND user_name LIKE ?"
+			bindParams = append(bindParams, fmt.Sprintf("%%%s%%", userName))
+		}
+
+		return ginx.GetPageItems(ginx.PageQuery{
+			GinCtx:     c,
+			Db:         di.Db(),
+			Select:     "user_id,user_name,money,created_at,updated_at",
+			From:       "t_users",
+			Where:      where,
+			BindParams: bindParams,
+			OrderBy:    "user_id DESC",
+		})
 	})
 	if err != nil {
 		return
 	}
 
-	ginx.Success(c, 200, pageItems)
+	ginx.Success(c, 200, pageItemsCache)
 }
 
 func (account) GetUsersById(c *gin.Context) {
@@ -170,40 +179,32 @@ func (account) PostUsers(c *gin.Context) {
 	wpsg := di.WorkerPoolSeparate(100).Group()
 	for i := 0; i < counts; i++ {
 		wpsg.Submit(func() {
-			db := di.Db()
-			if err := dbx.Begin(db); err != nil {
-				return
-			}
-
-			userName := fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999))
-			user, err := dbx.FetchOne(db, "SELECT user_id FROM t_users WHERE user_name=?", userName)
-			if err != nil {
-				dbx.Rollback(db)
-				return
-			}
-			var userId int64
-			if len(user) > 0 { // 记录存在
-				userId = user["user_id"].(int64)
-			} else { // 记录不存在
-				userId, err = dbx.Insert(db, "t_users", map[string]interface{}{"user_name": userName})
+			// 事务
+			_ = di.Db().Transaction(func(db gorose.IOrm) error {
+				userName := fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999))
+				user, err := dbx.FetchOne(db, "SELECT user_id FROM t_users WHERE user_name=?", userName)
 				if err != nil {
-					dbx.Rollback(db)
-					return
+					return err
 				}
-			}
-			sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,?) ON DUPLICATE KEY UPDATE counts = counts + 1"
-			if _, err = dbx.Execute(db, sql, userId, gox.RandInt64(1, 9)); err != nil {
-				dbx.Rollback(db)
-				return
-			}
-			if err := service.Cache.Delete("t_user_counts", userId); err != nil {
-				dbx.Rollback(db)
-				return
-			}
+				var userId int64
+				if len(user) > 0 { // 记录存在
+					userId = user["user_id"].(int64)
+				} else { // 记录不存在
+					userId, err = dbx.Insert(db, "t_users", map[string]interface{}{"user_name": userName})
+					if err != nil {
+						return err
+					}
+				}
+				sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,?) ON DUPLICATE KEY UPDATE counts = counts + 1"
+				if _, err = dbx.Execute(db, sql, userId, gox.RandInt64(1, 9)); err != nil {
+					return err
+				}
+				if err := service.Cache.Delete("t_user_counts", userId); err != nil {
+					return err
+				}
 
-			if err := dbx.Commit(db); err != nil {
-				return
-			}
+				return nil
+			})
 		})
 	}
 	wpsg.Wait()

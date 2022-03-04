@@ -13,7 +13,6 @@
 - WorkerPool    pond          https://github.com/alitto/pond
 - 消息队列       Asynq         https://github.com/hibiken/asynq
 
-
 ###  规范
 
 - 项目布局 
@@ -23,7 +22,6 @@
 - 编码规范 
   
   <a href="https://github.com/xxjwxc/uber_go_guide_cn" target="_blank">Uber Go 语言编码规范</a>
-
 
 ### 目录结构
 
@@ -57,12 +55,11 @@
     - cache.go          资源缓存
     - queue.go          消息队列 
 - pkg/                  外部应用可以使用的库代码
-  - dbx/                db操作封装. MySQL增/删/改/查/事务操作封装
+  - dbx/                db操作封装. MySQL增删改查操作封装
   - ginx/               gin增强方法. 此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
   - gox/                golang增强方法
 - go.mod                包管理  
 ```
-
 
 ### 环境定义
 
@@ -72,7 +69,6 @@
 - `testing`   测试环境
 - `stage`     预发布环境
 - `prod`      生产环境
-
 
 ### 配置
 
@@ -88,7 +84,6 @@
 
   `config.Get()`, `config.GetInt()`, `config.GetString()`, `config.GetBool()`, `config.GetIntSlice()`, `config.GetStringSlice()`
 
-
 ### 日志
 
 - 记录日志
@@ -100,7 +95,6 @@
 - SQL日志
 
   SQL日志文件路径通过`config/`中`sql_log`项配置, 缺省或为空时不记录日志, 注意文件需要读写权限.
-
 
 ### WorkerPool 
 
@@ -145,7 +139,6 @@
   }
   wpsg.Wait()  
   ```
-
 
 ### API
 
@@ -210,7 +203,6 @@
   kill -SIGINT $(ps aux | grep -v grep | grep demo-api | awk '{print $2}')
   ```
 
-
 ### Cli
 
 #### 流程
@@ -227,7 +219,6 @@ cd cmd/demo-cli
 go build
 RUNTIME_ENV=testing ./demo-cli <task> <action> [param]
 ```
-
 
 ### Cron
 
@@ -278,7 +269,6 @@ go build
 
   默认队列: 及时消息`service.Queue.Enqueue()`, 延时消息`service.Queue.EnqueueIn()`; 低优先级队列: 及时消息`service.Queue.LowEnqueue()`, 延时消息`service.Queue.LowEnqueueIn()`
 
-
 ### MySQL
 
 `dbx/` 提供以`map[string]interface{}`类型操作和读取数据库的封装 
@@ -305,10 +295,6 @@ MySQL=>Golang数据类型映射:
 - `Update()` 更新记录
 - `Delete()` 删除记录
 - `Execute()` 执行原生SQL
-- `Begin()` 开始事务
-- `Commit()` 提交事务
-- `Rollback()` 回滚事务
-
 
 ### Redis
 

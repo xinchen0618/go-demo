@@ -1,4 +1,4 @@
-// Package dbx MySQL增/删/改/查/事务操作封装
+// Package dbx MySQL增删改查操作封装
 //	MySQL=>Golang数据类型映射:
 //		bigint/int/smallint/tinyint => int64,
 //		float/double => float64,
@@ -199,36 +199,4 @@ func Execute(db gorose.IOrm, sql string, params ...interface{}) (affectedCounts 
 	}
 
 	return affectedCounts, nil
-}
-
-// Begin 开始事务
-//  @param db gorose.IOrm
-//  @return error
-func Begin(db gorose.IOrm) error {
-	if err := db.Begin(); err != nil {
-		zap.L().Error(err.Error())
-		return err
-	}
-	return nil
-}
-
-// Commit 提交事务
-//	提交失败会自动回滚
-//  @param db gorose.IOrm
-//  @return error
-func Commit(db gorose.IOrm) error {
-	if err := db.Commit(); err != nil {
-		zap.L().Error(err.Error())
-		Rollback(db)
-		return err
-	}
-	return nil
-}
-
-// Rollback 回滚事务
-//  @param db gorose.IOrm
-func Rollback(db gorose.IOrm) {
-	if err := db.Rollback(); err != nil {
-		zap.L().Error(err.Error())
-	}
 }
