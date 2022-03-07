@@ -20,7 +20,7 @@ func (user) AddUser(ctx context.Context, t *asynq.Task) error {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
 
-	_, err := dbx.Insert(di.Db(), "t_users", map[string]interface{}{"user_name": payload["user_name"]})
+	_, err := dbx.Insert(di.DemoDb(), "t_users", map[string]interface{}{"user_name": payload["user_name"]})
 	return err
 }
 
@@ -30,6 +30,6 @@ func (user) AddUserCounts(ctx context.Context, t *asynq.Task) error {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
 
-	_, err := dbx.Insert(di.Db(), "t_user_counts", map[string]interface{}{"user_id": payload["user_id"]})
+	_, err := dbx.Insert(di.DemoDb(), "t_user_counts", map[string]interface{}{"user_id": payload["user_id"]})
 	return err
 }

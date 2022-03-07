@@ -33,7 +33,7 @@ func (account) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis�
 	}
 
 	sql := "SELECT user_id FROM t_users WHERE user_name=? AND password=? LIMIT 1"
-	user, err := dbx.FetchOne(di.Db(), sql, jsonBody["user_name"], jsonBody["password"])
+	user, err := dbx.FetchOne(di.DemoDb(), sql, jsonBody["user_name"], jsonBody["password"])
 	if err != nil {
 		ginx.InternalError(c)
 		return
@@ -113,7 +113,7 @@ func (account) GetUsers(c *gin.Context) {
 		}
 
 		return ginx.GetPageItems(c, ginx.PageQuery{
-			Db:         di.Db(),
+			Db:         di.DemoDb(),
 			Select:     "user_id,user_name,money,created_at,updated_at",
 			From:       "t_users",
 			Where:      where,
@@ -134,7 +134,7 @@ func (account) GetUsersById(c *gin.Context) {
 		return
 	}
 
-	user, err := service.Cache.Get(di.Db(), "t_users", "user_id", userId)
+	user, err := service.Cache.Get(di.DemoDb(), "t_users", "user_id", userId)
 	if err != nil {
 		ginx.InternalError(c)
 		return
@@ -179,7 +179,7 @@ func (account) PostUsers(c *gin.Context) {
 	for i := 0; i < counts; i++ {
 		wpsg.Submit(func() {
 			// 事务
-			_ = di.Db().Transaction(func(db gorose.IOrm) error {
+			_ = di.DemoDb().Transaction(func(db gorose.IOrm) error {
 				userName := fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999))
 				user, err := dbx.FetchOne(db, "SELECT user_id FROM t_users WHERE user_name=?", userName)
 				if err != nil {

@@ -13,7 +13,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// print SQL
+// SQL log
 type sqlLogger struct {
 }
 
@@ -42,13 +42,13 @@ func (sqlLogger) EnableSlowLog() float64 {
 	return 0
 }
 
-// mysql, 成功则仅初始化一次, 失败允许再次初始化
+// MySQL, 从这里开始定义项目中的DB
 var (
 	dbEngine *gorose.Engin
 	dbOnce   gox.Once
 )
 
-func Db() gorose.IOrm {
+func DemoDb() gorose.IOrm {
 	_ = dbOnce.Do(func() error {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",
 			config.Get("mysql_username"),

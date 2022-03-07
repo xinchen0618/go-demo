@@ -24,13 +24,13 @@ func (user) InitPosition(c *cli.Context) error {
 		counts = "10"
 	}
 
-	users, err := dbx.FetchAll(di.Db(), "SELECT user_id FROM t_users WHERE position=0 ORDER BY user_id LIMIT ?", counts)
+	users, err := dbx.FetchAll(di.DemoDb(), "SELECT user_id FROM t_users WHERE position=0 ORDER BY user_id LIMIT ?", counts)
 	if err != nil {
 		return err
 	}
 	for _, user := range users {
 		userId := user["user_id"].(int64)
-		if _, err := dbx.Update(di.Db(), "t_users", map[string]interface{}{"position": 1024 * userId}, "user_id=?", userId); err != nil {
+		if _, err := dbx.Update(di.DemoDb(), "t_users", map[string]interface{}{"position": 1024 * userId}, "user_id=?", userId); err != nil {
 			return err
 		}
 	}
