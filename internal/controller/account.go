@@ -112,8 +112,7 @@ func (account) GetUsers(c *gin.Context) {
 			bindParams = append(bindParams, fmt.Sprintf("%%%s%%", userName))
 		}
 
-		return ginx.GetPageItems(ginx.PageQuery{
-			GinCtx:     c,
+		return ginx.GetPageItems(c, ginx.PageQuery{
 			Db:         di.Db(),
 			Select:     "user_id,user_name,money,created_at,updated_at",
 			From:       "t_users",
