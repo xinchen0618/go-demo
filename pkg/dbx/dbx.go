@@ -45,7 +45,7 @@ func FetchAll(db gorose.IOrm, sql string, params ...interface{}) ([]map[string]i
 //  @return error
 func FetchOne(db gorose.IOrm, sql string, params ...interface{}) (map[string]interface{}, error) {
 	sql = strings.TrimSpace(sql)
-	if !strings.HasSuffix(sql, "LIMIT 1") && !strings.HasSuffix(sql, "limit 1") {
+	if strings.ToUpper(gox.Substr(sql, -7)) != "LIMIT 1" {
 		sql += " LIMIT 1"
 	}
 
@@ -175,7 +175,6 @@ func Update(db gorose.IOrm, table string, data map[string]interface{}, where str
 //  @return affectedCounts int64
 //  @return err error
 func Delete(db gorose.IOrm, table string, where string, params ...interface{}) (affectedCounts int64, err error) {
-	// DELETE FROM table WHERE aaa=?
 	sql := fmt.Sprintf("DELETE FROM %s WHERE %s", table, where)
 	affectedCounts, err = Execute(db, sql, params...)
 	if err != nil {
