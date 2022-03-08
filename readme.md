@@ -65,7 +65,7 @@
 
 环境变量 `RUNTIME_ENV` 指定执行环境. 默认为生产环境. 参考 <a href="https://en.wikipedia.org/wiki/Deployment_environment" target="_blank">Deployment environment</a>
 
-- `dev`       开发环境. 开发人员的个人环境.
+- `dev`       开发环境. 开发人员的个人环境
 - `testing`   测试环境
 - `stage`     预发布环境
 - `prod`      生产环境
@@ -155,9 +155,9 @@
 `cmd/demo-api/main.go` -> `internal/router/` [-> `internal/middleware/`] -> `internal/controller/` [-> `internal/service/`]
 
 - `internal/router/` 路由, API版本在此控制, Major[.Minor], 比如 /v1, /v1.1, API出现向下不兼容且旧版仍需继续使用的情况, ~~比如不升级的旧版APP,~~ 新增Minor版本号. 业务出现结构性变化, 新增Major版本号.
-- `internal/middleware/` 中间件, 可选.
-- `internal/controller/` 业务处理, 事务控制尽量放置在这里, 放置在 `internal/service/` 中容易出现事务嵌套的问题.
-- `internal/service/` 原子级服务, 可选.
+- `internal/middleware/` 中间件, 可选
+- `internal/controller/` 业务处理
+- `internal/service/` 原子级服务, 可选
   
 #### 登录
 
@@ -213,8 +213,8 @@
 
 `cmd/demo-cli/main.go` -> `internal/action/` [-> `internal/service/`]
 
-- `cmd/demo-cli/main.go` 定义Cli路由, 按业务维度分两级.
-- `internal/action/` 执行逻辑.
+- `cmd/demo-cli/main.go` 定义Cli路由, 按业务维度分两级
+- `internal/action/` 执行逻辑
 
 #### 使用
 
@@ -230,8 +230,8 @@ RUNTIME_ENV=testing ./demo-cli <task> <action> [param]
 
 `cmd/demo-cron/main.go` -> `internal/cron/` [-> `internal/service/`]  
 
- - `cmd/demo-cron/main.go` 定义计划任务.
- - `internal/cron/` 执行逻辑.
+ - `cmd/demo-cron/main.go` 定义计划任务
+ - `internal/cron/` 执行逻辑
 
 #### 启动
 
@@ -248,8 +248,8 @@ go build
 
 `cmd/demo-queue/main.go` -> `internal/task/` [-> `internal/service/`]
 
-- `cmd/demo-queue/main.go` 定义队列任务.
-- `internal/task/` 执行逻辑.
+- `cmd/demo-queue/main.go` 定义队列任务
+- `internal/task/` 执行逻辑
 
 #### 使用
 

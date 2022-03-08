@@ -16,7 +16,7 @@ func main() {
 	s := gocron.NewScheduler(loc)
 
 	/* 计划任务路由 */
-	if _, err = s.Cron("*/1 * * * *").Do(cron.User.InitVip, 10); err != nil {
+	if _, err = s.Cron("* * * * *").Do(cron.User.DeleteUsers, 10); err != nil {
 		zap.L().Error(err.Error())
 	}
 

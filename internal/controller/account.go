@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gohouse/gorose/v2"
 	"github.com/spf13/cast"
 )
 
@@ -127,14 +126,6 @@ func (account) PostUsers(c *gin.Context) {
 	//}
 	//ginx.Success(c, 201, gin.H{"user_name": userName})
 
-	// 低优先级队列Demo
-	//userId := gox.RandInt64(111111, 999999)
-	//if err := service.Queue.LowEnqueue("user:AddUserCounts", map[string]interface{}{"user_id": userId}); err != nil {
-	//	ginx.InternalError(c)
-	//	return
-	//}
-	//ginx.Success(c, 201, gin.H{"user_id": userId})
-
 	jsonBody, err := ginx.GetJsonBody(c, []string{"counts:数量:+int:*"})
 	if err != nil {
 		return
@@ -149,32 +140,10 @@ func (account) PostUsers(c *gin.Context) {
 	wpsg := di.WorkerPoolSeparate(100).Group()
 	for i := 0; i < counts; i++ {
 		wpsg.Submit(func() {
-			// 事务
-			_ = di.DemoDb().Transaction(func(db gorose.IOrm) error {
-				userName := fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999))
-				user, err := dbx.FetchOne(db, "SELECT user_id FROM t_users WHERE user_name=?", userName)
-				if err != nil {
-					return err
-				}
-				var userId int64
-				if len(user) > 0 { // 记录存在
-					userId = user["user_id"].(int64)
-				} else { // 记录不存在
-					userId, err = dbx.Insert(db, "t_users", map[string]interface{}{"user_name": userName})
-					if err != nil {
-						return err
-					}
-				}
-				sql := "INSERT INTO t_user_counts(user_id,counts) VALUES(?,?) ON DUPLICATE KEY UPDATE counts = counts + 1"
-				if _, err = dbx.Execute(db, sql, userId, gox.RandInt64(1, 9)); err != nil {
-					return err
-				}
-				if err := service.Cache.Delete("t_user_counts", userId); err != nil {
-					return err
-				}
-
-				return nil
-			})
+			userData := map[string]interface{}{
+				"user_name": fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999)),
+			}
+			_, _ = service.User.CreateUser(userData)
 		})
 	}
 	wpsg.Wait()

@@ -2,8 +2,7 @@ package action
 
 import (
 	"fmt"
-	"go-demo/config/di"
-	"go-demo/pkg/dbx"
+	"go-demo/internal/service"
 
 	"github.com/urfave/cli/v2"
 )
@@ -14,25 +13,23 @@ type user struct{}
 // User 这里仅需结构体零值
 var User user
 
-// InitPosition
-//	@receiver user
-//	@param c *cli.Context
-//	@return error
-func (user) InitPosition(c *cli.Context) error {
-	counts := c.Args().Get(0)
-	if "" == counts {
-		counts = "10"
+// AddUser
+//  @receiver user
+//  @param c *cli.Context
+//  @return error
+func (user) AddUser(c *cli.Context) error {
+	userName := c.Args().Get(0)
+	if "" == userName {
+		fmt.Println("请输入用户名")
+		return nil
 	}
 
-	users, err := dbx.FetchAll(di.DemoDb(), "SELECT user_id FROM t_users WHERE position=0 ORDER BY user_id LIMIT ?", counts)
+	userData := map[string]interface{}{
+		"user_name": userName,
+	}
+	_, err := service.User.CreateUser(userData)
 	if err != nil {
 		return err
-	}
-	for _, user := range users {
-		userId := user["user_id"].(int64)
-		if _, err := dbx.Update(di.DemoDb(), "t_users", map[string]interface{}{"position": 1024 * userId}, "user_id=?", userId); err != nil {
-			return err
-		}
 	}
 	fmt.Println("处理完毕")
 

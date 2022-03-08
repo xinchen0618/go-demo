@@ -31,7 +31,6 @@ func main() {
 	mux.Use(loggingMiddleware)
 
 	mux.HandleFunc("user:AddUser", task.User.AddUser)
-	mux.HandleFunc("user:AddUserCounts", task.User.AddUserCounts)
 
 	if err := di.QueueServer().Run(mux); err != nil {
 		panic(err)

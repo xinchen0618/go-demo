@@ -16,9 +16,9 @@ func main() {
 				Usage: "用户相关",
 				Subcommands: []*cli.Command{
 					{
-						Name:   "init-position",
-						Usage:  "初始化用户position字段",
-						Action: action.User.InitPosition,
+						Name:   "add-user",
+						Usage:  "创建一个用户",
+						Action: action.User.AddUser,
 					},
 				},
 			},
