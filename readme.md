@@ -51,7 +51,7 @@
   - router/             API路由
   - middleware/         API中间件  
   - task/               消息队列任务 
-  - service/            公共业务逻辑
+  - service/            原子级服务. 业务应优先考虑是否可以封装为原子级操作以提高代码复用性
     - cache.go          资源缓存
     - queue.go          消息队列 
 - pkg/                  外部应用可以使用的库代码
@@ -74,7 +74,7 @@
 
 - 为什么放弃使用`Viper`
 
-  为了仅部署编译后的可执行文件, 就可直接运行, 不受YAML、TOML等配置文件位置的制约.
+  满足环境配置配置为可选的需求; 满足直接部署可执行文件, 不受YAML、TOML等配置文件位置制约的需求.
 
 - 多环境配置
   
@@ -83,6 +83,10 @@
 - 使用
 
   `config.Get()`, `config.GetInt()`, `config.GetString()`, `config.GetBool()`, `config.GetIntSlice()`, `config.GetStringSlice()`
+
+### 原子级服务
+
+  `internal/service/` 为可选项, 但业务应优先考虑是否可以封装为原子级操作以提高代码复用性. 比如, "添加用户"为一个原子级操作, "删除用户"也为一个原子级操作.
 
 ### 日志
 
@@ -153,7 +157,7 @@
 - `internal/router/` 路由, API版本在此控制, Major[.Minor], 比如 /v1, /v1.1, API出现向下不兼容且旧版仍需继续使用的情况, ~~比如不升级的旧版APP,~~ 新增Minor版本号. 业务出现结构性变化, 新增Major版本号.
 - `internal/middleware/` 中间件, 可选.
 - `internal/controller/` 业务处理, 事务控制尽量放置在这里, 放置在 `internal/service/` 中容易出现事务嵌套的问题.
-- `internal/service/` 公共业务逻辑封装, 可选.
+- `internal/service/` 原子级服务, 可选.
   
 #### 登录
 
@@ -161,7 +165,7 @@
 
   - 校验账户信息
   - 生成JWT Token
-  - 以 `jwt:user:<userId>:<JwtSignature>`的格式记录入Redis白名单
+  - 以 `jwt:<userType>:<userId>:<JwtSignature>`的格式记录入Redis白名单
   - JWT Token返回给客户端
 
 - 校验登录

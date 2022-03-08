@@ -1,20 +1,15 @@
 package controller
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
-	"go-demo/config"
 	"go-demo/config/consts"
 	"go-demo/config/di"
 	"go-demo/internal/service"
 	"go-demo/pkg/dbx"
 	"go-demo/pkg/ginx"
 	"go-demo/pkg/gox"
-	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/gohouse/gorose/v2"
 	"github.com/spf13/cast"
@@ -32,7 +27,8 @@ func (account) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis�
 		return
 	}
 
-	sql := "SELECT user_id FROM t_users WHERE user_name=? AND password=? LIMIT 1"
+	// 校验密码, 实际密码应使用gox.PasswordHash()创建散列
+	sql := "SELECT user_id,user_name FROM t_users WHERE user_name=? AND password=? LIMIT 1"
 	user, err := dbx.FetchOne(di.DemoDb(), sql, jsonBody["user_name"], jsonBody["password"])
 	if err != nil {
 		ginx.InternalError(c)
@@ -43,46 +39,21 @@ func (account) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis�
 		return
 	}
 
-	// JWT
-	loginTtl := 30 * 24 * time.Hour // 登录有效时长
-	claims := &jwt.StandardClaims{
-		Audience:  jsonBody["user_name"].(string),
-		ExpiresAt: time.Now().Add(loginTtl).Unix(),
-		Id:        cast.ToString(user["user_id"]),
-		IssuedAt:  time.Now().Unix(),
-		Issuer:    "account:PostUserLogin",
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(config.GetString("jwt_secret")))
+	// JWT登录
+	token, err := service.Auth.JwtLogin(consts.UserJwt, user["user_id"].(int64), user["user_name"].(string))
 	if err != nil {
-		ginx.InternalError(c, err)
-		return
-	}
-	// redis登录白名单
-	tokenAtoms := strings.Split(tokenString, ".")
-	payload, err := json.Marshal(claims)
-	if err != nil {
-		ginx.InternalError(c, err)
-		return
-	}
-	key := fmt.Sprintf(consts.JwtUserLogin, claims.Id, tokenAtoms[2])
-	if err = di.JwtRedis().Set(context.Background(), key, payload, loginTtl).Err(); err != nil {
-		ginx.InternalError(c, err)
+		ginx.InternalError(c)
 		return
 	}
 
-	ginx.Success(c, 200, gin.H{"user_id": user["user_id"], "token": tokenString})
+	ginx.Success(c, 200, gin.H{"user_id": user["user_id"], "token": token})
 }
 
 func (account) DeleteUserLogout(c *gin.Context) {
 	userId := c.GetInt64("userId")
-
-	// 删除对应redis白名单记录
-	tokenString := c.Request.Header.Get("Authorization")[7:]
-	tokenAtoms := strings.Split(tokenString, ".")
-	key := fmt.Sprintf(consts.JwtUserLogin, userId, tokenAtoms[2])
-	if err := di.JwtRedis().Del(context.Background(), key).Err(); err != nil {
-		ginx.InternalError(c, err)
+	token := c.Request.Header.Get("Authorization")[7:]
+	if err := service.Auth.JwtLogout(consts.UserJwt, token, userId); err != nil {
+		ginx.InternalError(c)
 		return
 	}
 
