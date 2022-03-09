@@ -13,7 +13,7 @@ func init() {
 		// 限流QPS
 		"qps_limit": 40000,
 
-		// DB
+		// DB DEMO
 		"mysql_host":           "127.0.0.1",
 		"mysql_port":           3306,
 		"mysql_username":       "root",
@@ -23,7 +23,7 @@ func init() {
 		"mysql_max_open_conns": 140,
 		"mysql_max_idle_conns": 30,
 
-		// Redis
+		// Redis DEMO
 		"redis_host":          "127.0.0.1",
 		"redis_port":          6379,
 		"redis_auth":          "",

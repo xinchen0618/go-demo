@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
+	"time"
+
 	"go-demo/config"
 	"go-demo/config/consts"
 	"go-demo/config/di"
-	"strings"
-	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-redis/redis/v8"

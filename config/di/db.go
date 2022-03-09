@@ -2,10 +2,11 @@ package di
 
 import (
 	"fmt"
-	"go-demo/config"
-	"go-demo/pkg/gox"
 	"os"
 	"time"
+
+	"go-demo/config"
+	"go-demo/pkg/gox"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gohouse/gorose/v2"
@@ -42,7 +43,7 @@ func (sqlLogger) EnableSlowLog() float64 {
 	return 0
 }
 
-// MySQL, 从这里开始定义项目中的DB
+// MySQL DEMO, 从这里开始定义项目中的DB
 var (
 	dbEngine *gorose.Engin
 	dbOnce   gox.Once

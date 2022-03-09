@@ -1,8 +1,9 @@
 package di
 
 import (
-	"go-demo/config"
 	"os"
+
+	"go-demo/config"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"

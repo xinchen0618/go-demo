@@ -2,12 +2,13 @@ package action
 
 import (
 	"fmt"
+
 	"go-demo/internal/service"
 
 	"github.com/urfave/cli/v2"
 )
 
-// 这里定义一个空结构体用于为大量的action方法做分类
+// 用户相关命令行 DEMO 这里定义一个空结构体用于为大量的action方法做分类
 type user struct{}
 
 // User 这里仅需结构体零值

@@ -2,8 +2,9 @@ package di
 
 import (
 	"fmt"
-	"go-demo/config"
 	"sync"
+
+	"go-demo/config"
 
 	"github.com/alitto/pond"
 	"go.uber.org/zap"

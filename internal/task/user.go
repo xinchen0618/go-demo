@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"go-demo/internal/service"
 
 	"github.com/hibiken/asynq"
 )
 
+// 用户相关消息队列 DEMO
 type user struct{}
 
 var User user

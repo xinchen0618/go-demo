@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
-	"go-demo/config/di"
-	"go-demo/internal/task"
 	"log"
 	"time"
+
+	"go-demo/config/di"
+	"go-demo/internal/task"
 
 	"github.com/hibiken/asynq"
 )
@@ -30,6 +31,7 @@ func main() {
 	mux := asynq.NewServeMux()
 	mux.Use(loggingMiddleware)
 
+	// 注册队列任务 DEMO
 	mux.HandleFunc("user:AddUser", task.User.AddUser)
 
 	if err := di.QueueServer().Run(mux); err != nil {

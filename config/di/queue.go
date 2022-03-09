@@ -2,8 +2,9 @@ package di
 
 import (
 	"fmt"
-	"go-demo/config"
 	"sync"
+
+	"go-demo/config"
 
 	"github.com/hibiken/asynq"
 )
@@ -43,7 +44,7 @@ func QueueServer() *asynq.Server {
 				Concurrency: 100,
 				// Optionally specify multiple queues with different priority.
 				Queues: map[string]int{
-					"default": 9,
+					"default": 99,
 					"low":     1,
 				},
 				// See the godoc for other configuration options

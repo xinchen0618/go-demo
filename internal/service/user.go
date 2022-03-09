@@ -8,6 +8,7 @@ import (
 	"github.com/gohouse/gorose/v2"
 )
 
+// 用户相关原子级操作 DEMO
 type user struct{}
 
 var User user
@@ -17,6 +18,7 @@ var User user
 //  @return int64
 //  @return error
 func (user) CreateUser(userData map[string]interface{}) (int64, error) {
+	// 假设需要写一张用户表和一张关联表, 用户不存在则创建, 存在则更新关联表统计字段
 	var userId int64
 	err := di.DemoDb().Transaction(func(db gorose.IOrm) error { // 事务DEMO
 		user, err := dbx.FetchOne(db, "SELECT user_id FROM t_users WHERE user_name=?", userData["user_name"])

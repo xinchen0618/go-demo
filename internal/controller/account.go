@@ -2,19 +2,20 @@ package controller
 
 import (
 	"fmt"
+	"time"
+
 	"go-demo/config/consts"
 	"go-demo/config/di"
 	"go-demo/internal/service"
 	"go-demo/pkg/dbx"
 	"go-demo/pkg/ginx"
 	"go-demo/pkg/gox"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 )
 
-// 这里定义一个空结构体用于为大量的controller方法做分类
+// 用户相关控制器 DEMO 这里定义一个空结构体用于为大量的controller方法做分类
 type account struct{}
 
 // Account 这里仅需结构体零值
@@ -60,7 +61,7 @@ func (account) DeleteUserLogout(c *gin.Context) {
 }
 
 func (account) GetUsers(c *gin.Context) {
-	// Cache Demo
+	// Cache Demo, 假设需要用户分页列表, 并可以按名称搜索
 	queries, err := ginx.GetQueries(c, []string{`user_name:用户名:string:""`, "page:页码:+int:1", "per_page:页大小:+int:12"})
 	if err != nil {
 		return
@@ -71,6 +72,7 @@ func (account) GetUsers(c *gin.Context) {
 		ginx.InternalError(c)
 		return
 	}
+	key = fmt.Sprintf(consts.CacheUsers, key)
 
 	pageItemsCache, err := ginx.GetOrSetCache(c, key, 3*time.Second, func() (interface{}, error) {
 		where := "1"

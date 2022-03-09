@@ -1,9 +1,10 @@
 package main
 
 import (
-	"go-demo/internal/action"
 	"log"
 	"os"
+
+	"go-demo/internal/action"
 
 	"github.com/urfave/cli/v2"
 )
@@ -11,6 +12,7 @@ import (
 func main() {
 	app := &cli.App{
 		Commands: []*cli.Command{ // cli路由
+			// DEMO
 			{
 				Name:  "user",
 				Usage: "用户相关",

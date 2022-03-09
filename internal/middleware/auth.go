@@ -1,10 +1,11 @@
 package middleware
 
 import (
+	"strings"
+
 	"go-demo/config/consts"
 	"go-demo/internal/service"
 	"go-demo/pkg/ginx"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )

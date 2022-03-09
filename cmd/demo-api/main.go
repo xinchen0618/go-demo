@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"go-demo/config"
 	"go-demo/internal/middleware"
 	"go-demo/internal/router"
@@ -22,7 +23,7 @@ func main() {
 	// panic处理/跨域处理/限流
 	r.Use(middleware.Recovery(), middleware.Cors(), middleware.QpsLimit(config.GetInt("qps_limit")))
 
-	// 加载路由
+	// 加载路由 DEMO
 	router.Account(r)
 
 	// 未知路由处理

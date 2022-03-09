@@ -2,8 +2,9 @@ package service
 
 import (
 	"encoding/json"
-	"go-demo/config/di"
 	"time"
+
+	"go-demo/config/di"
 
 	"github.com/hibiken/asynq"
 	"go.uber.org/zap"

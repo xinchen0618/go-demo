@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Account 账号模块
+// Account 账号模块 DEMO
 func Account(r *gin.Engine) {
 	accountGroup := r.Group("/account")
 	{
