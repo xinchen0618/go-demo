@@ -22,6 +22,7 @@ type auth struct{}
 var Auth auth
 
 // JwtLogin JWT登录
+//	先生成JWT, 再记录redis白名单
 //  @receiver auth
 //  @param userType string JWT登录用户类型
 //  @param id int64 用户id
@@ -95,6 +96,7 @@ func (auth) JwtCheck(userType string, token string) (int64, error) {
 }
 
 // JwtLogout JWT登出
+//	从redis白名单删除
 //  @receiver auth
 //  @param userType string
 //  @param token string

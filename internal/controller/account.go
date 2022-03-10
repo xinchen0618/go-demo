@@ -21,7 +21,7 @@ type account struct{}
 // Account 这里仅需结构体零值
 var Account account
 
-func (account) PostUserLogin(c *gin.Context) { // 先生成JWT, 再记录redis白名单
+func (account) PostUserLogin(c *gin.Context) {
 	jsonBody, err := ginx.GetJsonBody(c, []string{"user_name:用户名:string:+", "password:密码:string:+"})
 	if err != nil {
 		return
