@@ -25,7 +25,7 @@ func (user) AddUser(c *cli.Context) error {
 		return nil
 	}
 
-	userData := map[string]interface{}{
+	userData := map[string]any{
 		"user_name": userName,
 	}
 	_, err := service.User.CreateUser(userData)

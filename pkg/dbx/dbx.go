@@ -19,17 +19,17 @@ import (
 // FetchAll 获取多行记录
 //  @param db gorose.IOrm
 //  @param sql string
-//  @param params ...interface{} 不支持切片
-//  @return []map[string]interface{}
+//  @param params ...any 不支持切片
+//  @return []map[string]any
 //  @return error
-func FetchAll(db gorose.IOrm, sql string, params ...interface{}) ([]map[string]interface{}, error) {
+func FetchAll(db gorose.IOrm, sql string, params ...any) ([]map[string]any, error) {
 	rows, err := db.Query(sql, params...)
 	if err != nil {
 		zap.L().Error(err.Error())
-		return []map[string]interface{}{}, err
+		return []map[string]any{}, err
 	}
 
-	result := []map[string]interface{}{}
+	result := []map[string]any{}
 	for _, v := range rows {
 		result = append(result, v)
 	}
@@ -41,10 +41,10 @@ func FetchAll(db gorose.IOrm, sql string, params ...interface{}) ([]map[string]i
 //	查询时会自动添加限制LIMIT 1
 //  @param db gorose.IOrm
 //  @param sql string
-//  @param params ...interface{}
-//  @return map[string]interface{}
+//  @param params ...any
+//  @return map[string]any
 //  @return error
-func FetchOne(db gorose.IOrm, sql string, params ...interface{}) (map[string]interface{}, error) {
+func FetchOne(db gorose.IOrm, sql string, params ...any) (map[string]any, error) {
 	sql = strings.TrimSpace(sql)
 	if strings.ToUpper(gox.Substr(sql, -7)) != "LIMIT 1" {
 		sql += " LIMIT 1"
@@ -52,11 +52,11 @@ func FetchOne(db gorose.IOrm, sql string, params ...interface{}) (map[string]int
 
 	rows, err := FetchAll(db, sql, params...)
 	if err != nil {
-		return map[string]interface{}{}, err
+		return map[string]any{}, err
 	}
 
 	if 0 == len(rows) {
-		return map[string]interface{}{}, nil
+		return map[string]any{}, nil
 	}
 
 	return rows[0], nil
@@ -65,13 +65,13 @@ func FetchOne(db gorose.IOrm, sql string, params ...interface{}) (map[string]int
 // FetchValue 获取一个值
 //  @param db gorose.IOrm
 //  @param sql string
-//  @param params ...interface{}
-//  @return interface{}
+//  @param params ...any
+//  @return any
 //  @return error
-func FetchValue(db gorose.IOrm, sql string, params ...interface{}) (interface{}, error) {
+func FetchValue(db gorose.IOrm, sql string, params ...any) (any, error) {
 	row, err := FetchOne(db, sql, params...)
 	if err != nil {
-		return map[string]interface{}{}, err
+		return map[string]any{}, err
 	}
 
 	for _, value := range row {
@@ -85,16 +85,16 @@ func FetchValue(db gorose.IOrm, sql string, params ...interface{}) (interface{},
 // FetchColumn 获取一列值
 //  @param db gorose.IOrm
 //  @param sql string
-//  @param params ...interface{}
-//  @return []interface{}
+//  @param params ...any
+//  @return []any
 //  @return error
-func FetchColumn(db gorose.IOrm, sql string, params ...interface{}) ([]interface{}, error) {
+func FetchColumn(db gorose.IOrm, sql string, params ...any) ([]any, error) {
 	rows, err := FetchAll(db, sql, params...)
 	if err != nil {
-		return []interface{}{}, err
+		return []any{}, err
 	}
 
-	values := []interface{}{}
+	values := []any{}
 	for _, row := range rows {
 		for _, value := range row {
 			values = append(values, value)
@@ -109,9 +109,9 @@ func FetchColumn(db gorose.IOrm, sql string, params ...interface{}) ([]interface
 // 	Golang SQL驱动不支持IN(?)
 //	使用fmt.Sprint("IN(%s)", Slice2in(s))
 //	MySQL整型字段查询添加引号无影响
-//  @param s interface{}
+//  @param s any
 //  @return string
-func Slice2in(s interface{}) string {
+func Slice2in(s any) string {
 	stringSlice := cast.ToStringSlice(s)
 	cleaned := []string{}
 	for _, v := range stringSlice {
@@ -123,10 +123,10 @@ func Slice2in(s interface{}) string {
 // Insert 新增记录
 //  @param db gorose.IOrm
 //  @param table string
-//  @param data map[string]interface{}
+//  @param data map[string]any
 //  @return id int64
 //  @return err error
-func Insert(db gorose.IOrm, table string, data map[string]interface{}) (id int64, err error) {
+func Insert(db gorose.IOrm, table string, data map[string]any) (id int64, err error) {
 	id, err = db.Table(table).InsertGetId(data)
 	if err != nil {
 		zap.L().Error(err.Error())
@@ -139,14 +139,14 @@ func Insert(db gorose.IOrm, table string, data map[string]interface{}) (id int64
 // Update 更新记录
 //  @param db gorose.IOrm
 //  @param table string
-//  @param data map[string]interface{}
+//  @param data map[string]any
 //  @param where string
-//  @param params ...interface{}
+//  @param params ...any
 //  @return affectedCounts int64
 //  @return err error
-func Update(db gorose.IOrm, table string, data map[string]interface{}, where string, params ...interface{}) (affectedCounts int64, err error) {
+func Update(db gorose.IOrm, table string, data map[string]any, where string, params ...any) (affectedCounts int64, err error) {
 	dataPlaceholders := []string{}
-	dataValues := []interface{}{}
+	dataValues := []any{}
 	for k, v := range data {
 		dataPlaceholder := fmt.Sprintf("%s=?", k)
 		dataPlaceholders = append(dataPlaceholders, dataPlaceholder)
@@ -172,10 +172,10 @@ func Update(db gorose.IOrm, table string, data map[string]interface{}, where str
 //  @param db gorose.IOrm
 //  @param table string
 //  @param where string
-//  @param params ...interface{}
+//  @param params ...any
 //  @return affectedCounts int64
 //  @return err error
-func Delete(db gorose.IOrm, table string, where string, params ...interface{}) (affectedCounts int64, err error) {
+func Delete(db gorose.IOrm, table string, where string, params ...any) (affectedCounts int64, err error) {
 	sql := fmt.Sprintf("DELETE FROM %s WHERE %s", table, where)
 	affectedCounts, err = Execute(db, sql, params...)
 	if err != nil {
@@ -188,10 +188,10 @@ func Delete(db gorose.IOrm, table string, where string, params ...interface{}) (
 // Execute 执行原生SQL
 //  @param db gorose.IOrm
 //  @param sql string
-//  @param params ...interface{}
+//  @param params ...any
 //  @return affectedCounts int64
 //  @return err error
-func Execute(db gorose.IOrm, sql string, params ...interface{}) (affectedCounts int64, err error) {
+func Execute(db gorose.IOrm, sql string, params ...any) (affectedCounts int64, err error) {
 	affectedCounts, err = db.Execute(sql, params...)
 	if err != nil {
 		zap.L().Error(err.Error())

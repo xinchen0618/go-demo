@@ -7,8 +7,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// configure{"common": map[string]interface{}, "<runtimeEnv>": map[string]interface{}}
-var configure = map[string]map[string]interface{}{}
+// configure{"common": map[string]any, "<runtimeEnv>": map[string]any}
+var configure = map[string]map[string]any{}
 
 // GetRuntimeEnv 获取运行时环境
 //	@return string
@@ -21,7 +21,7 @@ func GetRuntimeEnv() string {
 	return runtimeEnv
 }
 
-func Get(key string) interface{} {
+func Get(key string) any {
 	runtimeEnv := GetRuntimeEnv()
 
 	if envConfigure, ok := configure[runtimeEnv]; ok { // 环境配置

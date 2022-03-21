@@ -69,7 +69,7 @@ func (auth) JwtLogin(userType string, id int64, userName string) (string, error)
 //  @return error
 func (auth) JwtCheck(userType string, token string) (int64, error) {
 	// JWT解析
-	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (any, error) {
 		return []byte(config.GetString("jwt_secret")), nil
 	})
 	if err != nil { // token无效

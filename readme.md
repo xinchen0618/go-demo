@@ -271,7 +271,7 @@ go build
 
 ### MySQL
 
-`dbx/` 提供以`map[string]interface{}`类型操作和读取数据库的封装 
+`dbx/` 提供以`map[string]any`类型操作和读取数据库的封装 
 
 #### 数据类型映射
 

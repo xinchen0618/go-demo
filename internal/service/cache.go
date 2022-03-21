@@ -29,10 +29,10 @@ var (
 //	@param db gorose.IOrm
 //	@param table string
 //	@param primaryKey string
-//	@param id interface{} 整数
+//	@param id any 整数
 //	@return bool
 //	@return error
-func (cache) set(db gorose.IOrm, table string, primaryKey string, id interface{}) (bool, error) {
+func (cache) set(db gorose.IOrm, table string, primaryKey string, id any) (bool, error) {
 	sql := fmt.Sprintf("SELECT * FROM %s WHERE %s = %d LIMIT 1", table, primaryKey, id)
 	data, err := dbx.FetchOne(db, sql)
 	if err != nil {
@@ -59,53 +59,53 @@ func (cache) set(db gorose.IOrm, table string, primaryKey string, id interface{}
 //	@param db gorose.IOrm
 //	@param table string
 //	@param primaryKey string
-//	@param id interface{} 整数
-//	@return map[string]interface{}
+//	@param id any 整数
+//	@return map[string]any
 //	@return error
-func (cache) Get(db gorose.IOrm, table string, primaryKey string, id interface{}) (map[string]interface{}, error) {
+func (cache) Get(db gorose.IOrm, table string, primaryKey string, id any) (map[string]any, error) {
 	key := fmt.Sprintf(consts.CacheResource, table, id)
-	v, err, _ := cacheSg.Do(key, func() (interface{}, error) {
+	v, err, _ := cacheSg.Do(key, func() (any, error) {
 		dataCache, err := di.CacheRedis().Get(context.Background(), key).Result()
 		if err != nil {
 			if err != redis.Nil { // redis异常
 				zap.L().Error(err.Error())
-				return map[string]interface{}{}, err
+				return map[string]any{}, err
 			}
 
 			// 缓存不存在
 			ok, err := Cache.set(db, table, primaryKey, id)
 			if err != nil {
-				return map[string]interface{}{}, err
+				return map[string]any{}, err
 			}
 			if !ok { // 记录不存在
-				return map[string]interface{}{}, nil
+				return map[string]any{}, nil
 			}
 			// 设置缓存成功
 			dataCache, err = di.CacheRedis().Get(context.Background(), key).Result()
 			if err != nil {
 				zap.L().Error(err.Error())
-				return map[string]interface{}{}, err
+				return map[string]any{}, err
 			}
 		}
-		var dataMap map[string]interface{}
+		var dataMap map[string]any
 		if err := msgpack.Unmarshal([]byte(dataCache), &dataMap); err != nil {
-			return map[string]interface{}{}, err
+			return map[string]any{}, err
 		}
 		return dataMap, nil
 	})
 	if err != nil {
-		return map[string]interface{}{}, err
+		return map[string]any{}, err
 	}
 
-	return v.(map[string]interface{}), nil
+	return v.(map[string]any), nil
 }
 
 // Delete 删除资源缓存
 //  @receiver cache
 //  @param table string
-//  @param ids ...interface{} 整数
+//  @param ids ...any 整数
 //  @return error
-func (cache) Delete(table string, ids ...interface{}) error {
+func (cache) Delete(table string, ids ...any) error {
 	if 0 == len(ids) {
 		return nil
 	}
@@ -126,11 +126,11 @@ func (cache) Delete(table string, ids ...interface{}) error {
 //  @receiver cache
 //  @param key string
 //  @param ttl time.Duration
-//  @param f func() (interface{}, error)
-//  @return interface{}
+//  @param f func() (any, error)
+//  @return any
 //  @return error
-func (cache) GetOrSet(key string, ttl time.Duration, f func() (interface{}, error)) (interface{}, error) {
-	result, err, _ := cacheSg.Do(key, func() (interface{}, error) {
+func (cache) GetOrSet(key string, ttl time.Duration, f func() (any, error)) (any, error) {
+	result, err, _ := cacheSg.Do(key, func() (any, error) {
 		var resultCache string
 		resultCache, err := di.CacheRedis().Get(context.Background(), key).Result()
 		if err != nil {
@@ -156,12 +156,12 @@ func (cache) GetOrSet(key string, ttl time.Duration, f func() (interface{}, erro
 			resultCache = string(resultBytes)
 		}
 
-		var resultInterface interface{}
-		if err := json.Unmarshal([]byte(resultCache), &resultInterface); err != nil {
+		var resultAny any
+		if err := json.Unmarshal([]byte(resultCache), &resultAny); err != nil {
 			zap.L().Error(err.Error())
 			return nil, err
 		}
-		return resultInterface, nil
+		return resultAny, nil
 	})
 	if err != nil {
 		return nil, err

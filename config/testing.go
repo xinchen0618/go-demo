@@ -6,7 +6,7 @@ func init() {
 		return
 	}
 
-	configure["testing"] = map[string]interface{}{
+	configure["testing"] = map[string]any{
 		// 运行端口
 		"server_port": 8080,
 

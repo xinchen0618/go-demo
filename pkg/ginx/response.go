@@ -8,8 +8,8 @@ import (
 // Success 向客户端输出成功信息
 //	@param c *gin.Context
 //	@param httpCode int
-//	@param obj ...interface{} 选填, 数据会json编码返回给客户端
-func Success(c *gin.Context, httpCode int, obj ...interface{}) {
+//	@param obj ...any 选填, 数据会json编码输出给客户端
+func Success(c *gin.Context, httpCode int, obj ...any) {
 	if len(obj) > 0 {
 		c.JSON(httpCode, obj[0])
 	} else {

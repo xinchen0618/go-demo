@@ -17,9 +17,9 @@ var Queue queue
 // Enqueue 发送及时任务
 //	@receiver queue
 //	@param taskName string
-//	@param payload map[string]interface{}
+//	@param payload map[string]any
 //	@return error
-func (queue) Enqueue(taskName string, payload map[string]interface{}) error {
+func (queue) Enqueue(taskName string, payload map[string]any) error {
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
 		zap.L().Error(err.Error())
@@ -37,9 +37,9 @@ func (queue) Enqueue(taskName string, payload map[string]interface{}) error {
 // LowEnqueue 发送低优先级及时任务
 //	@receiver queue
 //	@param taskName string
-//	@param payload map[string]interface{}
+//	@param payload map[string]any
 //	@return error
-func (queue) LowEnqueue(taskName string, payload map[string]interface{}) error {
+func (queue) LowEnqueue(taskName string, payload map[string]any) error {
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
 		zap.L().Error(err.Error())
@@ -57,10 +57,10 @@ func (queue) LowEnqueue(taskName string, payload map[string]interface{}) error {
 // EnqueueIn 发送延时任务
 //	@receiver queue
 //	@param taskName string
-//	@param payload map[string]interface{}
+//	@param payload map[string]any
 //	@param delay time.Duration
 //	@return error
-func (queue) EnqueueIn(taskName string, payload map[string]interface{}, delay time.Duration) error {
+func (queue) EnqueueIn(taskName string, payload map[string]any, delay time.Duration) error {
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
 		zap.L().Error(err.Error())
@@ -78,10 +78,10 @@ func (queue) EnqueueIn(taskName string, payload map[string]interface{}, delay ti
 // LowEnqueueIn 发送低优先级延时任务
 //	@receiver queue
 //	@param taskName string
-//	@param payload map[string]interface{}
+//	@param payload map[string]any
 //	@param delay time.Duration
 //	@return error
-func (queue) LowEnqueueIn(taskName string, payload map[string]interface{}, delay time.Duration) error {
+func (queue) LowEnqueueIn(taskName string, payload map[string]any, delay time.Duration) error {
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
 		zap.L().Error(err.Error())

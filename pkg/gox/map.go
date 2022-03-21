@@ -9,8 +9,8 @@ import (
 )
 
 // PrintMap 向console打印map
-//	@param m map[string]interface{}
-func PrintMap(m map[string]interface{}) {
+//	@param m map[string]any
+func PrintMap(m map[string]any) {
 	fmt.Println("{")
 	for k, v := range m {
 		fmt.Printf("\t%s: %T %#v\n", k, v, v)
@@ -19,10 +19,10 @@ func PrintMap(m map[string]interface{}) {
 }
 
 // Map2struct map转struct
-//  @param m map[string]interface{}
-//  @param sp interface{} 接收结果结构体的指针
+//  @param m map[string]any
+//  @param sp any 接收结果结构体的指针
 //  @return error
-func Map2struct(m map[string]interface{}, sp interface{}) error {
+func Map2struct(m map[string]any, sp any) error {
 	b, err := json.Marshal(m)
 	if err != nil {
 		zap.L().Error(err.Error())

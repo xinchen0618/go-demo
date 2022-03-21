@@ -6,7 +6,7 @@ func init() {
 		return
 	}
 
-	configure["prod"] = map[string]interface{}{
+	configure["prod"] = map[string]any{
 		// 运行端口
 		"server_port": 9080,
 

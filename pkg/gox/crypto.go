@@ -18,11 +18,11 @@ func Md5(s string) string {
 
 // Md5x 非String数据md5
 //	数据会先json.Marshal再Md5
-//	@param i interface{}
+//	@param a any
 //	@return string
 //	@return error
-func Md5x(i interface{}) (string, error) {
-	iBytes, err := json.Marshal(i)
+func Md5x(a any) (string, error) {
+	iBytes, err := json.Marshal(a)
 	if err != nil {
 		zap.L().Error(err.Error())
 		return "", err

@@ -11,23 +11,24 @@ import (
 	"strings"
 
 	"go.uber.org/zap"
+	"golang.org/x/exp/slices"
 )
 
 // Restful 发起Restful请求
 //	@param method string
 //	@param rawUrl string
-//	@param params map[string]interface{} url参数或entity参数, 若为url参数会进行url转义
+//	@param params map[string]any url参数或entity参数, 若为url参数会进行url转义
 //	@param headers map[string]string
-//	@return body map[string]interface{}
+//	@return body map[string]any
 //	@return httpCode int
 //	@return err error
-func Restful(method, rawUrl string, params map[string]interface{}, headers map[string]string) (body map[string]interface{}, httpCode int, err error) {
+func Restful(method, rawUrl string, params map[string]any, headers map[string]string) (body map[string]any, httpCode int, err error) {
 	method = strings.ToUpper(method)
 
 	// 参数
 	var entityParams io.Reader
 	if len(params) > 0 {
-		if InSlice(method, []string{"GET", "DELETE"}) { // url参数
+		if slices.Contains([]string{"GET", "DELETE"}, method) { // url参数
 			urlParams := url.Values{}
 			Url, err := url.Parse(rawUrl)
 			if err != nil {
@@ -57,7 +58,7 @@ func Restful(method, rawUrl string, params map[string]interface{}, headers map[s
 	}
 
 	// Header
-	if InSlice(method, []string{"POST", "PUT"}) {
+	if slices.Contains([]string{"POST", "PUT"}, method) {
 		req.Header.Set("Content-Type", "application/json")
 	}
 	if len(headers) > 0 {
@@ -79,7 +80,7 @@ func Restful(method, rawUrl string, params map[string]interface{}, headers map[s
 		zap.L().Error(err.Error())
 		return nil, 0, err
 	}
-	body = map[string]interface{}{}
+	body = map[string]any{}
 	if len(bodyBytes) > 0 {
 		if err := json.Unmarshal(bodyBytes, &body); err != nil {
 			zap.L().Error(err.Error())

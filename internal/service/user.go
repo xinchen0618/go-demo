@@ -17,7 +17,7 @@ var User user
 //  @receiver user
 //  @return int64
 //  @return error
-func (user) CreateUser(userData map[string]interface{}) (int64, error) {
+func (user) CreateUser(userData map[string]any) (int64, error) {
 	// 假设需要写一张用户表和一张关联表, 用户不存在则创建, 存在则更新关联表统计字段
 	var userId int64
 	err := di.DemoDb().Transaction(func(db gorose.IOrm) error { // 事务DEMO

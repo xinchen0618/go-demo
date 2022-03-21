@@ -28,7 +28,7 @@ type PageQuery struct {
 	Select     string
 	From       string
 	Where      string
-	BindParams []interface{}
+	BindParams []any
 	GroupBy    string
 	Having     string
 	OrderBy    string
@@ -36,11 +36,11 @@ type PageQuery struct {
 
 // PageItems 分页结果
 type PageItems struct {
-	Page        int64                    `json:"page"`
-	PerPage     int64                    `json:"per_page"`
-	TotalPages  int64                    `json:"total_pages"`
-	TotalCounts int64                    `json:"total_counts"`
-	Items       []map[string]interface{} `json:"items"`
+	Page        int64            `json:"page"`
+	PerPage     int64            `json:"per_page"`
+	TotalPages  int64            `json:"total_pages"`
+	TotalCounts int64            `json:"total_counts"`
+	Items       []map[string]any `json:"items"`
 }
 
 var (
@@ -50,13 +50,13 @@ var (
 // GetJsonBody 获取Json参数
 // 	@param c *gin.Context
 // 	@param patterns []string ["paramKey:paramName:paramType:paramPattern"] paramPattern +必填不可为空, *选填可为空, ?选填不可为空
-//	@return map[string]interface{}
+//	@return map[string]any
 //	@return error
-func GetJsonBody(c *gin.Context, patterns []string) (map[string]interface{}, error) {
-	jsonBody := make(map[string]interface{})
+func GetJsonBody(c *gin.Context, patterns []string) (map[string]any, error) {
+	jsonBody := make(map[string]any)
 	_ = c.ShouldBindJSON(&jsonBody) // 这里的error不要处理, 因为空body会报error
 
-	result := make(map[string]interface{})
+	result := make(map[string]any)
 	var err error
 	for _, pattern := range patterns {
 		patternAtoms := strings.Split(pattern, ":")
@@ -95,10 +95,10 @@ func GetJsonBody(c *gin.Context, patterns []string) (map[string]interface{}, err
 // GetQueries 获取Query参数
 // 	@param c *gin.Context
 // 	@param patterns []string ["paramKey:paramName:paramType:defaultValue"] defaultValue为required时参数必填
-//	@return map[string]interface{}
+//	@return map[string]any
 //	@return error
-func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, error) {
-	result := make(map[string]interface{})
+func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
+	result := make(map[string]any)
 	var err error
 	for _, pattern := range patterns {
 		patternAtoms := strings.Split(pattern, ":")
@@ -129,12 +129,12 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]interface{}, erro
 // FilterParam 校验参数类型
 // 	@param c *gin.Context
 // 	@param paramName string
-// 	@param paramValue interface{}
+// 	@param paramValue any
 // 	@param paramType string int整型64位, +int正整型64位, !-int非负整型64位, string字符串, []枚举(支持数字float64与字符串string混合枚举), array数组, []int整型64位数组, []string字符串数组
 // 	@param allowEmpty bool
-//	@return interface{}
+//	@return any
 //	@return error
-func FilterParam(c *gin.Context, paramName string, paramValue interface{}, paramType string, allowEmpty bool) (interface{}, error) {
+func FilterParam(c *gin.Context, paramName string, paramValue any, paramType string, allowEmpty bool) (any, error) {
 	valueType := reflect.TypeOf(paramValue).String() // 用户输入值类型
 
 	/* 整型64位 */
@@ -199,7 +199,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 
 	/* 枚举, 支持数字float64与字符串string混合枚举 */
 	if "[" == paramType[0:1] && "]" != paramType[1:2] {
-		var enum []interface{}
+		var enum []any
 		if err := json.Unmarshal([]byte(paramType), &enum); err != nil { // 候选值解析到切片
 			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
@@ -237,7 +237,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 	/* 数组 */
 	if "array" == paramType {
 		if "[]interface {}" == valueType {
-			if !allowEmpty && 0 == len(paramValue.([]interface{})) {
+			if !allowEmpty && 0 == len(paramValue.([]any)) {
 				Error(c, 400, "ParamEmpty", fmt.Sprintf("%s不得为空", paramName))
 				return nil, errors.New("ParamEmpty")
 			}
@@ -254,12 +254,12 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			return nil, err
 		}
 		intSlice := []int64{}
-		for _, item := range arrayValue.([]interface{}) {
-			itemInterface, err := FilterParam(c, paramName, item, "int", false)
+		for _, item := range arrayValue.([]any) {
+			itemAny, err := FilterParam(c, paramName, item, "int", false)
 			if err != nil {
 				return nil, err
 			}
-			intSlice = append(intSlice, itemInterface.(int64))
+			intSlice = append(intSlice, itemAny.(int64))
 		}
 		return intSlice, nil
 	}
@@ -271,12 +271,12 @@ func FilterParam(c *gin.Context, paramName string, paramValue interface{}, param
 			return nil, err
 		}
 		stringSlice := []string{}
-		for _, item := range arrayValue.([]interface{}) {
-			itemInterface, err := FilterParam(c, paramName, item, "string", false)
+		for _, item := range arrayValue.([]any) {
+			itemAny, err := FilterParam(c, paramName, item, "string", false)
 			if err != nil {
 				return nil, err
 			}
-			stringSlice = append(stringSlice, itemInterface.(string))
+			stringSlice = append(stringSlice, itemAny.(string))
 		}
 		return stringSlice, nil
 	}
@@ -298,7 +298,7 @@ func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
 	page := queries["page"].(int64)
 	perPage := queries["per_page"].(int64)
 
-	bindParams := []interface{}{}
+	bindParams := []any{}
 	if pageQuery.BindParams != nil {
 		bindParams = pageQuery.BindParams
 	}
@@ -330,7 +330,7 @@ func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
 			PerPage:     perPage,
 			TotalPages:  0,
 			TotalCounts: 0,
-			Items:       []map[string]interface{}{},
+			Items:       []map[string]any{},
 		}
 		return result, nil
 	}
@@ -361,11 +361,11 @@ func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
 //	@receiver cacheService
 //	@param key string
 //	@param ttl time.Duration 缓存时长
-//	@param f func() (interface{}, error)
-//	@return interface{}
+//	@param f func() (any, error)
+//	@return any
 //	@return error
-func GetOrSetCache(c *gin.Context, key string, ttl time.Duration, f func() (interface{}, error)) (interface{}, error) {
-	result, err, _ := cacheSg.Do(key, func() (interface{}, error) {
+func GetOrSetCache(c *gin.Context, key string, ttl time.Duration, f func() (any, error)) (any, error) {
+	result, err, _ := cacheSg.Do(key, func() (any, error) {
 		var resultCache string
 		resultCache, err := di.CacheRedis().Get(context.Background(), key).Result()
 		if err != nil {
@@ -391,12 +391,12 @@ func GetOrSetCache(c *gin.Context, key string, ttl time.Duration, f func() (inte
 			resultCache = string(resultBytes)
 		}
 
-		var resultInterface interface{}
-		if err := json.Unmarshal([]byte(resultCache), &resultInterface); err != nil {
+		var resultAny any
+		if err := json.Unmarshal([]byte(resultCache), &resultAny); err != nil {
 			InternalError(c, err)
 			return nil, err
 		}
-		return resultInterface, nil
+		return resultAny, nil
 	})
 	if err != nil {
 		return nil, err

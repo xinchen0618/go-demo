@@ -16,12 +16,12 @@ type user struct{}
 var User user
 
 func (user) AddUser(ctx context.Context, t *asynq.Task) error {
-	var payload map[string]interface{}
+	var payload map[string]any
 	if err := json.Unmarshal(t.Payload(), &payload); err != nil {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
 
-	userData := map[string]interface{}{
+	userData := map[string]any{
 		"user_name": payload["user_name"],
 	}
 	_, err := service.User.CreateUser(userData)

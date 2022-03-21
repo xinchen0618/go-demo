@@ -1,23 +1,24 @@
 module go-demo
 
-go 1.17
+go 1.18
 
 require (
-	github.com/alitto/pond v1.7.0
+	github.com/alitto/pond v1.7.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-co-op/gocron v1.13.0
-	github.com/go-redis/redis/v8 v8.11.4
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gohouse/gorose/v2 v2.1.12
 	github.com/golang-module/carbon v1.5.5
 	github.com/hibiken/asynq v0.22.1
 	github.com/juju/ratelimit v1.0.1
 	github.com/spf13/cast v1.4.1
-	github.com/urfave/cli/v2 v2.3.0
+	github.com/urfave/cli/v2 v2.4.0
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.uber.org/zap v1.21.0
+	golang.org/x/exp v0.0.0-20220318154914-8dddf5d87bd8
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
 
@@ -49,8 +50,8 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/crypto v0.0.0-20220307211146-efcb8507fb70 // indirect
-	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5 // indirect
+	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd // indirect
+	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect

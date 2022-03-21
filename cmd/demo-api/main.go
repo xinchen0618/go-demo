@@ -7,15 +7,15 @@ import (
 	"go-demo/internal/middleware"
 	"go-demo/internal/router"
 	"go-demo/pkg/ginx"
-	"go-demo/pkg/gox"
 
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/exp/slices"
 )
 
 func main() {
 	// 实例化gin
-	if gox.InSlice(config.GetRuntimeEnv(), []string{"prod", "stage"}) {
+	if slices.Contains([]string{"prod", "stage"}, config.GetRuntimeEnv()) {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	r := gin.Default()

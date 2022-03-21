@@ -74,9 +74,9 @@ func (account) GetUsers(c *gin.Context) {
 	}
 	key = fmt.Sprintf(consts.CacheUsers, key)
 
-	pageItemsCache, err := ginx.GetOrSetCache(c, key, 3*time.Second, func() (interface{}, error) {
+	pageItemsCache, err := ginx.GetOrSetCache(c, key, 3*time.Second, func() (any, error) {
 		where := "1"
-		bindParams := []interface{}{}
+		bindParams := []any{}
 
 		userName := queries["user_name"].(string)
 		if userName != "" {
@@ -122,7 +122,7 @@ func (account) GetUsersById(c *gin.Context) {
 func (account) PostUsers(c *gin.Context) {
 	// 延时队列Demo
 	//userName := fmt.Sprintf("QU%d", gox.RandInt64(111111, 999999))
-	//if err := service.Queue.EnqueueIn("user:AddUser", map[string]interface{}{"user_name": userName}, 5*time.Second); err != nil {
+	//if err := service.Queue.EnqueueIn("user:AddUser", map[string]any{"user_name": userName}, 5*time.Second); err != nil {
 	//	ginx.InternalError(c)
 	//	return
 	//}
@@ -142,7 +142,7 @@ func (account) PostUsers(c *gin.Context) {
 	wpsg := di.WorkerPoolSeparate(100).Group()
 	for i := 0; i < counts; i++ {
 		wpsg.Submit(func() {
-			userData := map[string]interface{}{
+			userData := map[string]any{
 				"user_name": fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999)),
 			}
 			_, _ = service.User.CreateUser(userData)
