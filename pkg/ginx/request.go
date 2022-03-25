@@ -204,6 +204,9 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		if err != nil {
 			return nil, err
 		}
+		if "" == valueStr.(string) {
+			return "0.00", nil
+		}
 		valueFloat, err := cast.ToFloat64E(valueStr)
 		if err != nil {
 			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
