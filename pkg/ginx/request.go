@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -130,65 +131,65 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
 // 	@param c *gin.Context
 // 	@param paramName string
 // 	@param paramValue any
-// 	@param paramType string int整型64位, +int正整型64位, !-int非负整型64位, string字符串, []枚举(支持数字float64与字符串string混合枚举), array数组, []int整型64位数组, []string字符串数组
+// 	@param paramType string int整型64位, +int正整型64位, !-int非负整型64位, string字符串, money金额, []枚举(支持数字float64与字符串string混合枚举), array数组, []int整型64位数组, []string字符串数组
 // 	@param allowEmpty bool
 //	@return any
 //	@return error
 func FilterParam(c *gin.Context, paramName string, paramValue any, paramType string, allowEmpty bool) (any, error) {
 	valueType := reflect.TypeOf(paramValue).String() // 用户输入值类型
 
-	/* 整型64位 */
+	// 整型64位
 	if "int" == paramType {
-		stringValue, err := FilterParam(c, paramName, paramValue, "string", allowEmpty) // 先统一转字符串再转整型, 这样小数就不允许输入了
+		valueStr, err := FilterParam(c, paramName, paramValue, "string", allowEmpty) // 先统一转字符串再转整型, 这样小数就不允许输入了
 		if err != nil {
 			return nil, err
 		}
-		if "" == stringValue.(string) {
+		if "" == valueStr.(string) {
 			return int64(0), nil
 		}
-		intValue, err := cast.ToInt64E(stringValue)
+		valueInt, err := cast.ToInt64E(valueStr)
 		if err != nil {
 			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
 		}
-		return intValue, nil
+		return valueInt, nil
 	}
 
-	/* 正整数64位 */
+	// 正整数64位
 	if "+int" == paramType {
-		intValue, err := FilterParam(c, paramName, paramValue, "int", allowEmpty)
+		valueInt, err := FilterParam(c, paramName, paramValue, "int", allowEmpty)
 		if err != nil {
 			return nil, err
 		}
-		if intValue.(int64) <= 0 {
+		if valueInt.(int64) <= 0 {
 			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
 		}
-		return intValue, nil
+		return valueInt, nil
 	}
 
-	/* 非负整数64位 */
+	// 非负整数64位
 	if "!-int" == paramType {
-		intValue, err := FilterParam(c, paramName, paramValue, "int", allowEmpty)
+		valueInt, err := FilterParam(c, paramName, paramValue, "int", allowEmpty)
 		if err != nil {
 			return nil, err
 		}
-		if intValue.(int64) < 0 {
+		if valueInt.(int64) < 0 {
 			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
 		}
-		return intValue, nil
+		return valueInt, nil
 	}
 
-	/* 字符串, 去首尾空格*/
+	// 字符串, 去首尾空格
 	if "string" == paramType {
 		if "string" == valueType {
-			stringValue := strings.TrimSpace(paramValue.(string))
-			if "" == stringValue && !allowEmpty {
+			valueStr := strings.TrimSpace(paramValue.(string))
+			if "" == valueStr && !allowEmpty {
 				Error(c, 400, "ParamEmpty", fmt.Sprintf("%s不得为空", paramName))
 				return nil, errors.New("ParamEmpty")
 			}
-			return stringValue, nil
+			return valueStr, nil
 		} else if "float64" == valueType {
 			return cast.ToString(paramValue), nil
 		} else {
@@ -197,7 +198,22 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		}
 	}
 
-	/* 枚举, 支持数字float64与字符串string混合枚举 */
+	// 金额
+	if "money" == paramType {
+		valueStr, err := FilterParam(c, paramName, paramValue, "string", allowEmpty)
+		if err != nil {
+			return nil, err
+		}
+		valueFloat, err := cast.ToFloat64E(valueStr)
+		if err != nil {
+			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
+			return nil, err
+		}
+
+		return strconv.FormatFloat(valueFloat, 'f', 2, 64), nil
+	}
+
+	// 枚举, 支持数字float64与字符串string混合枚举
 	if "[" == paramType[0:1] && "]" != paramType[1:2] {
 		var enum []any
 		if err := json.Unmarshal([]byte(paramType), &enum); err != nil { // 候选值解析到切片
@@ -212,18 +228,18 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 			}
 			// 用户输入类型与候选类型不一致
 			if "float64" == valueType {
-				stringValue := cast.ToString(paramValue)
-				if stringValue == value {
+				valueStr := cast.ToString(paramValue)
+				if valueStr == value {
 					return value, nil
 				}
 			} else if "string" == valueType {
-				floatValue, err := cast.ToFloat64E(paramValue)
+				valueFloat, err := cast.ToFloat64E(paramValue)
 				if err != nil {
 					Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 					return nil, errors.New("ParamInvalid")
 				}
-				if floatValue == value {
-					return floatValue, nil
+				if valueFloat == value {
+					return valueFloat, nil
 				}
 			} else {
 				Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
@@ -234,7 +250,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		return nil, errors.New("ParamInvalid")
 	}
 
-	/* 数组 */
+	// 数组
 	if "array" == paramType {
 		if "[]interface {}" == valueType {
 			if !allowEmpty && 0 == len(paramValue.([]any)) {
@@ -247,14 +263,14 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		return nil, errors.New("ParamInvalid")
 	}
 
-	/* int64数组 */
+	// int64数组
 	if "[]int" == paramType {
-		arrayValue, err := FilterParam(c, paramName, paramValue, "array", allowEmpty)
+		valueArr, err := FilterParam(c, paramName, paramValue, "array", allowEmpty)
 		if err != nil {
 			return nil, err
 		}
 		intSlice := []int64{}
-		for _, item := range arrayValue.([]any) {
+		for _, item := range valueArr.([]any) {
 			itemAny, err := FilterParam(c, paramName, item, "int", false)
 			if err != nil {
 				return nil, err
@@ -264,7 +280,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		return intSlice, nil
 	}
 
-	/* string数组 */
+	// string数组
 	if "[]string" == paramType {
 		arrayValue, err := FilterParam(c, paramName, paramValue, "array", allowEmpty)
 		if err != nil {
