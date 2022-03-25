@@ -136,6 +136,22 @@ func Insert(db gorose.IOrm, table string, data map[string]any) (id int64, err er
 	return id, nil
 }
 
+// InsertBatch 批量新增记录
+//  @param db gorose.IOrm
+//  @param table string
+//  @param data []map[string]any
+//  @return affectedCounts int64
+//  @return err error
+func InsertBatch(db gorose.IOrm, table string, data []map[string]any) (affectedCounts int64, err error) {
+	affectedCounts, err = db.Table(table).Insert(data)
+	if err != nil {
+		zap.L().Error(err.Error())
+		return 0, err
+	}
+
+	return affectedCounts, nil
+}
+
 // Update 更新记录
 //  @param db gorose.IOrm
 //  @param table string

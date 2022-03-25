@@ -295,6 +295,7 @@ MySQL => Golang 数据类型映射:
 - `FetchColumn()` 获取一列值
 - `Slice2in()` Slice转IN条件
 - `Insert()` 新增记录
+- `InsertBatch()` 批量新增记录
 - `Update()` 更新记录
 - `Delete()` 删除记录
 - `Execute()` 执行原生SQL
