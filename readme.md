@@ -135,7 +135,7 @@
   }
   
   # Wait Group
-  wpsg := di.WorkerPool(100).Group()
+  wpsg := di.WorkerPoolSeparate(100).Group()
   for i := 0; i < 10000; i++ {
     wpsg.Submit(func)
   }
