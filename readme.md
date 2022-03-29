@@ -305,7 +305,7 @@ MySQL => Golang 数据类型映射:
 
 ### Redis
 
-key统一在`config/consts/redis_key.go`中定义.
+`key`统一在`config/consts/redis_key.go`中定义.
 
 #### 规范
 

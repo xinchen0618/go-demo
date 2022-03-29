@@ -33,7 +33,7 @@ func Restful(method, rawUrl string, params map[string]any, headers map[string]st
 			Url, err := url.Parse(rawUrl)
 			if err != nil {
 				zap.L().Error(err.Error())
-				return nil, 0, err
+				return map[string]any{}, 0, err
 			}
 			for k, v := range params {
 				urlParams.Set(k, fmt.Sprint(v))
@@ -45,7 +45,7 @@ func Restful(method, rawUrl string, params map[string]any, headers map[string]st
 			paramBytes, err := json.Marshal(params)
 			if err != nil {
 				zap.L().Error(err.Error())
-				return nil, 0, err
+				return map[string]any{}, 0, err
 			}
 			entityParams = bytes.NewBuffer(paramBytes)
 		}
@@ -54,7 +54,7 @@ func Restful(method, rawUrl string, params map[string]any, headers map[string]st
 	req, err := http.NewRequest(method, rawUrl, entityParams)
 	if err != nil {
 		zap.L().Error(err.Error())
-		return nil, 0, err
+		return map[string]any{}, 0, err
 	}
 
 	// Header
@@ -71,20 +71,20 @@ func Restful(method, rawUrl string, params map[string]any, headers map[string]st
 	resp, err := client.Do(req)
 	if err != nil {
 		zap.L().Error(err.Error())
-		return nil, 0, err
+		return map[string]any{}, 0, err
 	}
 	defer resp.Body.Close()
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		zap.L().Error(err.Error())
-		return nil, 0, err
+		return map[string]any{}, 0, err
 	}
 	body = map[string]any{}
 	if len(bodyBytes) > 0 {
 		if err := json.Unmarshal(bodyBytes, &body); err != nil {
 			zap.L().Error(err.Error())
-			return nil, 0, err
+			return map[string]any{}, 0, err
 		}
 	}
 
