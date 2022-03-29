@@ -183,19 +183,18 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 
 	// 字符串, 去首尾空格
 	if "string" == paramType {
-		if "string" == valueType {
-			valueStr := strings.TrimSpace(paramValue.(string))
-			if "" == valueStr && !allowEmpty {
-				Error(c, 400, "ParamEmpty", fmt.Sprintf("%s不得为空", paramName))
-				return nil, errors.New("ParamEmpty")
-			}
-			return valueStr, nil
-		} else if "float64" == valueType {
-			return cast.ToString(paramValue), nil
-		} else {
+		valueStr, err := cast.ToStringE(paramValue)
+		if err != nil {
 			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
 		}
+		valueStr = strings.TrimSpace(valueStr)
+		if "" == valueStr && !allowEmpty {
+			Error(c, 400, "ParamEmpty", fmt.Sprintf("%s不得为空", paramName))
+			return nil, errors.New("ParamEmpty")
+		}
+
+		return valueStr, nil
 	}
 
 	// 金额
