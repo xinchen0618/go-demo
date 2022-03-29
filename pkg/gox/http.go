@@ -30,13 +30,13 @@ func Restful(method, rawUrl string, params map[string]any, headers map[string]st
 	if len(params) > 0 {
 		if slices.Contains([]string{"GET", "DELETE"}, method) { // url参数
 			urlParams := url.Values{}
+			for k, v := range params {
+				urlParams.Set(k, fmt.Sprint(v))
+			}
 			Url, err := url.Parse(rawUrl)
 			if err != nil {
 				zap.L().Error(err.Error())
 				return map[string]any{}, 0, err
-			}
-			for k, v := range params {
-				urlParams.Set(k, fmt.Sprint(v))
 			}
 			Url.RawQuery = urlParams.Encode()
 			rawUrl = Url.String()
