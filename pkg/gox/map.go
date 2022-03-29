@@ -3,20 +3,9 @@ package gox
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"go.uber.org/zap"
 )
-
-// PrintMap 向console打印map
-//	@param m map[string]any
-func PrintMap(m map[string]any) {
-	fmt.Println("{")
-	for k, v := range m {
-		fmt.Printf("\t%s: %T %#v\n", k, v, v)
-	}
-	fmt.Println("}")
-}
 
 // Map2struct map转struct
 //  @param m map[string]any
