@@ -65,7 +65,7 @@
 
 ### 环境定义
 
-环境变量 `RUNTIME_ENV` 指定执行环境. 默认为生产环境. 参考 <a href="https://en.wikipedia.org/wiki/Deployment_environment" target="_blank">Deployment environment</a>
+环境定义使用`DTAP`, 环境变量 `RUNTIME_ENV` 指定运行环境, 默认为生产环境. 参考 <a href="https://en.wikipedia.org/wiki/Deployment_environment" target="_blank">Deployment environment</a>
 
 - `dev`       开发环境. 开发人员的个人环境
 - `testing`   测试环境
@@ -228,8 +228,8 @@ RUNTIME_ENV=testing ./demo-cli <task> <action> [param]
 
 `cmd/demo-cron/main.go` -> `internal/cron/` [-> `internal/service/`]  
 
- - `cmd/demo-cron/main.go` 定义计划任务
- - `internal/cron/` 执行逻辑
+- `cmd/demo-cron/main.go` 定义计划任务
+- `internal/cron/` 执行逻辑
 
 #### 启动
 
@@ -280,9 +280,9 @@ go build
 
 ```
 MySQL => Golang 数据类型映射:
-    bigint/int/smallint/tinyint => int64,
-    float/double => float64,
-    varchar/char/longtext/text/mediumtext/tinytext/decimal/datetime/timestamp/date/time => string,
+  bigint/int/smallint/tinyint => int64,
+  float/double => float64,
+  varchar/char/longtext/text/mediumtext/tinytext/decimal/datetime/timestamp/date/time => string,
 ```
 
 - 写操作, Golang写MySQL对数据没有强类型要求
