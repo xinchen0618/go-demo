@@ -54,6 +54,7 @@
   - middleware/         API中间件  
   - task/               消息队列任务 
   - service/            原子级服务. 业务应优先考虑是否可以封装为原子级操作以提高代码复用性
+    - auth.go           鉴权
     - cache.go          资源缓存
     - queue.go          消息队列 
 - pkg/                  外部应用可以使用的库代码
@@ -65,7 +66,7 @@
 
 ### 环境定义
 
-环境定义使用`DTAP`, 环境变量 `RUNTIME_ENV` 指定运行环境, 默认为生产环境. 参考 <a href="https://en.wikipedia.org/wiki/Deployment_environment" target="_blank">Deployment environment</a>
+环境定义使用`DTAP`, 环境变量`RUNTIME_ENV`指定运行环境, 默认为生产环境. 参考 <a href="https://en.wikipedia.org/wiki/Deployment_environment" target="_blank">Deployment environment</a>
 
 - `dev`       开发环境. 开发人员的个人环境
 - `testing`   测试环境
