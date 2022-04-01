@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/cast"
 )
 
-// QpsLimit 限流QPS
+// QpsLimit QPS限流
 //	@param qps int
 //	@return gin.HandlerFunc
 func QpsLimit(qps int) gin.HandlerFunc {

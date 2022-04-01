@@ -34,6 +34,7 @@ func Cors() gin.HandlerFunc {
 			c.Header("Access-Control-Allow-Credentials", "false")
 			if "OPTIONS" == c.Request.Method {
 				ginx.Success(c, 200)
+				return
 			}
 		}
 		c.Next()
