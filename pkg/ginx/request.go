@@ -209,10 +209,16 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		valueFloat, err := cast.ToFloat64E(valueStr)
 		if err != nil {
 			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
-			return nil, err
+			return nil, errors.New("ParamInvalid")
 		}
 
-		return strconv.FormatFloat(valueFloat, 'f', 2, 64), nil
+		valueMoney := strconv.FormatFloat(valueFloat, 'f', 2, 64)
+		if valueMoney != valueStr {
+			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
+			return nil, errors.New("ParamInvalid")
+		}
+
+		return valueMoney, nil
 	}
 
 	// 枚举, 支持数字float64与字符串string混合枚举
