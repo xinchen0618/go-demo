@@ -15,6 +15,7 @@ import (
 
 	"go-demo/config/di"
 	"go-demo/pkg/dbx"
+	"go-demo/pkg/gox"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
@@ -197,28 +198,57 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		return valueStr, nil
 	}
 
-	// 金额
-	if "money" == paramType {
+	// 浮点数, float.%d, 数字表示精度(没有后补零), 超过精度四舍五入, 点号同数字可省略, 表示无限制, 返回类型为float64
+	if "float" == gox.Substr(paramType, 0, 5) {
 		valueStr, err := FilterParam(c, paramName, paramValue, "string", allowEmpty)
 		if err != nil {
 			return nil, err
 		}
-		if "" == valueStr.(string) {
-			return "0.00", nil
+
+		if "" == valueStr.(string) && allowEmpty {
+			return 0.0, nil
 		}
+
 		valueFloat, err := cast.ToFloat64E(valueStr)
 		if err != nil {
 			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
 		}
 
-		valueMoney := strconv.FormatFloat(valueFloat, 'f', 2, 64)
-		if valueMoney != valueStr {
-			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
-			return nil, errors.New("ParamInvalid")
+		prec := -1
+		precStr := gox.Substr(paramType, 6)
+		if precStr != "" {
+			prec, err = cast.ToIntE(precStr)
+			if err != nil {
+				Error(c, 400, "ParamTypeError", fmt.Sprintf("数据类型错误: %s", paramName))
+				return nil, errors.New("ParamTypeError")
+			}
+		}
+		if -1 == prec {
+			return valueFloat, nil
 		}
 
-		return valueMoney, nil
+		return gox.Round(valueFloat, prec), nil
+	}
+
+	// 精度小数, decimal.%d, 数字表示精度(有后补零), 超过精度四舍五入, 点号同数字可省略, 默认为2位小数, 返回类型为字符串
+	if "decimal" == gox.Substr(paramType, 0, 7) {
+		prec := 2
+		precStr := gox.Substr(paramType, 8)
+		if precStr != "" {
+			var err error
+			prec, err = cast.ToIntE(precStr)
+			if err != nil {
+				Error(c, 400, "ParamTypeError", fmt.Sprintf("数据类型错误: %s", paramName))
+				return nil, errors.New("ParamTypeError")
+			}
+		}
+		valueFloat, err := FilterParam(c, paramName, paramValue, fmt.Sprintf("float.%d", prec), allowEmpty)
+		if err != nil {
+			return nil, err
+		}
+
+		return strconv.FormatFloat(valueFloat.(float64), 'f', prec, 64), nil // 这里不会有精度问题, 精度在float递归时已经处理了
 	}
 
 	// 枚举, 支持数字float64与字符串string混合枚举
