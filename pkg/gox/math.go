@@ -8,3 +8,14 @@ func Round(val float64, precision int) float64 {
 	p := math.Pow10(precision)
 	return math.Floor(val*p+0.5) / p
 }
+
+// Fib 斐波那契数列
+//  @param n int
+//  @return int
+func Fib(n int) int {
+	x, y := 0, 1
+	for i := 0; i < n; i++ {
+		x, y = y, x+y
+	}
+	return x
+}
