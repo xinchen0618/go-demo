@@ -132,7 +132,7 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
 // 	@param c *gin.Context
 // 	@param paramName string
 // 	@param paramValue any
-// 	@param paramType string int整型64位, +int正整型64位, !-int非负整型64位, string字符串, money金额, []枚举(支持数字float64与字符串string混合枚举), array数组, []int整型64位数组, []string字符串数组
+// 	@param paramType string int整型64位, +int正整型64位, !-int非负整型64位, string字符串, float.%d浮点数, decimal.%d精度小数, []枚举(支持数字float64与字符串string混合枚举), array数组, []int整型64位数组, []string字符串数组
 // 	@param allowEmpty bool
 //	@return any
 //	@return error
