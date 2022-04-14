@@ -10,7 +10,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gohouse/gorose/v2"
-	"github.com/golang-module/carbon"
+	"github.com/golang-module/carbon/v2"
 	"go.uber.org/zap"
 )
 
