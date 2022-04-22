@@ -61,7 +61,7 @@ func (auth) JwtLogin(userType string, id int64, userName string) (string, error)
 	return tokenString, nil
 }
 
-// JwtCheck JWT登录校验
+// JwtCheck JWT校验
 //  @receiver auth
 //  @param userType string
 //  @param token string

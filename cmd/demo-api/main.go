@@ -20,8 +20,11 @@ func main() {
 	}
 	r := gin.Default()
 
-	// panic处理/跨域处理/限流
-	r.Use(middleware.Recovery(), middleware.Cors(), middleware.QpsLimit(config.GetInt("qps_limit")))
+	r.Use(
+		middleware.Recovery(),                           // panic处理
+		middleware.Cors(),                               // 跨域处理
+		middleware.QpsLimit(config.GetInt("qps_limit")), // 限流
+	)
 
 	// 加载路由 DEMO
 	router.Account(r)

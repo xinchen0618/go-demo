@@ -9,7 +9,7 @@ import (
 
 // Account 账号模块 DEMO
 func Account(r *gin.Engine) {
-	accountGroup := r.Group("/account")
+	accountGroup := r.Group("/account", middleware.UserJwtParse())
 	{
 		accountGroup.POST("/v1/login", controller.Account.PostUserLogin)
 		accountGroup.DELETE("/v1/logout", middleware.UserAuth(), controller.Account.DeleteUserLogout)
