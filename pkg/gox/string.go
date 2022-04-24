@@ -1,6 +1,9 @@
 package gox
 
-import "unicode/utf8"
+import (
+	"strings"
+	"unicode/utf8"
+)
 
 // AddSlashes 使用反斜线引用字符串
 //  @param str string
@@ -61,4 +64,16 @@ func Substr(s string, offset int, length ...int) string {
 	}
 
 	return string([]rune(s)[offset:end])
+}
+
+// EndWith 字符串以指定的字符串结尾
+//  @param s string
+//  @param suffix string
+//  @return string
+func EndWith(s, suffix string) string {
+	if strings.HasSuffix(s, suffix) {
+		return s
+	}
+
+	return s + suffix
 }

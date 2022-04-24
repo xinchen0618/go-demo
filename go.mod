@@ -15,7 +15,7 @@ require (
 	github.com/hibiken/asynq v0.23.0
 	github.com/juju/ratelimit v1.0.1
 	github.com/spf13/cast v1.4.1
-	github.com/urfave/cli/v2 v2.4.0
+	github.com/urfave/cli/v2 v2.4.5
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.uber.org/zap v1.21.0
 	golang.org/x/exp v0.0.0-20220414153411-bcd21879b8fd
