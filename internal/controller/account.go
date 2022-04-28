@@ -27,14 +27,15 @@ func (account) PostUserLogin(c *gin.Context) {
 		return
 	}
 
-	// 校验密码, 实际密码应使用gox.PasswordHash()创建散列
-	sql := "SELECT user_id,user_name FROM t_users WHERE user_name=? AND password=? LIMIT 1"
-	user, err := dbx.FetchOne(di.DemoDb(), sql, jsonBody["user_name"], jsonBody["password"])
+	// 校验密码
+	// language=SQL
+	sql := "SELECT user_id,user_name,password FROM t_users WHERE user_name=? LIMIT 1"
+	user, err := dbx.FetchOne(di.DemoDb(), sql, jsonBody["user_name"])
 	if err != nil {
 		ginx.InternalError(c)
 		return
 	}
-	if 0 == len(user) {
+	if 0 == len(user) || !gox.PasswordVerify(jsonBody["password"].(string), user["password"].(string)) {
 		ginx.Error(c, 400, "UserInvalid", "用户名或密码不正确")
 		return
 	}
@@ -144,6 +145,7 @@ func (account) PostUsers(c *gin.Context) {
 		wpsg.Submit(func() {
 			userData := map[string]any{
 				"user_name": fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999)),
+				"password":  gox.PasswordHash("111111"),
 			}
 			_, _ = service.User.CreateUser(userData)
 		})

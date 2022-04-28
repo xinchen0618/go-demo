@@ -37,7 +37,7 @@ func (auth) JwtLogin(userType string, id int64, userName string) (string, error)
 		ExpiresAt: time.Now().Add(loginTtl).Unix(),
 		Id:        cast.ToString(id),
 		IssuedAt:  time.Now().Unix(),
-		Issuer:    userType + " login",
+		Issuer:    userType,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(config.GetString("jwt_secret")))
