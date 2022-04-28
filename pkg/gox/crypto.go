@@ -40,7 +40,7 @@ func PasswordHash(password string) string {
 
 // PasswordVerify 验证密码与散列是否匹配
 //  @param password string
-//  @param hash string
+//  @param passwordHash string
 //  @return bool
 func PasswordVerify(password, passwordHash string) bool {
 	salt := passwordHash[0:6]
