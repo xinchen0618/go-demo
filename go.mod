@@ -11,20 +11,20 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gohouse/gorose/v2 v2.1.12
-	github.com/golang-module/carbon/v2 v2.1.2
+	github.com/golang-module/carbon/v2 v2.1.4
 	github.com/hibiken/asynq v0.23.0
 	github.com/juju/ratelimit v1.0.1
 	github.com/spf13/cast v1.4.1
-	github.com/urfave/cli/v2 v2.4.5
+	github.com/urfave/cli/v2 v2.5.0
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.uber.org/zap v1.21.0
-	golang.org/x/exp v0.0.0-20220414153411-bcd21879b8fd
+	golang.org/x/exp v0.0.0-20220426173459-3bcf042a4bf5
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
 
 require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
@@ -47,7 +47,7 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
+	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f // indirect
 	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect

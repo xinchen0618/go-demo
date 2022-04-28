@@ -14,8 +14,8 @@ import (
 func Recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
-			if err := recover(); err != nil {
-				ginx.InternalError(c, errors.New(fmt.Sprint(err)))
+			if r := recover(); r != nil {
+				ginx.InternalError(c, errors.New(fmt.Sprint(r)))
 			}
 		}()
 		c.Next()
