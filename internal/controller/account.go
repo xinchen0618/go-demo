@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"time"
 
 	"go-demo/config/consts"
 	"go-demo/config/di"
@@ -62,43 +61,34 @@ func (account) DeleteUserLogout(c *gin.Context) {
 }
 
 func (account) GetUsers(c *gin.Context) {
-	// Cache Demo, 假设需要用户分页列表, 并可以按名称搜索
-	queries, err := ginx.GetQueries(c, []string{`user_name:用户名:string:""`, "page:页码:+int:1", "per_page:页大小:+int:12"})
+	// 假设需要分页并可以按名称搜索
+	queries, err := ginx.GetQueries(c, []string{`user_name:用户名:string:""`})
 	if err != nil {
 		return
 	}
 
-	key, err := gox.Md5x(queries)
-	if err != nil {
-		ginx.InternalError(c)
-		return
+	where := "1"
+	bindParams := []any{}
+
+	userName := queries["user_name"].(string)
+	if userName != "" {
+		where += " AND user_name LIKE ?"
+		bindParams = append(bindParams, fmt.Sprintf("%%%s%%", userName))
 	}
-	key = fmt.Sprintf(consts.CacheUsers, key)
 
-	pageItemsCache, err := ginx.GetOrSetCache(c, key, 3*time.Second, func() (any, error) {
-		where := "1"
-		bindParams := []any{}
-
-		userName := queries["user_name"].(string)
-		if userName != "" {
-			where += " AND user_name LIKE ?"
-			bindParams = append(bindParams, fmt.Sprintf("%%%s%%", userName))
-		}
-
-		return ginx.GetPageItems(c, ginx.PageQuery{
-			Db:         di.DemoDb(),
-			Select:     "user_id,user_name,money,created_at,updated_at",
-			From:       "t_users",
-			Where:      where,
-			BindParams: bindParams,
-			OrderBy:    "user_id DESC",
-		})
+	pageItems, err := ginx.GetPageItems(c, ginx.PageQuery{
+		Db:         di.DemoDb(),
+		Select:     "user_id,user_name,money,created_at,updated_at",
+		From:       "t_users",
+		Where:      where,
+		BindParams: bindParams,
+		OrderBy:    "user_id DESC",
 	})
 	if err != nil {
 		return
 	}
 
-	ginx.Success(c, 200, pageItemsCache)
+	ginx.Success(c, 200, pageItems)
 }
 
 func (account) GetUsersById(c *gin.Context) {
@@ -121,14 +111,6 @@ func (account) GetUsersById(c *gin.Context) {
 }
 
 func (account) PostUsers(c *gin.Context) {
-	// 延时队列Demo
-	//userName := fmt.Sprintf("QU%d", gox.RandInt64(111111, 999999))
-	//if err := service.Queue.EnqueueIn("user:AddUser", map[string]any{"user_name": userName}, 5*time.Second); err != nil {
-	//	ginx.InternalError(c)
-	//	return
-	//}
-	//ginx.Success(c, 201, gin.H{"user_name": userName})
-
 	jsonBody, err := ginx.GetJsonBody(c, []string{"counts:数量:+int:*"})
 	if err != nil {
 		return
