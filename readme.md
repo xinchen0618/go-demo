@@ -279,12 +279,12 @@ go build
 
 - 读操作, Golang读取MySQL做了统一数据类型映射方便操作. MySQL整型(包括无符号)统一映射为Golang `int64`, 浮点型统一映射为 `float64`, 其他类型统一映射为`string` 
 
-```
-MySQL => Golang 数据类型映射:
-  bigint/int/smallint/tinyint => int64,
-  float/double => float64,
-  varchar/char/longtext/text/mediumtext/tinytext/decimal/datetime/timestamp/date/time => string,
-```
+  ```
+  MySQL => Golang 数据类型映射:
+    bigint/int/smallint/tinyint => int64,
+    float/double => float64,
+    varchar/char/longtext/text/mediumtext/tinytext/decimal/datetime/timestamp/date/time => string,
+  ```
 
 - 写操作, Golang写MySQL对数据没有强类型要求
 
