@@ -45,12 +45,12 @@ func (sqlLogger) EnableSlowLog() float64 {
 
 // MySQL DEMO, 从这里开始定义项目中的DB
 var (
-	dbEngine *gorose.Engin
-	dbOnce   gox.Once
+	demoDbEngine *gorose.Engin
+	demoDbOnce   gox.Once
 )
 
 func DemoDb() gorose.IOrm {
-	_ = dbOnce.Do(func() error {
+	_ = demoDbOnce.Do(func() error {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",
 			config.Get("mysql_username"),
 			config.Get("mysql_password"),
@@ -60,7 +60,7 @@ func DemoDb() gorose.IOrm {
 			config.Get("mysql_charset"),
 		)
 		var err error
-		dbEngine, err = gorose.Open(&gorose.Config{
+		demoDbEngine, err = gorose.Open(&gorose.Config{
 			Driver:          "mysql",
 			Dsn:             dsn,
 			SetMaxOpenConns: config.GetInt("mysql_max_open_conns"),
@@ -71,11 +71,11 @@ func DemoDb() gorose.IOrm {
 		}
 
 		if config.GetString("sql_log") != "" {
-			dbEngine.SetLogger(sqlLogger{})
+			demoDbEngine.SetLogger(sqlLogger{})
 		}
 
 		return nil
 	})
 
-	return dbEngine.NewOrm()
+	return demoDbEngine.NewOrm()
 }
