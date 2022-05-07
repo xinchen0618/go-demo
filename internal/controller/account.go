@@ -136,3 +136,50 @@ func (account) PostUsers(c *gin.Context) {
 
 	ginx.Success(c, 201, gin.H{"counts": counts})
 }
+
+func (account) PutUsersById(c *gin.Context) {
+	userId, err := ginx.FilterParam(c, "用户id", c.Param("user_id"), "+int", false)
+	if err != nil {
+		return
+	}
+	jsonBody, err := ginx.GetJsonBody(c, []string{"user_name:用户名:string:?", "money:金额:decimal:*"})
+	if err != nil {
+		return
+	}
+	if 0 == len(jsonBody) {
+		ginx.Error(c, 400, "ParamError", "请至少传递一个参数")
+		return
+	}
+
+	user, err := service.Cache.Get(di.DemoDb(), "t_users", "user_id", userId)
+	if err != nil {
+		ginx.InternalError(c)
+		return
+	}
+	if 0 == len(user) {
+		ginx.Error(c, 404, "UserNotFound", "用户不存在")
+		return
+	}
+
+	if _, ok := jsonBody["user_name"]; ok {
+		// language=SQL
+		sql := "SELECT user_id FROM t_users WHERE user_name = ? AND user_id != ?"
+		userConflict, err := dbx.FetchOne(di.DemoDb(), sql, jsonBody["user_name"], userId)
+		if err != nil {
+			ginx.InternalError(c)
+			return
+		}
+		if len(userConflict) > 0 {
+			ginx.Error(c, 400, "UserConflict", "用户名已存在")
+			return
+		}
+	}
+
+	if _, err := dbx.Update(di.DemoDb(), "t_users", jsonBody, "user_id = ?", userId); err != nil {
+		ginx.InternalError(c)
+		return
+	}
+	_ = service.Cache.Delete("t_users", userId)
+
+	ginx.Success(c, 204)
+}

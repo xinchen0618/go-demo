@@ -11,11 +11,11 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gohouse/gorose/v2 v2.1.12
-	github.com/golang-module/carbon/v2 v2.1.5
+	github.com/golang-module/carbon/v2 v2.1.6
 	github.com/hibiken/asynq v0.23.0
 	github.com/juju/ratelimit v1.0.1
 	github.com/spf13/cast v1.4.1
-	github.com/urfave/cli/v2 v2.5.1
+	github.com/urfave/cli/v2 v2.6.0
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.uber.org/zap v1.21.0
 	golang.org/x/exp v0.0.0-20220428152302-39d4317da171
