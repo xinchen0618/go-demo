@@ -8,6 +8,7 @@ import (
 	"go-demo/config/consts"
 	"go-demo/config/di"
 	"go-demo/pkg/ginx"
+	"go-demo/pkg/gox"
 
 	"github.com/gin-gonic/gin"
 	"github.com/juju/ratelimit"
@@ -34,14 +35,21 @@ func QpsLimit(qps int) gin.HandlerFunc {
 //  @return gin.HandlerFunc
 func SubmitLimit() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var id int64
+		var key string
 		if c.GetInt64("userId") > 0 {
-			id = c.GetInt64("userId")
+			key = cast.ToString(c.GetInt64("userId"))
 		} else if c.GetInt64("adminId") > 0 {
-			id = c.GetInt64("adminId")
+			key = cast.ToString(c.GetInt64("adminId"))
+		} else {
+			key = c.ClientIP() + ":" + c.Request.UserAgent()
 		}
-
-		key := fmt.Sprintf(consts.SubmitLimit, id, c.Request.Method, c.Request.URL.Path)
+		key += ":" + c.Request.Method + ":" + c.Request.URL.Path
+		key, err := gox.Md5x(key)
+		if err != nil {
+			ginx.InternalError(c)
+			return
+		}
+		key = fmt.Sprintf(consts.SubmitLimit, key)
 		ok, err := di.CacheRedis().SetNX(context.Background(), key, 1, 2*time.Second).Result() // 2秒/次
 		if err != nil {
 			ginx.InternalError(c, err)
