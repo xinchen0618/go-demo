@@ -35,6 +35,7 @@ func QpsLimit(qps int) gin.HandlerFunc {
 //  @return gin.HandlerFunc
 func SubmitLimit() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// 优先取用户id作为唯一标识, 如果没有则取ip+agent作为唯一标识
 		var key string
 		if c.GetInt64("userId") > 0 {
 			key = cast.ToString(c.GetInt64("userId"))
