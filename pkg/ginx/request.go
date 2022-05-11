@@ -374,7 +374,7 @@ func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
 	}
 	countsData, err := dbx.FetchValue(pageQuery.Db, countSql, bindParams...) // 计算总记录数
 	if err != nil {
-		InternalError(c)
+		InternalError(c, nil)
 		return PageItems{}, errors.New("InternalError")
 	}
 	counts := countsData.(int64)
@@ -397,7 +397,7 @@ func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
 	sql += fmt.Sprintf(" LIMIT %d, %d", offset, perPage)
 	items, err := dbx.FetchAll(pageQuery.Db, sql, bindParams...)
 	if err != nil {
-		InternalError(c)
+		InternalError(c, nil)
 		return PageItems{}, errors.New("InternalError")
 	}
 	result := PageItems{

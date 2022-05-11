@@ -33,7 +33,7 @@ func Cors() gin.HandlerFunc {
 			c.Header("Access-Control-Max-Age", "1728000")
 			c.Header("Access-Control-Allow-Credentials", "false")
 			if "OPTIONS" == c.Request.Method {
-				ginx.Success(c, 200)
+				ginx.Success(c, 200, nil)
 				return
 			}
 		}

@@ -31,7 +31,7 @@ func (account) PostUserLogin(c *gin.Context) {
 	sql := "SELECT user_id,user_name,password FROM t_users WHERE user_name=? LIMIT 1"
 	user, err := dbx.FetchOne(di.DemoDb(), sql, jsonBody["user_name"])
 	if err != nil {
-		ginx.InternalError(c)
+		ginx.InternalError(c, nil)
 		return
 	}
 	if 0 == len(user) || !gox.PasswordVerify(jsonBody["password"].(string), user["password"].(string)) {
@@ -42,7 +42,7 @@ func (account) PostUserLogin(c *gin.Context) {
 	// JWT登录
 	token, err := service.Auth.JwtLogin(consts.UserJwt, user["user_id"].(int64), user["user_name"].(string))
 	if err != nil {
-		ginx.InternalError(c)
+		ginx.InternalError(c, nil)
 		return
 	}
 
@@ -53,11 +53,11 @@ func (account) DeleteUserLogout(c *gin.Context) {
 	userId := c.GetInt64("userId")
 	token := c.Request.Header.Get("Authorization")[7:]
 	if err := service.Auth.JwtLogout(consts.UserJwt, token, userId); err != nil {
-		ginx.InternalError(c)
+		ginx.InternalError(c, nil)
 		return
 	}
 
-	ginx.Success(c, 204)
+	ginx.Success(c, 204, nil)
 }
 
 func (account) GetUsers(c *gin.Context) {
@@ -99,7 +99,7 @@ func (account) GetUsersById(c *gin.Context) {
 
 	user, err := service.Cache.Get(di.DemoDb(), "t_users", "user_id", userId)
 	if err != nil {
-		ginx.InternalError(c)
+		ginx.InternalError(c, nil)
 		return
 	}
 	if 0 == len(user) {
@@ -153,7 +153,7 @@ func (account) PutUsersById(c *gin.Context) {
 
 	user, err := service.Cache.Get(di.DemoDb(), "t_users", "user_id", userId)
 	if err != nil {
-		ginx.InternalError(c)
+		ginx.InternalError(c, nil)
 		return
 	}
 	if 0 == len(user) {
@@ -166,7 +166,7 @@ func (account) PutUsersById(c *gin.Context) {
 		sql := "SELECT user_id FROM t_users WHERE user_name = ? AND user_id != ?"
 		userConflict, err := dbx.FetchOne(di.DemoDb(), sql, jsonBody["user_name"], userId)
 		if err != nil {
-			ginx.InternalError(c)
+			ginx.InternalError(c, nil)
 			return
 		}
 		if len(userConflict) > 0 {
@@ -176,10 +176,10 @@ func (account) PutUsersById(c *gin.Context) {
 	}
 
 	if _, err := dbx.Update(di.DemoDb(), "t_users", jsonBody, "user_id = ?", userId); err != nil {
-		ginx.InternalError(c)
+		ginx.InternalError(c, nil)
 		return
 	}
 	_ = service.Cache.Delete("t_users", userId)
 
-	ginx.Success(c, 204)
+	ginx.Success(c, 204, nil)
 }

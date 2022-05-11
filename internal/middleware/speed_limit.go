@@ -47,7 +47,7 @@ func SubmitLimit() gin.HandlerFunc {
 		key += ":" + c.Request.Method + ":" + c.Request.URL.Path
 		key, err := gox.Md5x(key)
 		if err != nil {
-			ginx.InternalError(c)
+			ginx.InternalError(c, nil)
 			return
 		}
 		key = fmt.Sprintf(consts.SubmitLimit, key)

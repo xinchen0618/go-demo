@@ -8,10 +8,10 @@ import (
 // Success 向客户端输出成功信息
 //	@param c *gin.Context
 //	@param httpCode int
-//	@param obj ...any 选填, 数据会json编码输出给客户端
-func Success(c *gin.Context, httpCode int, obj ...any) {
-	if len(obj) > 0 {
-		c.JSON(httpCode, obj[0])
+//	@param body any 数据会json编码输出给客户端, nil表示无内容输出
+func Success(c *gin.Context, httpCode int, body any) {
+	if body != nil {
+		c.JSON(httpCode, body)
 	} else {
 		c.JSON(httpCode, gin.H{})
 	}
@@ -28,10 +28,10 @@ func Error(c *gin.Context, httpCode int, code, message string) {
 
 // InternalError 向客户端输出500错误
 //	@param c *gin.Context
-//	@param err ...error 选填, 记录错误日志
-func InternalError(c *gin.Context, err ...error) {
-	if len(err) > 0 {
-		zap.L().Error(err[0].Error())
+//	@param err error 记录错误日志, nil表示无需记录, 项目中方法的错误会就近记录, 无需重复记录
+func InternalError(c *gin.Context, err error) {
+	if err != nil {
+		zap.L().Error(err.Error())
 	}
 	Error(c, 500, "InternalError", "服务异常, 请稍后重试")
 }

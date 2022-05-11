@@ -25,7 +25,7 @@ func UserJwtParse() gin.HandlerFunc {
 		// JWT校验
 		userId, err := service.Auth.JwtCheck(consts.UserJwt, tokenString)
 		if err != nil {
-			ginx.InternalError(c)
+			ginx.InternalError(c, nil)
 			return
 		}
 		if 0 == userId {
