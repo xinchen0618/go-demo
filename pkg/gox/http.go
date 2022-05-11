@@ -19,7 +19,7 @@ import (
 //	@param rawUrl string
 //	@param params map[string]any url参数或entity参数, 若为url参数会进行url转义
 //	@param headers map[string]string
-//	@return body map[string]any
+//	@return body map[string]any 返回的是json.Unmarshal的数据
 //	@return httpCode int
 //	@return err error
 func Restful(method, rawUrl string, params map[string]any, headers map[string]string) (body map[string]any, httpCode int, err error) {

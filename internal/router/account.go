@@ -11,7 +11,7 @@ import (
 func Account(r *gin.Engine) {
 	accountGroup := r.Group("/account", middleware.UserJwtParse())
 	{
-		accountGroup.POST("/v1/login", controller.Account.PostUserLogin)                              // 用户登录
+		accountGroup.POST("/v1/login", middleware.SubmitLimit(), controller.Account.PostUserLogin)    // 用户登录
 		accountGroup.DELETE("/v1/logout", middleware.UserAuth(), controller.Account.DeleteUserLogout) // 用户退出登录
 
 		accountGroup.GET("/v1/users", controller.Account.GetUsers)                             // 获取用户列表

@@ -411,12 +411,11 @@ func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
 }
 
 // GetOrSetCache 获取或者设置业务缓存
-//	方法返回的是json.Unmarshal的数据
 //	@receiver cacheService
 //	@param key string
 //	@param ttl time.Duration 缓存时长
 //	@param f func() (any, error)
-//	@return any
+//	@return any 返回的是json.Unmarshal的数据
 //	@return error
 func GetOrSetCache(c *gin.Context, key string, ttl time.Duration, f func() (any, error)) (any, error) {
 	result, err, _ := cacheSg.Do(key, func() (any, error) {

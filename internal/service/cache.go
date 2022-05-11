@@ -122,12 +122,11 @@ func (cache) Delete(table string, ids ...any) error {
 }
 
 // GetOrSet 获取或设置自定义缓存
-//	方法返回的是json.Unmarshal的数据
 //  @receiver cache
 //  @param key string
 //  @param ttl time.Duration
 //  @param f func() (any, error)
-//  @return any
+//  @return any 返回的是json.Unmarshal的数据
 //  @return error
 func (cache) GetOrSet(key string, ttl time.Duration, f func() (any, error)) (any, error) {
 	result, err, _ := cacheSg.Do(key, func() (any, error) {

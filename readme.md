@@ -12,6 +12,7 @@
 - 计划任务        gocron       https://github.com/go-co-op/gocron
 - WorkerPool    pond          https://github.com/alitto/pond
 - 消息队列       Asynq         https://github.com/hibiken/asynq
+- 类型转换       cast          https://github.com/spf13/cast
 
 ###  规范
 
