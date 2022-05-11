@@ -10,11 +10,10 @@ import (
 //	@param httpCode int
 //	@param body any 数据会json编码输出给客户端, nil表示无内容输出
 func Success(c *gin.Context, httpCode int, body any) {
-	if body != nil {
-		c.JSON(httpCode, body)
-	} else {
-		c.JSON(httpCode, gin.H{})
+	if nil == body {
+		body = gin.H{}
 	}
+	c.JSON(httpCode, body)
 }
 
 // Error 向客户端输出失败信息
