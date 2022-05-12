@@ -43,7 +43,7 @@ func UserJwtParse() gin.HandlerFunc {
 func UserAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if 0 == c.GetInt64("userId") {
-			ginx.Error(c, 401, "UserUnauthorized", "用户未登录或登录已过期, 请重新登录")
+			ginx.Error(c, 401, "UserUnauthorized", "您未登录或登录已过期, 请重新登录")
 			return
 		}
 		c.Next()
