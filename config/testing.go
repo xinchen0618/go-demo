@@ -6,7 +6,7 @@ func init() {
 		return
 	}
 
-	configure["testing"] = map[string]any{
+	for k, v := range map[string]any{
 		// 运行端口
 		"server_port": 8080,
 
@@ -15,5 +15,10 @@ func init() {
 
 		// SQL日志
 		"sql_log": "/var/log/golang_sql.log",
+	} {
+		if _, ok := configure["testing"]; !ok {
+			configure["testing"] = map[string]any{}
+		}
+		configure["testing"][k] = v
 	}
 }

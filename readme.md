@@ -76,17 +76,23 @@
 
 ### 配置
 
-- 为什么放弃使用`Viper`
+- 配置需求
 
-  满足环境配置配置为可选的需求; 满足直接部署可执行文件, 不受YAML、TOML等配置文件位置制约的需求.
+  环境配置为可选; 直接部署可执行文件, 不受YAML/TOML等文件位置的制约;
 
 - 多环境配置
   
-  环境配置 <RUNTIME_ENV>.go, 同键名环境配置覆盖公共配置. dev环境配置不参与版本控制.
+  `common.go` 公共配置, `<RUNTIME_ENV>.go` 环境配置, 同键名环境配置覆盖公共配置. 
+
+  可以按分类将配置文件拆分为多个 `<RUNTIME_ENV>_<TYPE>.go`, 比如 `testing_db.go`, `testing_app.go`
+
+  dev环境配置不参与版本控制.
 
 - 使用
 
-  `config.Get()`, `config.GetInt()`, `config.GetString()`, `config.GetBool()`, `config.GetIntSlice()`, `config.GetStringSlice()`
+  配置值支持整型/字符串/布尔/整型切片/字符串切片. 
+
+  获取配置值 `config.Get()`, `config.GetInt()`, `config.GetString()`, `config.GetBool()`, `config.GetIntSlice()`, `config.GetStringSlice()`
 
 ### 日志
 

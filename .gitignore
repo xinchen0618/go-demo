@@ -1,3 +1,4 @@
 .idea
 **/tmp/
 config/dev.go
+config/dev_*.go
