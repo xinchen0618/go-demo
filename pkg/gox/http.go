@@ -73,7 +73,11 @@ func Restful(method, rawUrl string, params map[string]any, headers map[string]st
 		zap.L().Error(err.Error())
 		return map[string]any{}, 0, err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		if err := Body.Close(); err != nil {
+			zap.L().Error(err.Error())
+		}
+	}(resp.Body)
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
