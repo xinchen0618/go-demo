@@ -3,7 +3,6 @@
 package ginx
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,17 +10,13 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"time"
 
-	"go-demo/config/di"
 	"go-demo/pkg/dbx"
 	"go-demo/pkg/gox"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v8"
 	"github.com/gohouse/gorose/v2"
 	"github.com/spf13/cast"
-	"golang.org/x/sync/singleflight"
 )
 
 // PageQuery 分页参数
@@ -44,10 +39,6 @@ type PageItems struct {
 	TotalCounts int64            `json:"total_counts"`
 	Items       []map[string]any `json:"items"`
 }
-
-var (
-	cacheSg singleflight.Group
-)
 
 // GetJsonBody 获取Json参数
 // 	@param c *gin.Context
@@ -406,53 +397,6 @@ func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
 		TotalPages:  int64(math.Ceil(float64(counts) / float64(perPage))),
 		TotalCounts: counts,
 		Items:       items,
-	}
-	return result, nil
-}
-
-// GetOrSetCache 获取或者设置业务缓存
-//	@receiver cacheService
-//	@param key string
-//	@param ttl time.Duration 缓存时长
-//	@param f func() (any, error)
-//	@return any 返回的是json.Unmarshal的数据
-//	@return error
-func GetOrSetCache(c *gin.Context, key string, ttl time.Duration, f func() (any, error)) (any, error) {
-	result, err, _ := cacheSg.Do(key, func() (any, error) {
-		var resultCache string
-		resultCache, err := di.CacheRedis().Get(context.Background(), key).Result()
-		if err != nil {
-			if err != redis.Nil {
-				InternalError(c, err)
-				return nil, err
-			}
-
-			// 缓存不存在
-			result, err := f()
-			if err != nil {
-				return nil, err
-			}
-			resultBytes, err := json.Marshal(result)
-			if err != nil {
-				InternalError(c, err)
-				return nil, err
-			}
-			if err := di.CacheRedis().Set(context.Background(), key, resultBytes, ttl).Err(); err != nil {
-				InternalError(c, err)
-				return nil, err
-			}
-			resultCache = string(resultBytes)
-		}
-
-		var resultAny any
-		if err := json.Unmarshal([]byte(resultCache), &resultAny); err != nil {
-			InternalError(c, err)
-			return nil, err
-		}
-		return resultAny, nil
-	})
-	if err != nil {
-		return nil, err
 	}
 	return result, nil
 }

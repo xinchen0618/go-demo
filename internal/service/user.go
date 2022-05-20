@@ -37,7 +37,7 @@ func (user) CreateUser(userData map[string]any) (int64, error) {
 		if _, err = dbx.Execute(db, sql, userId, gox.RandInt64(1, 9)); err != nil {
 			return err
 		}
-		if err := Cache.Delete("t_user_counts", userId); err != nil {
+		if err := DbCache.Delete("t_user_counts", userId); err != nil {
 			return err
 		}
 
@@ -59,14 +59,14 @@ func (user) DeleteUser(userId int64) error {
 		if _, err := dbx.Delete(db, "t_users", "user_id=?", userId); err != nil {
 			return err
 		}
-		if err := Cache.Delete("t_users", userId); err != nil {
+		if err := DbCache.Delete("t_users", userId); err != nil {
 			return err
 		}
 
 		if _, err := dbx.Delete(db, "t_user_counts", "user_id=?", userId); err != nil {
 			return err
 		}
-		if err := Cache.Delete("t_user_counts", userId); err != nil {
+		if err := DbCache.Delete("t_user_counts", userId); err != nil {
 			return err
 		}
 

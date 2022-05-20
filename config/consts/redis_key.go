@@ -12,5 +12,5 @@ const (
 
 // 缓存
 const (
-	CacheResource = "cache:resource:%s:%d" // 资源缓存 cache:resource:<table_name>:<primary_id>
+	CacheDb = "cache:db:%s:%d" // DB缓存 cache:db:<table_name>:<primary_id>
 )

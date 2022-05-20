@@ -97,7 +97,7 @@ func (account) GetUsersById(c *gin.Context) {
 		return
 	}
 
-	user, err := service.Cache.Get(di.DemoDb(), "t_users", "user_id", userId)
+	user, err := service.DbCache.Get(di.DemoDb(), "t_users", "user_id", userId)
 	if err != nil {
 		ginx.InternalError(c, nil)
 		return
@@ -151,7 +151,7 @@ func (account) PutUsersById(c *gin.Context) {
 		return
 	}
 
-	user, err := service.Cache.Get(di.DemoDb(), "t_users", "user_id", userId)
+	user, err := service.DbCache.Get(di.DemoDb(), "t_users", "user_id", userId)
 	if err != nil {
 		ginx.InternalError(c, nil)
 		return
@@ -179,7 +179,7 @@ func (account) PutUsersById(c *gin.Context) {
 		ginx.InternalError(c, nil)
 		return
 	}
-	_ = service.Cache.Delete("t_users", userId)
+	_ = service.DbCache.Delete("t_users", userId)
 
 	ginx.Success(c, 204, nil)
 }
