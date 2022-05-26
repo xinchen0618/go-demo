@@ -26,7 +26,7 @@ func FetchAll(db gorose.IOrm, sql string, params ...any) ([]map[string]any, erro
 	rows, err := db.Query(sql, params...)
 	if err != nil {
 		zap.L().Error(err.Error())
-		return []map[string]any{}, err
+		return nil, err
 	}
 
 	result := []map[string]any{}
@@ -52,7 +52,7 @@ func FetchOne(db gorose.IOrm, sql string, params ...any) (map[string]any, error)
 
 	rows, err := FetchAll(db, sql, params...)
 	if err != nil {
-		return map[string]any{}, err
+		return nil, err
 	}
 
 	if 0 == len(rows) {
@@ -71,7 +71,7 @@ func FetchOne(db gorose.IOrm, sql string, params ...any) (map[string]any, error)
 func FetchValue(db gorose.IOrm, sql string, params ...any) (any, error) {
 	row, err := FetchOne(db, sql, params...)
 	if err != nil {
-		return map[string]any{}, err
+		return nil, err
 	}
 
 	for _, value := range row {
@@ -91,7 +91,7 @@ func FetchValue(db gorose.IOrm, sql string, params ...any) (any, error) {
 func FetchColumn(db gorose.IOrm, sql string, params ...any) ([]any, error) {
 	rows, err := FetchAll(db, sql, params...)
 	if err != nil {
-		return []any{}, err
+		return nil, err
 	}
 
 	values := []any{}

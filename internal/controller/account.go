@@ -142,6 +142,7 @@ func (account) PutUsersById(c *gin.Context) {
 	if err != nil {
 		return
 	}
+
 	jsonBody, err := ginx.GetJsonBody(c, []string{"user_name:用户名:string:?", "money:金额:decimal:*"})
 	if err != nil {
 		return

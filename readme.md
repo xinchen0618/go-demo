@@ -330,5 +330,5 @@ go build
 
 - 业务缓存
 
-  - API业务缓存, `service.GinCache.GetOrSet()`获取或设置API业务缓存, 现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
+  - API业务缓存, `service.GinCache.GetOrSet()`获取或设置API业务缓存, 出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
   - 自定义缓存, `service.Cache.GetOrSet()`获取或设置自定义缓存
