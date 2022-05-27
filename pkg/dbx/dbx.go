@@ -46,7 +46,7 @@ func FetchAll(db gorose.IOrm, sql string, params ...any) ([]map[string]any, erro
 //  @return error
 func FetchOne(db gorose.IOrm, sql string, params ...any) (map[string]any, error) {
 	sql = strings.TrimSpace(sql)
-	if strings.ToUpper(gox.Substr(sql, -7)) != "LIMIT 1" {
+	if strings.ToUpper(gox.Substr(sql, -7, nil)) != "LIMIT 1" {
 		sql += " LIMIT 1"
 	}
 

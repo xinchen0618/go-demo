@@ -28,6 +28,7 @@ func WorkerPool() *pond.WorkerPool {
 }
 
 // WorkerPoolSeparate 独享Goroutine池
+//  一次请求提交大量数据, 使用独享Goroutine池起限流作用
 //  @param maxWorkers int
 //  @return *pond.WorkerPool
 func WorkerPoolSeparate(maxWorkers int) *pond.WorkerPool {

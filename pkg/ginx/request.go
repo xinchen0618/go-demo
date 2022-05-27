@@ -207,7 +207,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		}
 
 		prec := -1
-		precStr := gox.Substr(paramType, 6)
+		precStr := gox.Substr(paramType, 6, nil)
 		if precStr != "" {
 			prec, err = cast.ToIntE(precStr)
 			if err != nil {
@@ -225,7 +225,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 	// 精度小数, decimal.%d, 数字表示精度(有后补零), 超过精度四舍五入, 点号同数字可省略, 默认为2位小数, 返回类型为字符串
 	if "decimal" == gox.Substr(paramType, 0, 7) {
 		prec := 2
-		precStr := gox.Substr(paramType, 8)
+		precStr := gox.Substr(paramType, 8, nil)
 		if precStr != "" {
 			var err error
 			prec, err = cast.ToIntE(precStr)
