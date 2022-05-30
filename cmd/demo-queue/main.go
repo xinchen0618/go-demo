@@ -32,7 +32,7 @@ func main() {
 	mux.Use(loggingMiddleware)
 
 	// 注册队列任务 DEMO
-	mux.HandleFunc("user:AddUser", task.User.AddUser)
+	mux.HandleFunc("User:AddUser", task.User.AddUser)
 
 	if err := di.QueueServer().Run(mux); err != nil {
 		panic(err)

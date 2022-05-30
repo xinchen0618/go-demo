@@ -12,7 +12,6 @@ import (
 	"go-demo/config/di"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/go-redis/redis/v8"
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
 )
@@ -83,11 +82,10 @@ func (auth) JwtCheck(userType string, token string) (int64, error) {
 	// 白名单
 	tokenAtoms := strings.Split(token, ".")
 	key := fmt.Sprintf(consts.JwtLogin, userType, claims["jti"], tokenAtoms[2])
-	if err := di.JwtRedis().Get(context.Background(), key).Err(); err != nil {
-		if err != redis.Nil { // redis服务异常
-			zap.L().Error(err.Error())
-			return 0, err
-		}
+	if n, err := di.JwtRedis().Exists(context.Background(), key).Result(); err != nil {
+		zap.L().Error(err.Error())
+		return 0, err
+	} else if 0 == n {
 		// 不在白名单内
 		return 0, nil
 	}
