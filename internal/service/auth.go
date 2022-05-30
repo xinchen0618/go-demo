@@ -85,8 +85,7 @@ func (auth) JwtCheck(userType string, token string) (int64, error) {
 	if n, err := di.JwtRedis().Exists(context.Background(), key).Result(); err != nil {
 		zap.L().Error(err.Error())
 		return 0, err
-	} else if 0 == n {
-		// 不在白名单内
+	} else if 0 == n { // 不在白名单内
 		return 0, nil
 	}
 
