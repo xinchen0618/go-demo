@@ -71,13 +71,13 @@ func (dbCache) Get(db gorose.IOrm, table string, primaryKey string, id any) (map
 		if err != nil {
 			if err != redis.Nil { // redis异常
 				zap.L().Error(err.Error())
-				return map[string]any{}, err
+				return nil, err
 			}
 
 			// 缓存不存在
 			ok, err := DbCache.set(db, table, primaryKey, id)
 			if err != nil {
-				return map[string]any{}, err
+				return nil, err
 			}
 			if !ok { // 记录不存在
 				return map[string]any{}, nil
@@ -86,17 +86,17 @@ func (dbCache) Get(db gorose.IOrm, table string, primaryKey string, id any) (map
 			dataCache, err = di.CacheRedis().Get(context.Background(), key).Result()
 			if err != nil {
 				zap.L().Error(err.Error())
-				return map[string]any{}, err
+				return nil, err
 			}
 		}
 		var dataMap map[string]any
 		if err := msgpack.Unmarshal([]byte(dataCache), &dataMap); err != nil {
-			return map[string]any{}, err
+			return nil, err
 		}
 		return dataMap, nil
 	})
 	if err != nil {
-		return map[string]any{}, err
+		return nil, err
 	}
 
 	return v.(map[string]any), nil
