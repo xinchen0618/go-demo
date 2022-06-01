@@ -22,22 +22,6 @@ type ws struct{}
 
 var Ws ws
 
-var clientHub = map[*WsClient]struct{}{}
-
-// SetClientHub
-//  @receiver ws
-//  @param client *WsClient
-func (ws) SetClientHub(client *WsClient) {
-	clientHub[client] = struct{}{}
-}
-
-// DeleteClientHub
-//  @receiver ws
-//  @param client *WsClient
-func (ws) DeleteClientHub(client *WsClient) {
-	delete(clientHub, client)
-}
-
 // Send 发送消息
 //  @receiver ws
 //  @param client *WsClient
@@ -67,18 +51,6 @@ func (ws) Send(client *WsClient, msgType string, msgData map[string]any) error {
 	return nil
 }
 
-// Broadcast 广播消息
-//  @receiver ws
-//  @param msgType string
-//  @param msgData map[string]any
-func (ws) Broadcast(msgType string, msgData map[string]any) {
-	for client := range clientHub {
-		if err := Ws.Send(client, msgType, msgData); err != nil {
-			zap.L().Error(err.Error())
-		}
-	}
-}
-
 // Close 关闭client
 //  @receiver ws
 //  @param client *WsClient
@@ -90,5 +62,4 @@ func (ws) Close(client *WsClient) {
 		zap.L().Error(err.Error())
 	}
 	client.IsClosed = true
-	Ws.DeleteClientHub(client)
 }

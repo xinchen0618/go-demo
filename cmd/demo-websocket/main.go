@@ -21,6 +21,7 @@ import (
 )
 
 var upgrader = websocket.Upgrader{} // use default options
+var pongWait = 60 * time.Second     // 心跳超时时间
 
 func socketHandler(w http.ResponseWriter, r *http.Request) {
 	// Upgrade our raw HTTP connection to a websocket based one
@@ -66,11 +67,9 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	// HUB
-	service.Ws.SetClientHub(client)
 
 	// 心跳
-	if err := client.Conn.SetReadDeadline(time.Now().Add(60 * time.Second)); err != nil {
+	if err := client.Conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
 		zap.L().Error(err.Error())
 	}
 	gox.Go(func() {
@@ -86,7 +85,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	})
 	client.Conn.SetPongHandler(func(appData string) error {
-		if err := client.Conn.SetReadDeadline(time.Now().Add(60 * time.Second)); err != nil {
+		if err := client.Conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
 			zap.L().Error(err.Error())
 		}
 		return nil
