@@ -21,7 +21,8 @@ import (
 )
 
 var upgrader = websocket.Upgrader{} // use default options
-var pongWait = 60 * time.Second     // 心跳超时时间
+var pongWait = 30 * time.Second     // 心跳超时
+var pingPeriod = pongWait / 4       // 心跳间隔
 
 func socketHandler(w http.ResponseWriter, r *http.Request) {
 	client := &service.WsClient{Conn: nil, IsClosed: true}
@@ -74,7 +75,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		zap.L().Error(err.Error())
 	}
 	gox.Go(func() {
-		ticker := time.NewTicker(5 * time.Second)
+		ticker := time.NewTicker(pingPeriod)
 		defer ticker.Stop()
 		for range ticker.C {
 			if client.IsClosed {
