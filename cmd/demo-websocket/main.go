@@ -24,14 +24,15 @@ var upgrader = websocket.Upgrader{} // use default options
 var pongWait = 60 * time.Second     // 心跳超时时间
 
 func socketHandler(w http.ResponseWriter, r *http.Request) {
+	client := &service.WsClient{Conn: nil, IsClosed: true}
 	// Upgrade our raw HTTP connection to a websocket based one
-	var err error
-	client := new(service.WsClient)
-	client.Conn, err = upgrader.Upgrade(w, r, nil)
+	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		zap.L().Error(err.Error())
 		return
 	}
+	client.Conn = conn
+	client.IsClosed = false
 	// Close
 	defer service.Ws.Close(client)
 
