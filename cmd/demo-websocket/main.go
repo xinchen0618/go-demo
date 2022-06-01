@@ -95,7 +95,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	for {
 		_, message, err := client.Conn.ReadMessage()
 		if err != nil {
-			if !websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseNoStatusReceived) {
+			if websocket.IsCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				zap.L().Error(err.Error())
 			}
 			break
