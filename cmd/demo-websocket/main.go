@@ -126,5 +126,5 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/websocket", socketHandler)
-	log.Fatal(http.ListenAndServe("localhost:9090", nil))
+	log.Fatal(http.ListenAndServe(":9090", nil))
 }
