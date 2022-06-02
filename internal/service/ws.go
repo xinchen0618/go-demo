@@ -2,7 +2,9 @@ package service
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
+
+	"go-demo/config/di"
 
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
@@ -23,32 +25,34 @@ type ws struct{}
 var Ws ws
 
 // Send 发送消息
+//  方法为异步处理
 //  @receiver ws
 //  @param client *WsClient
 //  @param msgType string
 //  @param msgData map[string]any
 //  @return error
-func (ws) Send(client *WsClient, msgType string, msgData map[string]any) error {
+func (ws) Send(client *WsClient, msgType string, msgData map[string]any) {
 	if client.IsClosed {
-		return errors.New("client is closed")
+		zap.L().Error(fmt.Sprintf("%p client is closed", client))
+		return
 	}
 
-	if nil == msgData {
-		msgData = map[string]any{}
-	}
-	message, err := json.Marshal(WsMsg{
-		Type: msgType,
-		Data: msgData,
+	di.WorkerPool().Submit(func() {
+		if nil == msgData {
+			msgData = map[string]any{}
+		}
+		message, err := json.Marshal(WsMsg{
+			Type: msgType,
+			Data: msgData,
+		})
+		if err != nil {
+			zap.L().Error(err.Error())
+			return
+		}
+		if err := client.Conn.WriteMessage(websocket.TextMessage, message); err != nil {
+			zap.L().Error(err.Error())
+		}
 	})
-	if err != nil {
-		zap.L().Error(err.Error())
-		return err
-	}
-	if err := client.Conn.WriteMessage(websocket.TextMessage, message); err != nil {
-		zap.L().Error(err.Error())
-		return err
-	}
-	return nil
 }
 
 // Close 关闭client

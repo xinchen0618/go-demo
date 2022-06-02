@@ -41,7 +41,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	clientId := r.URL.Query().Get("client_id") // url_base64(userId:jwtSignature)
 	clientIdDecoded, err := base64.RawURLEncoding.DecodeString(clientId)
 	if err != nil {
-		_ = service.Ws.Send(client, "ClientError", map[string]any{
+		service.Ws.Send(client, "ClientError", map[string]any{
 			"code":    "UserUnauthorized",
 			"message": "您未登录或登录已过期, 请重新登录",
 		})
@@ -49,7 +49,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	userJwt := strings.Split(string(clientIdDecoded), ":")
 	if len(userJwt) != 2 {
-		_ = service.Ws.Send(client, "ClientError", map[string]any{
+		service.Ws.Send(client, "ClientError", map[string]any{
 			"code":    "UserUnauthorized",
 			"message": "您未登录或登录已过期, 请重新登录",
 		})
@@ -57,13 +57,13 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	key := fmt.Sprintf(consts.JwtLogin, consts.UserJwt, userJwt[0], userJwt[1])
 	if n, err := di.JwtRedis().Exists(context.Background(), key).Result(); err != nil {
-		_ = service.Ws.Send(client, "ClientError", map[string]any{
+		service.Ws.Send(client, "ClientError", map[string]any{
 			"code":    "InternalError",
 			"message": "服务异常, 请稍后重试",
 		})
 		return
 	} else if 0 == n {
-		_ = service.Ws.Send(client, "ClientError", map[string]any{
+		service.Ws.Send(client, "ClientError", map[string]any{
 			"code":    "UserUnauthorized",
 			"message": "您未登录或登录已过期, 请重新登录",
 		})
@@ -104,7 +104,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		msg := service.WsMsg{}
 		if err := json.Unmarshal(message, &msg); err != nil {
-			_ = service.Ws.Send(client, "ClientError", map[string]any{
+			service.Ws.Send(client, "ClientError", map[string]any{
 				"code":    "MessageError",
 				"message": "消息格式不正确",
 			})
@@ -116,7 +116,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		case "MicroChat:SendMessage": // DEMO
 			ws.MicroChat.SendMessage(client, msg.Data)
 		default: // 未知路由
-			_ = service.Ws.Send(client, "ClientError", map[string]any{
+			service.Ws.Send(client, "ClientError", map[string]any{
 				"code":    "TypeError",
 				"message": "未知消息类型",
 			})
