@@ -17,7 +17,7 @@ import (
 // Restful 发起Restful请求
 //	@param method string
 //	@param rawUrl string
-//	@param params map[string]any url参数或entity参数, 若为url参数会进行url转义
+//	@param params map[string]any GET/DELETE为url参数, url参数会进行url转义, 其他方法为entity参数
 //	@param headers map[string]string
 //	@return body map[string]any 返回的是json.Unmarshal的数据
 //	@return httpCode int
