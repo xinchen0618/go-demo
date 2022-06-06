@@ -17,7 +17,7 @@ func (microChat) SendMessage(client *service.WsClient, data map[string]any) {
 	}
 	content = "yes, " + content
 
-	service.Ws.Send(client, "MicroChat:SendMessage", map[string]any{
+	_ = service.Ws.Send(client, "MicroChat:SendMessage", map[string]any{
 		"content": content,
 	})
 }
