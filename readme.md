@@ -67,7 +67,9 @@
 
 ### 环境定义
 
-环境定义使用`DTAP`, 环境变量`RUNTIME_ENV`指定运行环境, 默认为生产环境. 参考 <a href="https://en.wikipedia.org/wiki/Deployment_environment" target="_blank">Deployment environment</a>
+环境定义使用`DTAP`, 参考 <a href="https://en.wikipedia.org/wiki/Deployment_environment" target="_blank">Deployment environment</a>
+
+环境变量`RUNTIME_ENV`指定运行环境, 可以在系统中设置, 也可以在命令行中指定, 默认为生产环境. 
 
 - `dev`       开发环境. 开发人员的个人环境
 - `testing`   测试环境
