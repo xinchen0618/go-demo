@@ -282,7 +282,7 @@ go build
 
 ### MySQL
 
-`dbx` 提供以`map[string]any`类型操作和读取数据库的封装, 同时支持读取结果至struct或指定类型
+`dbx` 提供以`map[string]any`类型操作和读取数据库的封装, 同时支持读取结果至`struct`或指定类型
 
 #### 数据类型映射
 
@@ -299,13 +299,13 @@ go build
 
 #### 操作封装
 
-- `FetchAll()` 获取多行记录返回map切片
-- `TakeAll()` 获取多行记录至struct切片
-- `FetchOne()` 获取一行记录返回map
-- `TakeOne()` 获取一行记录至struct
-- `FetchValue()` 获取一个值返回any
+- `FetchAll()` 获取多行记录返回`map`切片
+- `TakeAll()` 获取多行记录至`struct`切片
+- `FetchOne()` 获取一行记录返回`map`
+- `TakeOne()` 获取一行记录至`struct`
+- `FetchValue()` 获取一个值返回`any`
 - `TakeValue()` 获取一个值至指定类型
-- `FetchColumn()` 获取一列值返回any切片
+- `FetchColumn()` 获取一列值返回`any`切片
 - `TakeColumn()` 获取一列值至指定类型切片
 - `Slice2in()` Slice转IN条件
 - `Insert()` 新增记录
@@ -313,7 +313,7 @@ go build
 - `Update()` 更新记录
 - `Delete()` 删除记录
 - `Execute()` 执行原生SQL
-- `Begin()` 手动开始事务. 事务应优先考虑Transaction()闭包操作是否会更加方便
+- `Begin()` 手动开始事务. 事务应优先考虑`Transaction()`闭包操作是否会更加方便
 - `Commit()` 手动提交事务
 - `Rollback()` 手动回滚事务
 
