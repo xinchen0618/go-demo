@@ -282,9 +282,9 @@ go build
 
 ### MySQL
 
-`dbx` 提供以`map[string]any`类型操作和读取数据库的封装, 同时支持获取结果至struct或指定类型
+`dbx` 提供以`map[string]any`类型操作和读取数据库的封装, 同时支持读取结果至struct或指定类型
 
-#### map数据类型映射
+#### 数据类型映射
 
 - 读操作, MySQL整型(包括无符号)统一映射为Golang `int64`, 浮点型统一映射为 `float64`, 其他类型统一映射为`string` 
 
