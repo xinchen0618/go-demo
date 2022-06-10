@@ -10,6 +10,7 @@ import (
 	"go-demo/config/di"
 	"go-demo/pkg/dbx"
 	"go-demo/pkg/ginx"
+	"go-demo/pkg/gox"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
@@ -25,7 +26,7 @@ type dbCache struct{}
 
 var DbCache dbCache
 
-// set 设置资源缓存
+// set 设置DB缓存
 //	@receiver dbCache
 //	@param db gorose.IOrm
 //	@param table string
@@ -55,7 +56,7 @@ func (dbCache) set(db gorose.IOrm, table string, primaryKey string, id any) (boo
 	return true, nil
 }
 
-// Get 获取资源缓存
+// Get 获取DB缓存返回map
 //  缓存不存在时会建立
 //	@receiver dbCache
 //	@param db gorose.IOrm
@@ -102,7 +103,30 @@ func (dbCache) Get(db gorose.IOrm, table string, primaryKey string, id any) (map
 	return v.(map[string]any), nil
 }
 
-// Delete 删除资源缓存
+// Take 获取DB缓存至struct
+//  @receiver dbCache
+//  @param p any 接收结果的指针
+//  @param db gorose.IOrm
+//  @param table string
+//  @param primaryKey string
+//  @param id any
+//  @return error
+func (dbCache) Take(p any, db gorose.IOrm, table string, primaryKey string, id any) error {
+	data, err := DbCache.Get(db, table, primaryKey, id)
+	if err != nil {
+		return err
+	}
+	if 0 == len(data) {
+		return nil
+	}
+	if err := gox.TypeCast(data, p); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Delete 删除DB缓存
 //  @receiver dbCache
 //  @param table string
 //  @param ids ...any 整数

@@ -38,7 +38,7 @@ func FetchAll(db gorose.IOrm, sql string, params ...any) ([]map[string]any, erro
 }
 
 // TakeAll 获取多行记录至struct
-//  @param p any
+//  @param p any 接收结果的指针
 //  @param db gorose.IOrm
 //  @param sql string
 //  @param params ...any
@@ -81,7 +81,7 @@ func FetchOne(db gorose.IOrm, sql string, params ...any) (map[string]any, error)
 }
 
 // TakeOne 获取一行记录至struct
-//  @param p any
+//  @param p any 接收结果的指针
 //  @param db gorose.IOrm
 //  @param sql string
 //  @param params ...any
@@ -119,7 +119,7 @@ func FetchValue(db gorose.IOrm, sql string, params ...any) (any, error) {
 }
 
 // TakeValue 获取一个值至指定类型
-//  @param p any
+//  @param p any 接收结果的指针
 //  @param db gorose.IOrm
 //  @param sql string
 //  @param params ...any
@@ -160,7 +160,7 @@ func FetchColumn(db gorose.IOrm, sql string, params ...any) ([]any, error) {
 }
 
 // TakeColumn 获取一列值至指定类型
-//  @param p any
+//  @param p any 接收结果的指针
 //  @param db gorose.IOrm
 //  @param sql string
 //  @param params ...any

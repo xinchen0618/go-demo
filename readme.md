@@ -331,10 +331,11 @@ go build
 
   以资源对象为单位, 使用旁路缓存策略
 
-  - `service.DbCache.Get()`获取缓存(缓存不存在时会建立)
-  - `service.DbCache.Delete()`删除缓存
+  - `service.DbCache.Get()` 获取DB缓存返回map(缓存不存在时会建立)
+  - `service.DbCache.Take()` 获取DB缓存至struct(缓存不存在时会建立)
+  - `service.DbCache.Delete()` 删除DB缓存
 
 - 业务缓存
 
-  - API业务缓存, `service.GinCache.GetOrSet()`获取或设置API业务缓存, 出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
-  - 自定义缓存, `service.Cache.GetOrSet()`获取或设置自定义缓存
+  - API业务缓存, `service.GinCache.GetOrSet()` 获取或设置API业务缓存, 出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
+  - 自定义缓存, `service.Cache.GetOrSet()` 获取或设置自定义缓存
