@@ -7,17 +7,17 @@ import (
 	"go.uber.org/zap"
 )
 
-// Map2struct map转struct
-//  @param m map[string]any
-//  @param sp any 接收结果结构体的指针
+// TypeCast 类型转换
+//  @param m any 原数据
+//  @param p any 目标结果的指针
 //  @return error
-func Map2struct(m map[string]any, sp any) error {
-	b, err := json.Marshal(m)
+func TypeCast(o any, p any) error {
+	b, err := json.Marshal(o)
 	if err != nil {
 		zap.L().Error(err.Error())
 		return err
 	}
-	if err := json.Unmarshal(b, sp); err != nil {
+	if err := json.Unmarshal(b, p); err != nil {
 		zap.L().Error(err.Error())
 		return err
 	}

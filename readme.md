@@ -282,11 +282,11 @@ go build
 
 ### MySQL
 
-`dbx` 提供以`map[string]any`类型操作和读取数据库的封装 
+`dbx` 提供以`map[string]any`类型操作和读取数据库的封装, 同时支持获取结果至struct或指定类型
 
-#### 数据类型映射
+#### map数据类型映射
 
-- 读操作, Golang读取MySQL做了统一数据类型映射方便操作. MySQL整型(包括无符号)统一映射为Golang `int64`, 浮点型统一映射为 `float64`, 其他类型统一映射为`string` 
+- 读操作, MySQL整型(包括无符号)统一映射为Golang `int64`, 浮点型统一映射为 `float64`, 其他类型统一映射为`string` 
 
   ```
   MySQL => Golang 数据类型映射:
@@ -299,10 +299,14 @@ go build
 
 #### 操作封装
 
-- `FetchAll()` 获取多行记录
-- `FetchOne()` 获取一行记录
-- `FetchValue()` 获取一个值
-- `FetchColumn()` 获取一列值
+- `FetchAll()` 获取多行记录返回map切片
+- `TakeAll()` 获取多行记录至struct切片
+- `FetchOne()` 获取一行记录返回map
+- `TakeOne()` 获取一行记录至struct
+- `FetchValue()` 获取一个值返回any
+- `TakeValue()` 获取一个值至指定类型
+- `FetchColumn()` 获取一列值返回any切片
+- `TakeColumn()` 获取一列值至指定类型切片
 - `Slice2in()` Slice转IN条件
 - `Insert()` 新增记录
 - `InsertBatch()` 批量新增记录

@@ -27,26 +27,29 @@ func (account) PostUserLogin(c *gin.Context) {
 	}
 
 	// 校验密码
-	// language=SQL
+	var user struct {
+		UserId   int64  `json:"user_id"`
+		UserName string `json:"user_name"`
+		Password string `json:"password"`
+	}
 	sql := "SELECT user_id,user_name,password FROM t_users WHERE user_name=? LIMIT 1"
-	user, err := dbx.FetchOne(di.DemoDb(), sql, jsonBody["user_name"])
-	if err != nil {
+	if err := dbx.TakeOne(&user, di.DemoDb(), sql, jsonBody["user_name"]); err != nil {
 		ginx.InternalError(c, nil)
 		return
 	}
-	if 0 == len(user) || !gox.PasswordVerify(jsonBody["password"].(string), user["password"].(string)) {
+	if 0 == user.UserId || !gox.PasswordVerify(jsonBody["password"].(string), user.Password) {
 		ginx.Error(c, 400, "UserInvalid", "用户名或密码不正确")
 		return
 	}
 
 	// JWT登录
-	token, err := service.Auth.JwtLogin(consts.UserJwt, user["user_id"].(int64), user["user_name"].(string))
+	token, err := service.Auth.JwtLogin(consts.UserJwt, user.UserId, user.UserName)
 	if err != nil {
 		ginx.InternalError(c, nil)
 		return
 	}
 
-	ginx.Success(c, 200, gin.H{"user_id": user["user_id"], "token": token})
+	ginx.Success(c, 200, gin.H{"user_id": user.UserId, "token": token})
 }
 
 func (account) DeleteUserLogout(c *gin.Context) {
@@ -163,7 +166,6 @@ func (account) PutUsersById(c *gin.Context) {
 	}
 
 	if _, ok := jsonBody["user_name"]; ok {
-		// language=SQL
 		sql := "SELECT user_id FROM t_users WHERE user_name = ? AND user_id != ?"
 		userConflict, err := dbx.FetchOne(di.DemoDb(), sql, jsonBody["user_name"], userId)
 		if err != nil {

@@ -16,7 +16,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// FetchAll 获取多行记录
+// FetchAll 获取多行记录返回map
 //  @param db gorose.IOrm
 //  @param sql string
 //  @param params ...any 不支持切片
@@ -37,7 +37,25 @@ func FetchAll(db gorose.IOrm, sql string, params ...any) ([]map[string]any, erro
 	return result, nil
 }
 
-// FetchOne 获取一行记录
+// TakeAll 获取多行记录至struct
+//  @param p any
+//  @param db gorose.IOrm
+//  @param sql string
+//  @param params ...any
+//  @return error
+func TakeAll(p any, db gorose.IOrm, sql string, params ...any) error {
+	items, err := FetchAll(db, sql, params...)
+	if err != nil {
+		return err
+	}
+	if err := gox.TypeCast(items, p); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// FetchOne 获取一行记录返回map
 //	查询时会自动添加限制LIMIT 1
 //  @param db gorose.IOrm
 //  @param sql string
@@ -62,6 +80,24 @@ func FetchOne(db gorose.IOrm, sql string, params ...any) (map[string]any, error)
 	return rows[0], nil
 }
 
+// TakeOne 获取一行记录至struct
+//  @param p any
+//  @param db gorose.IOrm
+//  @param sql string
+//  @param params ...any
+//  @return error
+func TakeOne(p any, db gorose.IOrm, sql string, params ...any) error {
+	item, err := FetchOne(db, sql, params...)
+	if err != nil {
+		return err
+	}
+	if err := gox.TypeCast(item, p); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // FetchValue 获取一个值
 //  @param db gorose.IOrm
 //  @param sql string
@@ -80,6 +116,24 @@ func FetchValue(db gorose.IOrm, sql string, params ...any) (any, error) {
 
 	// 0 == len(row)
 	return nil, nil
+}
+
+// TakeValue 获取一个值至指定类型
+//  @param p any
+//  @param db gorose.IOrm
+//  @param sql string
+//  @param params ...any
+//  @return error
+func TakeValue(p any, db gorose.IOrm, sql string, params ...any) error {
+	value, err := FetchValue(db, sql, params...)
+	if err != nil {
+		return err
+	}
+	if err := gox.TypeCast(value, p); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // FetchColumn 获取一列值
@@ -103,6 +157,24 @@ func FetchColumn(db gorose.IOrm, sql string, params ...any) ([]any, error) {
 	}
 
 	return values, nil
+}
+
+// TakeColumn 获取一列值至指定类型
+//  @param p any
+//  @param db gorose.IOrm
+//  @param sql string
+//  @param params ...any
+//  @return error
+func TakeColumn(p any, db gorose.IOrm, sql string, params ...any) error {
+	values, err := FetchColumn(db, sql, params...)
+	if err != nil {
+		return err
+	}
+	if err := gox.TypeCast(values, p); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Slice2in Slice转IN条件
