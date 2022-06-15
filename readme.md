@@ -331,8 +331,8 @@ go build
 
   以资源对象为单位, 使用旁路缓存策略
 
-  - `service.DbCache.Get()` 获取DB缓存返回map(缓存不存在时会建立)
-  - `service.DbCache.Take()` 获取DB缓存至struct(缓存不存在时会建立)
+  - `service.DbCache.Get()` 获取DB缓存返回`map`(缓存不存在时会建立)
+  - `service.DbCache.Take()` 获取DB缓存至`struct`(缓存不存在时会建立)
   - `service.DbCache.Delete()` 删除DB缓存
 
 - 业务缓存

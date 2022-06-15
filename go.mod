@@ -7,7 +7,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-gonic/gin v1.8.1
-	github.com/go-co-op/gocron v1.13.0
+	github.com/go-co-op/gocron v1.14.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gohouse/gorose/v2 v2.1.12
@@ -19,7 +19,7 @@ require (
 	github.com/urfave/cli/v2 v2.8.1
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.uber.org/zap v1.21.0
-	golang.org/x/exp v0.0.0-20220609121020-a51bd0440498
+	golang.org/x/exp v0.0.0-20220613132600-b0d781184e0d
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f
 )
 
@@ -52,8 +52,8 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
-	golang.org/x/net v0.0.0-20220607020251-c690dde0001d // indirect
-	golang.org/x/sys v0.0.0-20220608164250-635b8c9b7f68 // indirect
+	golang.org/x/net v0.0.0-20220614195744-fb05da6f9022 // indirect
+	golang.org/x/sys v0.0.0-20220614162138-6c1b26c55098 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220609170525-579cf78fd858 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
