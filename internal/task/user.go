@@ -2,10 +2,10 @@ package task
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"go-demo/internal/service"
+	"go-demo/pkg/queuex"
 
 	"github.com/hibiken/asynq"
 )
@@ -16,14 +16,19 @@ type user struct{}
 var User user
 
 func (user) AddUser(ctx context.Context, t *asynq.Task) error {
-	var payload map[string]any
-	if err := json.Unmarshal(t.Payload(), &payload); err != nil {
-		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
+	var userData struct {
+		UserName string `json:"user_name"`
+	}
+	if err := queuex.Payload(&userData, t); err != nil {
+		return err
+	}
+	if "" == userData.UserName {
+		return fmt.Errorf("用户名不得为空. %w", asynq.SkipRetry)
 	}
 
-	userData := map[string]any{
-		"user_name": payload["user_name"],
+	user := map[string]any{
+		"user_name": userData.UserName,
 	}
-	_, err := service.User.CreateUser(userData)
+	_, err := service.User.CreateUser(user)
 	return err
 }

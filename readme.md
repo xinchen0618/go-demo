@@ -47,7 +47,7 @@
   - common.go           公共配置
   - prod.go             生产环境配置
   - testing.go          测试环境配置
-- internal/             内部应用代码
+- internal/             内部应用代码. 处理业务的代码
   - action/             命令行action
   - cron/               计划任务  
   - controller/         API控制器
@@ -56,14 +56,14 @@
   - task/               消息队列任务 
   - service/            原子级服务. 业务应优先考虑是否可以封装为原子级操作以提高代码复用性
     - auth.go           鉴权
-    - queue.go          消息队列 
-- pkg/                  外部应用可以使用的库代码
+- pkg/                  外部应用可以使用的代码
   - dbx/                db操作封装. MySQL增删改查操作封装
   - ginx/               gin增强方法. 此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
   - gox/                golang增强方法
   - cachex/             自定义缓存
   - dbcache/            db缓存
   - gincache/           API业务缓存. 此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
+  - queuex/             消息队列操作封装
 - go.mod                包管理  
 ```
 
@@ -280,7 +280,7 @@ go build
 
   消息队列按任务优先级分两个队列: 默认队列, 该队列分配了较多的系统资源, 任务一般发送至此队列; 低优先级队列, 该队列分配了较少的系统资源, 数据量大优先级低的任务发送至此队列
 
-  默认队列: 及时消息`service.Queue.Enqueue()`, 延时消息`service.Queue.EnqueueIn()`; 低优先级队列: 及时消息`service.Queue.LowEnqueue()`, 延时消息`service.Queue.LowEnqueueIn()`
+  默认队列: 及时消息`queuex.Enqueue()`, 延时消息`queuex.EnqueueIn()`; 低优先级队列: 及时消息`queuex.LowEnqueue()`, 延时消息`queuex.LowEnqueueIn()`
 
 ### MySQL
 
