@@ -56,12 +56,14 @@
   - task/               消息队列任务 
   - service/            原子级服务. 业务应优先考虑是否可以封装为原子级操作以提高代码复用性
     - auth.go           鉴权
-    - cache.go          缓存
     - queue.go          消息队列 
 - pkg/                  外部应用可以使用的库代码
   - dbx/                db操作封装. MySQL增删改查操作封装
   - ginx/               gin增强方法. 此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
   - gox/                golang增强方法
+  - cachex/             自定义缓存
+  - dbcache/            db缓存
+  - gincache/           API业务缓存. 此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
 - go.mod                包管理  
 ```
 
@@ -331,11 +333,11 @@ go build
 
   以资源对象为单位, 使用旁路缓存策略
 
-  - `service.DbCache.Get()` 获取DB缓存返回`map`(缓存不存在时会建立)
-  - `service.DbCache.Take()` 获取DB缓存至`struct`(缓存不存在时会建立)
-  - `service.DbCache.Delete()` 删除DB缓存
+  - `dbcache.Get()` 获取DB缓存返回`map`(缓存不存在时会建立)
+  - `dbcache.Take()` 获取DB缓存至`struct`(缓存不存在时会建立)
+  - `dbcache.Delete()` 删除DB缓存
 
 - 业务缓存
 
-  - API业务缓存, `service.GinCache.GetOrSet()` 获取或设置API业务缓存, 出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
-  - 自定义缓存, `service.Cache.GetOrSet()` 获取或设置自定义缓存
+  - API业务缓存, `gincache.GetOrSet()` 获取或设置API业务缓存, 出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
+  - 自定义缓存, `cachex.GetOrSet()` 获取或设置自定义缓存

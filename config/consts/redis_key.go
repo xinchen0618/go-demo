@@ -9,8 +9,3 @@ const (
 const (
 	SubmitLimit = "submit:limit:%s" // 提交频率限制, submit:limit:<md5(id|ip&&agent+method+path)>
 )
-
-// 缓存
-const (
-	CacheDb = "cache:db:%s:%d" // DB缓存 cache:db:<table_name>:<primary_id>
-)

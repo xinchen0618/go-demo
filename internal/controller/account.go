@@ -6,6 +6,7 @@ import (
 	"go-demo/config/consts"
 	"go-demo/config/di"
 	"go-demo/internal/service"
+	"go-demo/pkg/dbcache"
 	"go-demo/pkg/dbx"
 	"go-demo/pkg/ginx"
 	"go-demo/pkg/gox"
@@ -100,7 +101,7 @@ func (account) GetUsersById(c *gin.Context) {
 		return
 	}
 
-	user, err := service.DbCache.Get(di.DemoDb(), "t_users", "user_id", userId)
+	user, err := dbcache.Get(di.CacheRedis(), di.DemoDb(), "t_users", "user_id", userId)
 	if err != nil {
 		ginx.InternalError(c, nil)
 		return
@@ -155,7 +156,7 @@ func (account) PutUsersById(c *gin.Context) {
 		return
 	}
 
-	user, err := service.DbCache.Get(di.DemoDb(), "t_users", "user_id", userId)
+	user, err := dbcache.Get(di.CacheRedis(), di.DemoDb(), "t_users", "user_id", userId)
 	if err != nil {
 		ginx.InternalError(c, nil)
 		return
@@ -182,7 +183,7 @@ func (account) PutUsersById(c *gin.Context) {
 		ginx.InternalError(c, nil)
 		return
 	}
-	_ = service.DbCache.Delete("t_users", userId)
+	_ = dbcache.Delete(di.CacheRedis(), "t_users", userId)
 
 	ginx.Success(c, 204, nil)
 }
