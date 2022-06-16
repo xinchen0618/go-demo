@@ -288,7 +288,7 @@ go build
 
 #### 数据类型映射
 
-- 读操作, MySQL整型(包括无符号)统一映射为Golang `int64`, 浮点型统一映射为 `float64`, 其他类型统一映射为`string` 
+- 读操作, 若不指定结果接收类型, MySQL整型(包括无符号)统一映射为Golang `int64`, 浮点型统一映射为 `float64`, 其他类型统一映射为`string` 
 
   ```
   MySQL => Golang 数据类型映射:

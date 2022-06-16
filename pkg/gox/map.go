@@ -8,7 +8,7 @@ import (
 )
 
 // TypeCast 类型转换
-//  @param m any 原数据
+//  @param o any 原数据
 //  @param p any 目标结果的指针
 //  @return error
 func TypeCast(o any, p any) error {
