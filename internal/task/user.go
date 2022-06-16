@@ -16,19 +16,19 @@ type user struct{}
 var User user
 
 func (user) AddUser(ctx context.Context, t *asynq.Task) error {
-	var userData struct {
+	var user struct {
 		UserName string `json:"user_name"`
 	}
-	if err := queuex.Payload(&userData, t); err != nil {
+	if err := queuex.Payload(&user, t); err != nil {
 		return err
 	}
-	if "" == userData.UserName {
+	if "" == user.UserName {
 		return fmt.Errorf("用户名不得为空. %w", asynq.SkipRetry)
 	}
 
-	user := map[string]any{
-		"user_name": userData.UserName,
+	userData := map[string]any{
+		"user_name": user.UserName,
 	}
-	_, err := service.User.CreateUser(user)
+	_, err := service.User.CreateUser(userData)
 	return err
 }
