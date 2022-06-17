@@ -1,11 +1,11 @@
 package service
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 
 	"github.com/gorilla/websocket"
+	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 )
 
@@ -38,7 +38,7 @@ func (ws) Send(client *WsClient, msgType string, msgData map[string]any) error {
 	if nil == msgData {
 		msgData = map[string]any{}
 	}
-	message, err := json.Marshal(WsMsg{
+	message, err := jsoniter.Marshal(WsMsg{
 		Type: msgType,
 		Data: msgData,
 	})

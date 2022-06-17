@@ -2,10 +2,10 @@ package gox
 
 import (
 	"crypto/md5"
-	"encoding/json"
 	"fmt"
 	"strconv"
 
+	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 )
 
@@ -22,7 +22,7 @@ func Md5(s string) string {
 //	@return string
 //	@return error
 func Md5x(a any) (string, error) {
-	iBytes, err := json.Marshal(a)
+	iBytes, err := jsoniter.Marshal(a)
 	if err != nil {
 		zap.L().Error(err.Error())
 		return "", err

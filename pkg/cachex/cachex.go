@@ -2,10 +2,10 @@ package cachex
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 	"golang.org/x/sync/singleflight"
 )
@@ -34,7 +34,7 @@ func GetOrSet(cache *redis.Client, key string, ttl time.Duration, f func() (any,
 			if err != nil {
 				return nil, err
 			}
-			resultBytes, err := json.Marshal(result)
+			resultBytes, err := jsoniter.Marshal(result)
 			if err != nil {
 				zap.L().Error(err.Error())
 				return nil, err
@@ -47,7 +47,7 @@ func GetOrSet(cache *redis.Client, key string, ttl time.Duration, f func() (any,
 		}
 
 		var resultAny any
-		if err := json.Unmarshal([]byte(resultCache), &resultAny); err != nil {
+		if err := jsoniter.Unmarshal([]byte(resultCache), &resultAny); err != nil {
 			zap.L().Error(err.Error())
 			return nil, err
 		}

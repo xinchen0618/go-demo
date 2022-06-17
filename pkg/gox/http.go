@@ -2,7 +2,6 @@ package gox
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -10,6 +9,7 @@ import (
 	"net/url"
 	"strings"
 
+	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 	"golang.org/x/exp/slices"
 )
@@ -42,7 +42,7 @@ func Restful(method, rawUrl string, params map[string]any, headers map[string]st
 			rawUrl = Url.String()
 
 		} else { // entity参数
-			paramBytes, err := json.Marshal(params)
+			paramBytes, err := jsoniter.Marshal(params)
 			if err != nil {
 				zap.L().Error(err.Error())
 				return map[string]any{}, 0, err
@@ -86,7 +86,7 @@ func Restful(method, rawUrl string, params map[string]any, headers map[string]st
 	}
 	body = map[string]any{}
 	if len(bodyBytes) > 0 {
-		if err := json.Unmarshal(bodyBytes, &body); err != nil {
+		if err := jsoniter.Unmarshal(bodyBytes, &body); err != nil {
 			zap.L().Error(err.Error())
 			return map[string]any{}, 0, err
 		}

@@ -13,6 +13,7 @@
 - WorkerPool    pond          https://github.com/alitto/pond
 - 消息队列       Asynq         https://github.com/hibiken/asynq
 - 类型转换       cast          https://github.com/spf13/cast
+- json         jsoniter      https://github.com/json-iterator/go
 
 ###  规范
 

@@ -2,8 +2,7 @@
 package gox
 
 import (
-	"encoding/json"
-
+	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 )
 
@@ -12,12 +11,12 @@ import (
 //  @param p any 目标结果的指针
 //  @return error
 func TypeCast(o any, p any) error {
-	b, err := json.Marshal(o)
+	b, err := jsoniter.Marshal(o)
 	if err != nil {
 		zap.L().Error(err.Error())
 		return err
 	}
-	if err := json.Unmarshal(b, p); err != nil {
+	if err := jsoniter.Unmarshal(b, p); err != nil {
 		zap.L().Error(err.Error())
 		return err
 	}

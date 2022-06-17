@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -12,6 +11,7 @@ import (
 	"go-demo/config/di"
 
 	"github.com/dgrijalva/jwt-go"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
 )
@@ -46,7 +46,7 @@ func (auth) JwtLogin(userType string, id int64, userName string) (string, error)
 	}
 	// redis登录白名单
 	tokenAtoms := strings.Split(tokenString, ".")
-	payload, err := json.Marshal(claims)
+	payload, err := jsoniter.Marshal(claims)
 	if err != nil {
 		zap.L().Error(err.Error())
 		return "", err

@@ -2,13 +2,13 @@ package gincache
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"go-demo/pkg/ginx"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
+	jsoniter "github.com/json-iterator/go"
 	"golang.org/x/sync/singleflight"
 )
 
@@ -37,7 +37,7 @@ func GetOrSet(c *gin.Context, cache *redis.Client, key string, ttl time.Duration
 			if err != nil {
 				return nil, err
 			}
-			resultBytes, err := json.Marshal(result)
+			resultBytes, err := jsoniter.Marshal(result)
 			if err != nil {
 				ginx.InternalError(c, err)
 				return nil, err
@@ -50,7 +50,7 @@ func GetOrSet(c *gin.Context, cache *redis.Client, key string, ttl time.Duration
 		}
 
 		var resultAny any
-		if err := json.Unmarshal([]byte(resultCache), &resultAny); err != nil {
+		if err := jsoniter.Unmarshal([]byte(resultCache), &resultAny); err != nil {
 			ginx.InternalError(c, err)
 			return nil, err
 		}

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -17,6 +16,7 @@ import (
 	"go-demo/pkg/gox"
 
 	"github.com/gorilla/websocket"
+	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 )
 
@@ -103,7 +103,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		msg := service.WsMsg{}
-		if err := json.Unmarshal(message, &msg); err != nil {
+		if err := jsoniter.Unmarshal(message, &msg); err != nil {
 			_ = service.Ws.Send(client, "ClientError", map[string]any{
 				"code":    "MessageError",
 				"message": "消息格式不正确",

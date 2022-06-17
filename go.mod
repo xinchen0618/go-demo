@@ -14,6 +14,7 @@ require (
 	github.com/golang-module/carbon/v2 v2.1.8
 	github.com/gorilla/websocket v1.5.0
 	github.com/hibiken/asynq v0.23.0
+	github.com/json-iterator/go v1.1.12
 	github.com/juju/ratelimit v1.0.1
 	github.com/spf13/cast v1.5.0
 	github.com/urfave/cli/v2 v2.8.1
@@ -36,7 +37,6 @@ require (
 	github.com/gohouse/t v0.0.0-20201007094014-630049a6bfe9 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
