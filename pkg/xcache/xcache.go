@@ -1,4 +1,4 @@
-package cachex
+package xcache
 
 import (
 	"context"
