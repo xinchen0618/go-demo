@@ -34,20 +34,19 @@ func GetOrSet(cache *redis.Client, key string, ttl time.Duration, f func() (any,
 			if err != nil {
 				return nil, err
 			}
-			resultBytes, err := jsoniter.Marshal(result)
+			resultCache, err = jsoniter.MarshalToString(result)
 			if err != nil {
 				zap.L().Error(err.Error())
 				return nil, err
 			}
-			if err := cache.Set(context.Background(), key, resultBytes, ttl).Err(); err != nil {
+			if err := cache.Set(context.Background(), key, resultCache, ttl).Err(); err != nil {
 				zap.L().Error(err.Error())
 				return nil, err
 			}
-			resultCache = string(resultBytes)
 		}
 
 		var resultAny any
-		if err := jsoniter.Unmarshal([]byte(resultCache), &resultAny); err != nil {
+		if err := jsoniter.UnmarshalFromString(resultCache, &resultAny); err != nil {
 			zap.L().Error(err.Error())
 			return nil, err
 		}

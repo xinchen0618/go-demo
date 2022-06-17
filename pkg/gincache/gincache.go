@@ -37,20 +37,19 @@ func GetOrSet(c *gin.Context, cache *redis.Client, key string, ttl time.Duration
 			if err != nil {
 				return nil, err
 			}
-			resultBytes, err := jsoniter.Marshal(result)
+			resultCache, err = jsoniter.MarshalToString(result)
 			if err != nil {
 				ginx.InternalError(c, err)
 				return nil, err
 			}
-			if err := cache.Set(context.Background(), key, resultBytes, ttl).Err(); err != nil {
+			if err := cache.Set(context.Background(), key, resultCache, ttl).Err(); err != nil {
 				ginx.InternalError(c, err)
 				return nil, err
 			}
-			resultCache = string(resultBytes)
 		}
 
 		var resultAny any
-		if err := jsoniter.Unmarshal([]byte(resultCache), &resultAny); err != nil {
+		if err := jsoniter.UnmarshalFromString(resultCache, &resultAny); err != nil {
 			ginx.InternalError(c, err)
 			return nil, err
 		}
