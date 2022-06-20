@@ -21,7 +21,7 @@ func (user) AddUser(ctx context.Context, t *asynq.Task) error {
 	var user struct {
 		UserName string `json:"user_name"`
 	}
-	if err := queuex.Payload(&user, t); err != nil {
+	if err := queuex.Payload(t, &user); err != nil {
 		return err
 	}
 

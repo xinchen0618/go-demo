@@ -92,10 +92,10 @@ func LowEnqueueIn(client *asynq.Client, taskName string, payload map[string]any,
 }
 
 // Payload 从Task中解析Payload
-//  @param p any 接收结果的指针, map指针或者struct指针皆可
 //  @param t *asynq.Task
+//  @param p any 接收结果的指针, map指针或者struct指针皆可
 //  @return error 解析失败返回的是SkipRetry的包裹, task方法中返回这个error将不再重试
-func Payload(p any, t *asynq.Task) error {
+func Payload(t *asynq.Task, p any) error {
 	if err := json.Unmarshal(t.Payload(), &p); err != nil {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
