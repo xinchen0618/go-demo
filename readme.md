@@ -63,7 +63,6 @@
   - gox/                golang增强方法
   - queuex/             消息队列操作封装
   - dbcache/            db缓存
-  - gincache/           API业务缓存. 此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
   - xcache/             自定义缓存
 - go.mod                包管理  
 ```
@@ -340,5 +339,5 @@ go build
 
 - 业务缓存
 
-  - API业务缓存, `gincache.GetOrSet()` 获取或设置API业务缓存, 出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
   - 自定义缓存, `xcache.GetOrSet()` 获取或设置自定义缓存
+  - API业务缓存, `xcache.GinCache()` 获取或设置API业务缓存, 出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
