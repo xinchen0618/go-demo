@@ -7,6 +7,7 @@ package dbx
 
 import (
 	"fmt"
+	"math"
 	"strings"
 
 	"go-demo/pkg/gox"
@@ -64,7 +65,7 @@ func TakeAll(p any, db gorose.IOrm, sql string, params ...any) error {
 //  @return error
 func FetchOne(db gorose.IOrm, sql string, params ...any) (map[string]any, error) {
 	sql = strings.TrimSpace(sql)
-	if strings.ToUpper(gox.Substr(sql, -7, nil)) != "LIMIT 1" {
+	if strings.ToUpper(gox.Substr(sql, -7, math.MaxInt)) != "LIMIT 1" {
 		sql += " LIMIT 1"
 	}
 

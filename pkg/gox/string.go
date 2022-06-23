@@ -2,8 +2,6 @@ package gox
 
 import (
 	"unicode/utf8"
-
-	"github.com/spf13/cast"
 )
 
 // AddSlashes 使用反斜线引用字符串
@@ -31,11 +29,10 @@ func AddSlashes(str string) string {
 // 	  若offset为非负数, 返回的子串将从字符串的offset位置开始, 从0开始计算.
 //	  若offset为负数，返回的子串将从字符串结尾处向前数第offset个字符开始.
 //	  若offset大于字符串长度，返回空字符串.
-//  @param length any 长度
-//    若length为nil, 返回的子串将从offset位置开始直到字符串结尾.
+//  @param length int 长度
 //    若length大于字符串长度, 返回的子串将从offset位置开始直到字符串结尾.
 //  @return string
-func Substr(s string, offset int, length any) string {
+func Substr(s string, offset, length int) string {
 	// 字符串长度
 	runeCount := utf8.RuneCountInString(s)
 	if 0 == runeCount {
@@ -53,17 +50,9 @@ func Substr(s string, offset int, length any) string {
 		}
 	}
 
-	// 截取长度
-	subLen := 0
-	if nil == length {
-		subLen = runeCount
-	} else {
-		subLen = cast.ToInt(length)
-	}
-
 	// 结束位置
-	end := offset + subLen
-	if end > runeCount {
+	end := offset + length
+	if end > runeCount || end < 0 {
 		end = runeCount
 	}
 
