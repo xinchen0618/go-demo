@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gohouse/gorose/v2"
+	"github.com/spf13/cast"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.uber.org/zap"
 	"golang.org/x/sync/singleflight"
@@ -59,6 +60,7 @@ func set(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, i
 //  @return map[string]any
 //  @return error
 func Get(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, id any) (map[string]any, error) {
+	id = cast.ToInt64(id)
 	key := fmt.Sprintf(dbcacheKey, table, id)
 	v, err, _ := sg.Do(key, func() (any, error) {
 		dataCache, err := cache.Get(context.Background(), key).Result()
@@ -130,6 +132,7 @@ func Delete(cache *redis.Client, table string, ids ...any) error {
 	}
 
 	for _, id := range ids {
+		id = cast.ToInt64(id)
 		key := fmt.Sprintf(dbcacheKey, table, id)
 		if err := cache.Del(context.Background(), key).Err(); err != nil {
 			zap.L().Error(err.Error())
