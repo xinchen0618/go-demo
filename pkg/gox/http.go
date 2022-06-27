@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	jsoniter "github.com/json-iterator/go"
+	"github.com/samber/lo"
 	"go.uber.org/zap"
-	"golang.org/x/exp/slices"
 )
 
 // Restful 发起Restful请求
@@ -28,7 +28,7 @@ func Restful(method, rawUrl string, params map[string]any, headers map[string]st
 	// 参数
 	var entityParams io.Reader
 	if len(params) > 0 {
-		if slices.Contains([]string{"GET", "DELETE"}, method) { // url参数
+		if lo.Contains([]string{"GET", "DELETE"}, method) { // url参数
 			urlParams := url.Values{}
 			for k, v := range params {
 				urlParams.Set(k, fmt.Sprint(v))
@@ -58,7 +58,7 @@ func Restful(method, rawUrl string, params map[string]any, headers map[string]st
 	}
 
 	// Header
-	if slices.Contains([]string{"POST", "PUT"}, method) {
+	if lo.Contains([]string{"POST", "PUT"}, method) {
 		req.Header.Set("Content-Type", "application/json")
 	}
 	if len(headers) > 0 {

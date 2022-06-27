@@ -10,12 +10,12 @@ import (
 
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/exp/slices"
+	"github.com/samber/lo"
 )
 
 func main() {
 	// 实例化gin
-	if slices.Contains([]string{"prod", "stage"}, config.GetRuntimeEnv()) {
+	if lo.Contains([]string{"prod", "stage"}, config.GetRuntimeEnv()) {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	r := gin.Default()
