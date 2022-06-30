@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
-	jsoniter "github.com/json-iterator/go"
+	"github.com/goccy/go-json"
 	"go.uber.org/zap"
 	"golang.org/x/sync/singleflight"
 )
@@ -37,19 +37,20 @@ func GetOrSet(cache *redis.Client, key string, ttl time.Duration, f func() (any,
 			if err != nil {
 				return nil, err
 			}
-			resultCache, err = jsoniter.MarshalToString(result)
+			resultBytes, err := json.Marshal(result)
 			if err != nil {
 				zap.L().Error(err.Error())
 				return nil, err
 			}
-			if err := cache.Set(context.Background(), key, resultCache, ttl).Err(); err != nil {
+			if err := cache.Set(context.Background(), key, resultBytes, ttl).Err(); err != nil {
 				zap.L().Error(err.Error())
 				return nil, err
 			}
+			resultCache = string(resultBytes)
 		}
 
 		var resultAny any
-		if err := jsoniter.UnmarshalFromString(resultCache, &resultAny); err != nil {
+		if err := json.Unmarshal([]byte(resultCache), &resultAny); err != nil {
 			zap.L().Error(err.Error())
 			return nil, err
 		}
@@ -84,19 +85,20 @@ func GinCache(c *gin.Context, cache *redis.Client, key string, ttl time.Duration
 			if err != nil {
 				return nil, err
 			}
-			resultCache, err = jsoniter.MarshalToString(result)
+			resultBytes, err := json.Marshal(result)
 			if err != nil {
 				ginx.InternalError(c, err)
 				return nil, err
 			}
-			if err := cache.Set(context.Background(), key, resultCache, ttl).Err(); err != nil {
+			if err := cache.Set(context.Background(), key, resultBytes, ttl).Err(); err != nil {
 				ginx.InternalError(c, err)
 				return nil, err
 			}
+			resultCache = string(resultBytes)
 		}
 
 		var resultAny any
-		if err := jsoniter.UnmarshalFromString(resultCache, &resultAny); err != nil {
+		if err := json.Unmarshal([]byte(resultCache), &resultAny); err != nil {
 			ginx.InternalError(c, err)
 			return nil, err
 		}

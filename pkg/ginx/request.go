@@ -14,8 +14,8 @@ import (
 	"go-demo/pkg/gox"
 
 	"github.com/gin-gonic/gin"
+	"github.com/goccy/go-json"
 	"github.com/gohouse/gorose/v2"
-	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/cast"
 )
 
@@ -245,7 +245,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 	// 枚举, 支持数字float64与字符串string混合枚举
 	if "[" == paramType[0:1] && "]" != paramType[1:2] {
 		var enum []any
-		if err := jsoniter.Unmarshal([]byte(paramType), &enum); err != nil { // 候选值解析到切片
+		if err := json.Unmarshal([]byte(paramType), &enum); err != nil { // 候选值解析到切片
 			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
 		}

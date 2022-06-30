@@ -5,15 +5,15 @@
 - API           Gin          https://github.com/gin-gonic/gin
 - MySQL         GoRose       https://github.com/gohouse/gorose
 - Redis         go-redis     https://github.com/go-redis/redis
-- 登录          jwt-go        https://github.com/dgrijalva/jwt-go
-- 日志          zap           https://github.com/uber-go/zap
-- 优雅停止      endless       https://github.com/fvbock/endless
-- 命令行         urfave/cli   https://github.com/urfave/cli
+- 登录           jwt-go        https://github.com/dgrijalva/jwt-go
+- 日志           zap           https://github.com/uber-go/zap
+- 优雅停止        endless       https://github.com/fvbock/endless
+- 命令行          urfave/cli   https://github.com/urfave/cli
 - 计划任务        gocron       https://github.com/go-co-op/gocron
 - WorkerPool    pond          https://github.com/alitto/pond
-- 消息队列       Asynq         https://github.com/hibiken/asynq
-- 类型转换       cast          https://github.com/spf13/cast
-- json         jsoniter      https://github.com/json-iterator/go
+- 消息队列        Asynq         https://github.com/hibiken/asynq
+- 类型转换        cast          https://github.com/spf13/cast
+- json          go-json       https://github.com/goccy/go-json
 
 ###  规范
 

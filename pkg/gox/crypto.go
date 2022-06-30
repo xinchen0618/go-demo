@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/goccy/go-json"
 	"go.uber.org/zap"
 )
 
@@ -22,7 +22,7 @@ func Md5(s string) string {
 //	@return string
 //	@return error
 func Md5x(a any) (string, error) {
-	iBytes, err := jsoniter.Marshal(a)
+	iBytes, err := json.Marshal(a)
 	if err != nil {
 		zap.L().Error(err.Error())
 		return "", err
