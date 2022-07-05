@@ -35,22 +35,17 @@ func QpsLimit(qps int) gin.HandlerFunc {
 //  @return gin.HandlerFunc
 func SubmitLimit() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var uid string // md5(id+method+path)
 		// 优先取用户id作为唯一标识, 如果没有则取ip+agent作为唯一标识
-		var key string
 		if c.GetInt64("userId") > 0 {
-			key = cast.ToString(c.GetInt64("userId"))
+			uid = cast.ToString(c.GetInt64("userId"))
 		} else if c.GetInt64("adminId") > 0 {
-			key = cast.ToString(c.GetInt64("adminId"))
+			uid = cast.ToString(c.GetInt64("adminId"))
 		} else {
-			key = c.ClientIP() + ":" + c.Request.UserAgent()
+			uid = c.ClientIP() + ":" + c.Request.UserAgent()
 		}
-		key += ":" + c.Request.Method + ":" + c.Request.URL.Path
-		key, err := gox.Md5x(key)
-		if err != nil {
-			ginx.InternalError(c, nil)
-			return
-		}
-		key = fmt.Sprintf(consts.SubmitLimit, key)
+		uid = gox.Md5(uid + ":" + c.Request.Method + ":" + c.Request.URL.Path)
+		key := fmt.Sprintf(consts.SubmitLimit, uid)
 		ok, err := di.CacheRedis().SetNX(context.Background(), key, 1, 2*time.Second).Result() // 2秒/次
 		if err != nil {
 			ginx.InternalError(c, err)
