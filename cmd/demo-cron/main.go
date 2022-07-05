@@ -25,5 +25,4 @@ func main() {
 	s.StartAsync()
 	// starts the scheduler and blocks current execution path
 	s.StartBlocking()
-
 }

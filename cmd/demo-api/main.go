@@ -32,7 +32,6 @@ func main() {
 	// 未知路由处理
 	r.NoRoute(func(c *gin.Context) {
 		ginx.Error(c, 404, "ResourceNotFound", "您请求的资源不存在")
-		return
 	})
 
 	// Run gin

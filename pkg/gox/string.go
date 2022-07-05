@@ -1,25 +1,16 @@
 package gox
 
 import (
+	"strings"
 	"unicode/utf8"
 )
 
 // AddSlashes 使用反斜线引用字符串
-//  @param str string
+//  @param s string
 //  @return string
-func AddSlashes(str string) string {
-	var tmpRune []rune
-	strRune := []rune(str)
-	for _, ch := range strRune {
-		switch ch {
-		case []rune{'\\'}[0], []rune{'"'}[0], []rune{'\''}[0]:
-			tmpRune = append(tmpRune, []rune{'\\'}[0])
-			tmpRune = append(tmpRune, ch)
-		default:
-			tmpRune = append(tmpRune, ch)
-		}
-	}
-	return string(tmpRune)
+func AddSlashes(s string) string {
+	r := strings.NewReplacer(`\`, `\\`, `'`, `\'`, `"`, `\"`)
+	return r.Replace(s)
 }
 
 // Substr 返回字符串的子串

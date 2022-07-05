@@ -120,7 +120,7 @@ func (account) PostUsers(c *gin.Context) {
 		return
 	}
 
-	var counts = 100
+	counts := 100
 	if _, ok := jsonBody["counts"]; ok {
 		counts = cast.ToInt(jsonBody["counts"])
 	}

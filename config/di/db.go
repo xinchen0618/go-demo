@@ -15,30 +15,38 @@ import (
 )
 
 // SQL log
-type sqlLogger struct {
-}
+type sqlLogger struct{}
 
 func (sqlLogger) Sql(sqlStr string, runtime time.Duration) {
-	f, err := os.OpenFile(config.GetString("sql_log"), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	f, err := os.OpenFile(config.GetString("sql_log"), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0o644)
 	if err != nil {
 		zap.L().Error(err.Error())
 	}
-	defer f.Close()
+	defer func(f *os.File) {
+		if err := f.Close(); err != nil {
+			zap.L().Error(err.Error())
+		}
+	}(f)
 
 	if _, err := fmt.Fprintf(f, "[SQL] [%s] %s --- %s\n", carbon.Now().ToDateTimeString(), runtime.String(), sqlStr); err != nil {
 		zap.L().Error(err.Error())
 	}
 }
+
 func (sqlLogger) Slow(sqlStr string, runtime time.Duration) {
 }
+
 func (sqlLogger) Error(msg string) {
 }
+
 func (sqlLogger) EnableSqlLog() bool {
 	return true
 }
+
 func (sqlLogger) EnableErrorLog() bool {
 	return false
 }
+
 func (sqlLogger) EnableSlowLog() float64 {
 	return 0
 }

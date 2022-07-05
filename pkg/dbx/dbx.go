@@ -244,9 +244,7 @@ func Update(db gorose.IOrm, table string, data map[string]any, where string, par
 	dataPlaceholdersStr := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(dataPlaceholders)), ","), "[]")
 
 	allValues := dataValues
-	for _, v := range params {
-		allValues = append(allValues, v)
-	}
+	allValues = append(allValues, params...)
 
 	sql := fmt.Sprintf("UPDATE %s SET %s WHERE %s", table, dataPlaceholdersStr, where)
 	affectedCounts, err = Execute(db, sql, allValues...)

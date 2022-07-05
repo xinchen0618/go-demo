@@ -13,7 +13,7 @@ import (
 //  @param data [][]string
 //  @return error
 func PutCsv(name string, data [][]string) error {
-	f, err := os.Create(name) //创建文件
+	f, err := os.Create(name) // 创建文件
 	if err != nil {
 		zap.L().Error(err.Error())
 		return err
@@ -29,8 +29,8 @@ func PutCsv(name string, data [][]string) error {
 		return err
 	}
 
-	w := csv.NewWriter(f)                    //创建一个新的写入文件流
-	if err := w.WriteAll(data); err != nil { //写入数据
+	w := csv.NewWriter(f)                    // 创建一个新的写入文件流
+	if err := w.WriteAll(data); err != nil { // 写入数据
 		zap.L().Error(err.Error())
 		return err
 	}

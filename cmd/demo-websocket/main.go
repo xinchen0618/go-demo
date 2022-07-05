@@ -20,9 +20,11 @@ import (
 	"go.uber.org/zap"
 )
 
-var upgrader = websocket.Upgrader{} // use default options
-var pongWait = 30 * time.Second     // 心跳超时
-var pingPeriod = pongWait / 4       // 心跳间隔
+var (
+	upgrader   = websocket.Upgrader{} // use default options
+	pongWait   = 30 * time.Second     // 心跳超时
+	pingPeriod = pongWait / 4         // 心跳间隔
+)
 
 func socketHandler(w http.ResponseWriter, r *http.Request) {
 	client := &service.WsClient{Conn: nil, IsClosed: true}
