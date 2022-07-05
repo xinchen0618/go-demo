@@ -5,6 +5,9 @@ func init() {
 	if GetRuntimeEnv() != "testing" {
 		return
 	}
+	if _, ok := configure["testing"]; !ok {
+		configure["testing"] = map[string]any{}
+	}
 
 	for k, v := range map[string]any{
 		// 运行端口
@@ -16,9 +19,6 @@ func init() {
 		// SQL日志
 		"sql_log": "/var/log/golang_sql.log",
 	} {
-		if _, ok := configure["testing"]; !ok {
-			configure["testing"] = map[string]any{}
-		}
 		configure["testing"][k] = v
 	}
 }
