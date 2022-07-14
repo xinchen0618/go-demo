@@ -1,10 +1,10 @@
 package queuex
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
+	"github.com/goccy/go-json"
 	"github.com/hibiken/asynq"
 	"go.uber.org/zap"
 )
