@@ -165,7 +165,7 @@
 
 `cmd/demo-api/main.go` -> `internal/router/` [-> `internal/middleware/`] -> `internal/controller/` [-> `internal/service/`]
 
-- `internal/router/` 路由, API版本在此控制, Major[.Minor], 比如 /v1, /v1.1, API出现向下不兼容且旧版仍需继续使用的情况, ~~比如不升级的旧版APP,~~ 新增Minor版本号. 业务出现结构性变化, 新增Major版本号.
+- `internal/router/` 路由, API版本在此控制.
 - `internal/middleware/` 中间件, 可选
 - `internal/controller/` 业务处理
 - `internal/service/` 原子级服务, 可选, 业务应优先考虑是否可以封装为原子级操作以提高代码复用性. 比如, "添加用户"为一个原子级操作, "删除用户"也为一个原子级操作.
@@ -203,7 +203,7 @@
 
 - 预发布&生产环境执行编译好的程序
 
-  实际上会提前编译好, 在机器上直接部署可执行文件. 若使用Docker并且没有CGO的需求, 使用`scratch`或`alpine`作为底层镜像编译时注意设置`CGO_ENABLED=0`. 
+  实际上会提前编译好, 在机器上直接部署可执行文件. 注意build阶段与run阶段c库是否一致, build阶段设置`CGO_ENABLED=0`使用内置的实现来替代系统库则不需要关注此问题.
 
   ```
   # 启动
