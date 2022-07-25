@@ -213,16 +213,16 @@ func Insert(db gorose.IOrm, table string, data map[string]any) (id int64, err er
 //  @param db gorose.IOrm
 //  @param table string
 //  @param data []map[string]any
-//  @return affectedCounts int64
+//  @return affectedRows int64
 //  @return err error
-func InsertBatch(db gorose.IOrm, table string, data []map[string]any) (affectedCounts int64, err error) {
-	affectedCounts, err = db.Table(table).Insert(data)
+func InsertBatch(db gorose.IOrm, table string, data []map[string]any) (affectedRows int64, err error) {
+	affectedRows, err = db.Table(table).Insert(data)
 	if err != nil {
 		zap.L().Error(err.Error())
 		return 0, err
 	}
 
-	return affectedCounts, nil
+	return affectedRows, nil
 }
 
 // Update 更新记录
@@ -231,9 +231,9 @@ func InsertBatch(db gorose.IOrm, table string, data []map[string]any) (affectedC
 //  @param data map[string]any
 //  @param where string
 //  @param params ...any
-//  @return affectedCounts int64
+//  @return affectedRows int64
 //  @return err error
-func Update(db gorose.IOrm, table string, data map[string]any, where string, params ...any) (affectedCounts int64, err error) {
+func Update(db gorose.IOrm, table string, data map[string]any, where string, params ...any) (affectedRows int64, err error) {
 	dataPlaceholders := []string{}
 	dataValues := []any{}
 	for k, v := range data {
@@ -247,12 +247,12 @@ func Update(db gorose.IOrm, table string, data map[string]any, where string, par
 	allValues = append(allValues, params...)
 
 	sql := fmt.Sprintf("UPDATE %s SET %s WHERE %s", table, dataPlaceholdersStr, where)
-	affectedCounts, err = Execute(db, sql, allValues...)
+	affectedRows, err = Execute(db, sql, allValues...)
 	if err != nil {
 		return 0, err
 	}
 
-	return affectedCounts, nil
+	return affectedRows, nil
 }
 
 // Delete 删除记录
@@ -260,32 +260,32 @@ func Update(db gorose.IOrm, table string, data map[string]any, where string, par
 //  @param table string
 //  @param where string
 //  @param params ...any
-//  @return affectedCounts int64
+//  @return affectedRows int64
 //  @return err error
-func Delete(db gorose.IOrm, table string, where string, params ...any) (affectedCounts int64, err error) {
+func Delete(db gorose.IOrm, table string, where string, params ...any) (affectedRows int64, err error) {
 	sql := fmt.Sprintf("DELETE FROM %s WHERE %s", table, where)
-	affectedCounts, err = Execute(db, sql, params...)
+	affectedRows, err = Execute(db, sql, params...)
 	if err != nil {
 		return 0, err
 	}
 
-	return affectedCounts, nil
+	return affectedRows, nil
 }
 
 // Execute 执行原生SQL
 //  @param db gorose.IOrm
 //  @param sql string
 //  @param params ...any
-//  @return affectedCounts int64
+//  @return affectedRows int64
 //  @return err error
-func Execute(db gorose.IOrm, sql string, params ...any) (affectedCounts int64, err error) {
-	affectedCounts, err = db.Execute(sql, params...)
+func Execute(db gorose.IOrm, sql string, params ...any) (affectedRows int64, err error) {
+	affectedRows, err = db.Execute(sql, params...)
 	if err != nil {
 		zap.L().Error(err.Error())
 		return 0, err
 	}
 
-	return affectedCounts, nil
+	return affectedRows, nil
 }
 
 // Begin 手动开始事务

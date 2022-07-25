@@ -9,7 +9,7 @@ import (
 //  @param s string
 //  @return string
 func AddSlashes(s string) string {
-	r := strings.NewReplacer(`\`, `\\`, `'`, `\'`, `"`, `\"`)
+	r := strings.NewReplacer(`\`, `\\`, `'`, `\'`, `"`, `\"`, `%`, `\%`)
 	return r.Replace(s)
 }
 

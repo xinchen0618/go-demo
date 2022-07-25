@@ -77,7 +77,7 @@ func (account) GetUsers(c *gin.Context) {
 	userName := queries["user_name"].(string)
 	if userName != "" {
 		where += " AND user_name LIKE ?"
-		bindParams = append(bindParams, fmt.Sprintf("%%%s%%", userName))
+		bindParams = append(bindParams, fmt.Sprintf("%%%s%%", gox.AddSlashes(userName)))
 	}
 
 	pageItems, err := ginx.GetPageItems(c, ginx.PageQuery{
@@ -185,5 +185,5 @@ func (account) PutUsersById(c *gin.Context) {
 	}
 	_ = dbcache.Delete(di.CacheRedis(), "t_users", userId)
 
-	ginx.Success(c, 204, nil)
+	ginx.Success(c, 200, nil)
 }
