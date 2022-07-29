@@ -30,7 +30,7 @@ func FetchAll(db gorose.IOrm, sql string, params ...any) ([]map[string]any, erro
 		return nil, err
 	}
 
-	result := []map[string]any{}
+	result := make([]map[string]any, 0)
 	for _, v := range rows {
 		result = append(result, v)
 	}
@@ -149,7 +149,7 @@ func FetchColumn(db gorose.IOrm, sql string, params ...any) ([]any, error) {
 		return nil, err
 	}
 
-	values := []any{}
+	values := make([]any, 0)
 	for _, row := range rows {
 		for _, value := range row {
 			values = append(values, value)
@@ -186,7 +186,7 @@ func TakeColumn(p any, db gorose.IOrm, sql string, params ...any) error {
 //  @return string
 func Slice2in(s any) string {
 	stringSlice := cast.ToStringSlice(s)
-	cleaned := []string{}
+	cleaned := make([]string, 0)
 	for _, v := range stringSlice {
 		cleaned = append(cleaned, gox.AddSlashes(v))
 	}
@@ -234,8 +234,8 @@ func InsertBatch(db gorose.IOrm, table string, data []map[string]any) (affectedR
 //  @return affectedRows int64
 //  @return err error
 func Update(db gorose.IOrm, table string, data map[string]any, where string, params ...any) (affectedRows int64, err error) {
-	dataPlaceholders := []string{}
-	dataValues := []any{}
+	dataPlaceholders := make([]string, 0)
+	dataValues := make([]any, 0)
 	for k, v := range data {
 		dataPlaceholder := fmt.Sprintf("%s=?", k)
 		dataPlaceholders = append(dataPlaceholders, dataPlaceholder)

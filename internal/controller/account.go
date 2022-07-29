@@ -72,7 +72,7 @@ func (account) GetUsers(c *gin.Context) {
 	}
 
 	where := "1"
-	bindParams := []any{}
+	bindParams := make([]any, 0)
 
 	userName := queries["user_name"].(string)
 	if userName != "" {

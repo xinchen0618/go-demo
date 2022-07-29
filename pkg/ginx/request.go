@@ -42,7 +42,7 @@ type PageItems struct {
 
 // GetJsonBody 获取Json参数
 // 	@param c *gin.Context
-// 	@param patterns []string ["paramKey:paramName:paramType:paramPattern"] paramPattern +必填不可为空, *选填可为空, ?选填不可为空
+// 	@param patterns []string ["paramKey:paramName:paramType:paramPattern"] paramType: 详情见FilterParam()方法paramType参数; paramPattern: +必填不可为空, *选填可为空, ?选填不可为空.
 //	@return map[string]any
 //	@return error
 func GetJsonBody(c *gin.Context, patterns []string) (map[string]any, error) {
@@ -87,7 +87,7 @@ func GetJsonBody(c *gin.Context, patterns []string) (map[string]any, error) {
 
 // GetQueries 获取Query参数
 // 	@param c *gin.Context
-// 	@param patterns []string ["paramKey:paramName:paramType:defaultValue"] defaultValue为required时参数必填
+// 	@param patterns []string ["paramKey:paramName:paramType:defaultValue"] paramType: 详情见FilterParam()方法paramType参数; defaultValue为required时参数必填.
 //	@return map[string]any
 //	@return error
 func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
@@ -298,7 +298,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		if err != nil {
 			return nil, err
 		}
-		intSlice := []int64{}
+		intSlice := make([]int64, 0)
 		for _, item := range valueArr.([]any) {
 			itemAny, err := FilterParam(c, paramName, item, "int", false)
 			if err != nil {
@@ -315,7 +315,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		if err != nil {
 			return nil, err
 		}
-		stringSlice := []string{}
+		stringSlice := make([]string, 0)
 		for _, item := range arrayValue.([]any) {
 			itemAny, err := FilterParam(c, paramName, item, "string", false)
 			if err != nil {
@@ -343,7 +343,7 @@ func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
 	page := queries["page"].(int64)
 	perPage := queries["per_page"].(int64)
 
-	bindParams := []any{}
+	bindParams := make([]any, 0)
 	if pageQuery.BindParams != nil {
 		bindParams = pageQuery.BindParams
 	}
