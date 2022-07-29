@@ -42,7 +42,9 @@ type PageItems struct {
 
 // GetJsonBody 获取Json参数
 // 	@param c *gin.Context
-// 	@param patterns []string ["paramKey:paramName:paramType:paramPattern"] paramType: 详情见FilterParam()方法paramType参数; paramPattern: +必填不可为空, *选填可为空, ?选填不可为空.
+// 	@param patterns []string ["paramKey:paramName:paramType:paramPattern"]
+//	  paramType: 类型. 详情见FilterParam()方法paramType参数.
+//	  paramPattern: 传值模式. +表示字段必传,值不可为空; *表示字段选传,值可为空; ?表示字段选传,值不可为空.
 //	@return map[string]any
 //	@return error
 func GetJsonBody(c *gin.Context, patterns []string) (map[string]any, error) {
@@ -87,7 +89,9 @@ func GetJsonBody(c *gin.Context, patterns []string) (map[string]any, error) {
 
 // GetQueries 获取Query参数
 // 	@param c *gin.Context
-// 	@param patterns []string ["paramKey:paramName:paramType:defaultValue"] paramType: 详情见FilterParam()方法paramType参数; defaultValue为required时参数必填.
+// 	@param patterns []string ["paramKey:paramName:paramType:defaultValue"]
+//	  paramType: 类型. 详情见FilterParam()方法paramType参数.
+//	  defaultValue: 默认值. required表示参数必填, ""表示空字符串; 字符串不需要引号.
 //	@return map[string]any
 //	@return error
 func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
