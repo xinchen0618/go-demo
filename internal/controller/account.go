@@ -179,11 +179,10 @@ func (account) PutUsersById(c *gin.Context) {
 		}
 	}
 
-	if _, err := dbx.Update(di.DemoDb(), "t_users", jsonBody, "user_id = ?", userId); err != nil {
+	if _, err := dbcache.Update(di.CacheRedis(), di.DemoDb(), "t_users", "user_id", jsonBody, "user_id = ?", userId); err != nil {
 		ginx.InternalError(c, nil)
 		return
 	}
-	_ = dbcache.Delete(di.CacheRedis(), "t_users", userId)
 
 	ginx.Success(c, 200, nil)
 }

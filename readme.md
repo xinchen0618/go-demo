@@ -332,11 +332,15 @@ go build
 
 - DB缓存
 
-  以资源对象为单位, 使用旁路缓存策略
+  以资源对象为单位, 使用旁路缓存策略.
+ 
+  使用`dbcache.Get()`或`dbcache.Take()`方法获取DB记录, 在更新和删除DB记录时, 必须使用`dbcache.Update()`和`dbcache.Delete()`方法自动维护缓存, 或`dbcache.Expired()`手动清除缓存.
 
-  - `dbcache.Get()` 获取DB缓存返回`map`(缓存不存在时会建立)
-  - `dbcache.Take()` 获取DB缓存至`struct`(缓存不存在时会建立)
-  - `dbcache.Delete()` 删除DB缓存
+  - `dbcache.Get()` 获取DB记录返回`map`并维护缓存
+  - `dbcache.Take()` 获取DB记录至`struct`并维护缓存
+  - `dbcache.Update()` 更新DB记录并维护缓存
+  - `dbcache.Delete()` 删除DB记录并维护缓存
+  - `dbcache.Expired()` 过期缓存
 
 - 业务缓存
 

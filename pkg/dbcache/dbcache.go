@@ -50,8 +50,8 @@ func set(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, i
 	return true, nil
 }
 
-// Get 获取DB缓存返回map
-//  缓存不存在时会建立
+// Get 获取DB记录返回map并维护缓存
+//  使用dbcache.Get()或dbcache.Take()方法获取DB记录, 在更新和删除DB记录时, 必须使用dbcache.Update()和dbcache.Delete()方法自动维护缓存, 或dbcache.Expired()手动清除缓存
 //  @param cache *redis.Client
 //  @param db gorose.IOrm
 //  @param table string
@@ -98,7 +98,8 @@ func Get(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, i
 	return v.(map[string]any), nil
 }
 
-// Take 获取DB缓存至struct
+// Take 获取DB记录至struct并维护缓存
+//  使用dbcache.Get()或dbcache.Take()方法获取DB记录, 在更新和删除DB记录时, 必须使用dbcache.Update()和dbcache.Delete()方法自动维护缓存, 或dbcache.Expired()手动清除缓存
 //  @param p any 接收结果的指针
 //  @param cache *redis.Client
 //  @param db gorose.IOrm
@@ -121,12 +122,77 @@ func Take(p any, cache *redis.Client, db gorose.IOrm, table string, primaryKey s
 	return nil
 }
 
-// Delete 删除DB缓存
+// Update 更新DB记录并维护缓存
+//  @param cache *redis.Client
+//  @param db gorose.IOrm
+//  @param table string
+//  @param primaryKey string
+//  @param data map[string]any
+//  @param where string
+//  @param params ...any
+//  @return affectedRows int64
+//  @return err error
+func Update(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, data map[string]any, where string, params ...any) (affectedRows int64, err error) {
+	// 清除缓存
+	sql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", primaryKey, table, where)
+	ids, err := dbx.FetchColumn(db, sql, params...)
+	if err != nil {
+		return 0, err
+	}
+	if 0 == len(ids) {
+		return 0, nil
+	}
+	if err := Expired(cache, table, ids...); err != nil {
+		return 0, err
+	}
+
+	// 更新数据
+	affectedRows, err = dbx.Update(db, table, data, where, params...)
+	if err != nil {
+		return 0, err
+	}
+
+	return affectedRows, nil
+}
+
+// Delete 删除DB记录并维护缓存
+//  @param cache *redis.Client
+//  @param db gorose.IOrm
+//  @param table string
+//  @param primaryKey string
+//  @param where string
+//  @param params ...any
+//  @return affectedRows int64
+//  @return err error
+func Delete(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, where string, params ...any) (affectedRows int64, err error) {
+	// 清除缓存
+	sql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", primaryKey, table, where)
+	ids, err := dbx.FetchColumn(db, sql, params...)
+	if err != nil {
+		return 0, err
+	}
+	if 0 == len(ids) {
+		return 0, nil
+	}
+	if err := Expired(cache, table, ids...); err != nil {
+		return 0, err
+	}
+
+	// 删除数据
+	affectedRows, err = dbx.Delete(db, table, where, params...)
+	if err != nil {
+		return 0, err
+	}
+
+	return affectedRows, nil
+}
+
+// Expired 过期缓存
 //  @param cache *redis.Client
 //  @param table string
 //  @param ids ...any
 //  @return error
-func Delete(cache *redis.Client, table string, ids ...any) error {
+func Expired(cache *redis.Client, table string, ids ...any) error {
 	if 0 == len(ids) {
 		return nil
 	}
