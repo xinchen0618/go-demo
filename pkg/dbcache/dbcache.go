@@ -64,13 +64,9 @@ func Get(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, i
 	key := fmt.Sprintf(dbcacheKey, table, id)
 	v, err, _ := sg.Do(key, func() (any, error) {
 		dataCache, err := cache.Get(context.Background(), key).Result()
-		if err != nil {
-			if err != redis.Nil { // redis异常
-				zap.L().Error(err.Error())
-				return nil, err
-			}
-
-			// 缓存不存在
+		switch err {
+		case nil:
+		case redis.Nil: // 缓存不存在
 			ok, err := set(cache, db, table, primaryKey, id)
 			if err != nil {
 				return nil, err
@@ -84,7 +80,11 @@ func Get(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, i
 				zap.L().Error(err.Error())
 				return nil, err
 			}
+		default: // redis异常
+			zap.L().Error(err.Error())
+			return nil, err
 		}
+
 		var dataMap map[string]any
 		if err := msgpack.Unmarshal([]byte(dataCache), &dataMap); err != nil {
 			return nil, err

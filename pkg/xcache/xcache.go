@@ -26,13 +26,9 @@ func GetOrSet(cache *redis.Client, key string, ttl time.Duration, f func() (any,
 	result, err, _ := sg.Do(key, func() (any, error) {
 		var resultCache string
 		resultCache, err := cache.Get(context.Background(), key).Result()
-		if err != nil {
-			if err != redis.Nil {
-				zap.L().Error(err.Error())
-				return nil, err
-			}
-
-			// 缓存不存在
+		switch err {
+		case nil:
+		case redis.Nil: // 缓存不存在
 			result, err := f()
 			if err != nil {
 				return nil, err
@@ -47,6 +43,9 @@ func GetOrSet(cache *redis.Client, key string, ttl time.Duration, f func() (any,
 				return nil, err
 			}
 			resultCache = string(resultBytes)
+		default: // redis异常
+			zap.L().Error(err.Error())
+			return nil, err
 		}
 
 		var resultAny any
@@ -74,13 +73,9 @@ func GinCache(c *gin.Context, cache *redis.Client, key string, ttl time.Duration
 	result, err, _ := sg.Do(key, func() (any, error) {
 		var resultCache string
 		resultCache, err := cache.Get(context.Background(), key).Result()
-		if err != nil {
-			if err != redis.Nil {
-				ginx.InternalError(c, err)
-				return nil, err
-			}
-
-			// 缓存不存在
+		switch err {
+		case nil:
+		case redis.Nil: // 缓存不存在
 			result, err := f()
 			if err != nil {
 				return nil, err
@@ -95,6 +90,9 @@ func GinCache(c *gin.Context, cache *redis.Client, key string, ttl time.Duration
 				return nil, err
 			}
 			resultCache = string(resultBytes)
+		default: // redis异常
+			ginx.InternalError(c, err)
+			return nil, err
 		}
 
 		var resultAny any

@@ -23,7 +23,7 @@ var Auth auth
 // JwtLogin JWT登录
 //	先生成JWT, 再记录redis白名单
 //  @receiver auth
-//  @param userType string JWT登录用户类型
+//  @param userType string JWT登录用户类型, 集中在consts/auth.go中定义
 //  @param id int64 用户id
 //  @param userName string
 //  @return string jwt token
@@ -62,7 +62,7 @@ func (auth) JwtLogin(userType string, id int64, userName string) (string, error)
 
 // JwtCheck JWT校验
 //  @receiver auth
-//  @param userType string
+//  @param userType string JWT登录用户类型, 集中在consts/auth.go中定义
 //  @param token string
 //  @return int64 用户id, 0表示校验不通过
 //  @return error
@@ -95,7 +95,7 @@ func (auth) JwtCheck(userType string, token string) (int64, error) {
 // JwtLogout JWT登出
 //	从redis白名单删除
 //  @receiver auth
-//  @param userType string
+//  @param userType string JWT登录用户类型, 集中在consts/auth.go中定义
 //  @param token string
 //  @param id int64
 //  @return error
