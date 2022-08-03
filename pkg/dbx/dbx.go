@@ -39,7 +39,7 @@ func FetchAll(db gorose.IOrm, sql string, params ...any) ([]map[string]any, erro
 }
 
 // TakeAll 获取多行记录至struct
-//  @param p any 接收结果的指针
+//  @param p any 接收结果的指针, json tag是必须的
 //  @param db gorose.IOrm
 //  @param sql string
 //  @param params ...any
@@ -82,7 +82,7 @@ func FetchOne(db gorose.IOrm, sql string, params ...any) (map[string]any, error)
 }
 
 // TakeOne 获取一行记录至struct
-//  @param p any 接收结果的指针
+//  @param p any 接收结果的指针, json tag是必须的
 //  @param db gorose.IOrm
 //  @param sql string
 //  @param params ...any
