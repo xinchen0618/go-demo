@@ -15,9 +15,6 @@ func init() {
 
 		// JWT密钥, JWT配套有白名单功能不必担心秘钥泄露的问题
 		"jwt_secret": "Xx4KJQ2AguFL5gWurcRJvVfDC5a2itLi53vFJN9wthYkrxtQbdeRDkWTHzAjnn5n",
-
-		// SQL日志
-		"sql_log": "/var/log/golang_sql.log",
 	} {
 		configure["testing"][k] = v
 	}

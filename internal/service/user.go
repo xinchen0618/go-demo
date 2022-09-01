@@ -15,9 +15,10 @@ type user struct{}
 var User user
 
 // CreateUser 创建用户
-//  @receiver user
-//  @return int64
-//  @return error
+//
+//	@receiver user
+//	@return int64
+//	@return error
 func (user) CreateUser(userData map[string]any) (int64, error) {
 	// 假设需要写一张用户表和一张关联表, 用户不存在则创建, 存在则更新关联表统计字段
 	var userId int64
@@ -52,11 +53,12 @@ func (user) CreateUser(userData map[string]any) (int64, error) {
 }
 
 // DeleteUser 删除用户
-//  @receiver user
-//  @param userId int64
-//  @return error
+//
+//	@receiver user
+//	@param userId int64
+//	@return error
 func (user) DeleteUser(userId int64) error {
-	err := di.DemoDb().Transaction(func(db gorose.IOrm) error {
+	return di.DemoDb().Transaction(func(db gorose.IOrm) error {
 		if _, err := dbcache.Delete(di.CacheRedis(), db, "t_users", "user_id", "user_id = ?", userId); err != nil {
 			return err
 		}
@@ -67,6 +69,4 @@ func (user) DeleteUser(userId int64) error {
 
 		return nil
 	})
-
-	return err
 }
