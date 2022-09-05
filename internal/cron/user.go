@@ -2,10 +2,8 @@ package cron
 
 import (
 	"go-demo/config/di"
-	"go-demo/internal/service"
+	"go-demo/pkg/dbcache"
 	"go-demo/pkg/dbx"
-
-	"github.com/spf13/cast"
 )
 
 // 用户相关计划任务 DEMO 这里定义一个空结构体用于为大量的cron方法做分类
@@ -15,6 +13,7 @@ type user struct{}
 var User user
 
 // DeleteUsers
+//
 //	@receiver user
 //	@param counts int
 func (user) DeleteUsers(counts int) {
@@ -25,7 +24,7 @@ func (user) DeleteUsers(counts int) {
 	for _, userId := range userIds {
 		userId := userId
 		di.WorkerPool().Submit(func() {
-			_ = service.User.DeleteUser(cast.ToInt64(userId))
+			_, _ = dbcache.Delete(di.CacheRedis(), di.DemoDb(), "t_users", "user_id", "user_id = ?", userId)
 		})
 	}
 }

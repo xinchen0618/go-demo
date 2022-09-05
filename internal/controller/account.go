@@ -82,7 +82,7 @@ func (account) GetUsers(c *gin.Context) {
 
 	pageItems, err := ginx.GetPageItems(c, ginx.PageQuery{
 		Db:         di.DemoDb(),
-		Select:     "user_id,user_name,money,created_at,updated_at",
+		Select:     "user_id,user_name,created_at,updated_at",
 		From:       "t_users",
 		Where:      where,
 		BindParams: bindParams,
@@ -147,7 +147,7 @@ func (account) PutUsersById(c *gin.Context) {
 		return
 	}
 
-	jsonBody, err := ginx.GetJsonBody(c, []string{"user_name:用户名:string:?", "money:金额:decimal:*"})
+	jsonBody, err := ginx.GetJsonBody(c, []string{"user_name:用户名:string:?", "password:密码:string:?"})
 	if err != nil {
 		return
 	}
@@ -177,6 +177,9 @@ func (account) PutUsersById(c *gin.Context) {
 			ginx.Error(c, 400, "UserConflict", "用户名已存在")
 			return
 		}
+	}
+	if password, ok := jsonBody["password"].(string); ok {
+		jsonBody["password"] = gox.PasswordHash(password)
 	}
 
 	if _, err := dbcache.Update(di.CacheRedis(), di.DemoDb(), "t_users", "user_id", jsonBody, "user_id = ?", userId); err != nil {
