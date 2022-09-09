@@ -16,12 +16,12 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/hibiken/asynq v0.23.0
 	github.com/juju/ratelimit v1.0.2
-	github.com/samber/lo v1.27.1
+	github.com/samber/lo v1.28.0
 	github.com/spf13/cast v1.5.0
 	github.com/urfave/cli/v2 v2.11.2
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.uber.org/zap v1.23.0
-	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde
+	golang.org/x/sync v0.0.0-20220907140024-f12130a52804
 )
 
 require (
@@ -52,9 +52,9 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
-	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91 // indirect
-	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
-	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
+	golang.org/x/exp v0.0.0-20220907003533-145caa8ea1d0 // indirect
+	golang.org/x/net v0.0.0-20220907135653-1e95f45603a7 // indirect
+	golang.org/x/sys v0.0.0-20220908164124-27713097b956 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect

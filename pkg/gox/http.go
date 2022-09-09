@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -15,6 +14,7 @@ import (
 )
 
 // Restful 发起Restful请求
+//
 //	@param method string
 //	@param rawUrl string
 //	@param params map[string]any GET/DELETE为url参数, url参数会进行url转义, 其他方法为entity参数
@@ -79,7 +79,7 @@ func Restful(method, rawUrl string, params map[string]any, headers map[string]st
 		}
 	}(resp.Body)
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		zap.L().Error(err.Error())
 		return map[string]any{}, 0, err
