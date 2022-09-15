@@ -1,4 +1,5 @@
 // Package ginx gin增强方法
+//
 //	此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
 package ginx
 
@@ -41,8 +42,9 @@ type PageItems struct {
 }
 
 // GetJsonBody 获取Json参数
-// 	@param c *gin.Context
-// 	@param patterns []string ["paramKey:paramName:paramType:paramPattern"]
+//
+//	@param c *gin.Context
+//	@param patterns []string ["paramKey:paramName:paramType:paramPattern"]
 //	  paramType: 类型. 详情见FilterParam()方法paramType参数.
 //	  paramPattern: 传值模式. +表示字段必传,值不可为空; *表示字段选传,值可为空; ?表示字段选传,值不可为空.
 //	@return map[string]any
@@ -88,8 +90,9 @@ func GetJsonBody(c *gin.Context, patterns []string) (map[string]any, error) {
 }
 
 // GetQueries 获取Query参数
-// 	@param c *gin.Context
-// 	@param patterns []string ["paramKey:paramName:paramType:defaultValue"]
+//
+//	@param c *gin.Context
+//	@param patterns []string ["paramKey:paramName:paramType:defaultValue"]
 //	  paramType: 类型. 详情见FilterParam()方法paramType参数.
 //	  defaultValue: 默认值. required表示参数必填, ""表示空字符串; 字符串不需要引号.
 //	@return map[string]any
@@ -124,18 +127,19 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
 }
 
 // FilterParam 校验参数类型
-// 	@param c *gin.Context
-// 	@param paramName string
-// 	@param paramValue any
-// 	@param paramType string int整型64位, +int正整型64位, !-int非负整型64位, string字符串, float.%d浮点数, decimal.%d精度小数, []枚举(支持数字float64与字符串string混合枚举), array数组, []int整型64位数组, []string字符串数组
-// 	@param allowEmpty bool
+//
+//	@param c *gin.Context
+//	@param paramName string
+//	@param paramValue any
+//	@param paramType string integer整型64位, +integer正整型64位, !-integer非负整型64位, string字符串, float.%d浮点数, decimal.%d精度小数, []枚举(支持数字float64与字符串string混合枚举), array数组, []integer整型64位数组, []string字符串数组
+//	@param allowEmpty bool
 //	@return any
 //	@return error
 func FilterParam(c *gin.Context, paramName string, paramValue any, paramType string, allowEmpty bool) (any, error) {
 	valueType := reflect.TypeOf(paramValue).String() // 用户输入值类型
 
 	// 整型64位
-	if "int" == paramType {
+	if "integer" == paramType {
 		valueStr, err := FilterParam(c, paramName, paramValue, "string", allowEmpty) // 先统一转字符串再转整型, 这样小数就不允许输入了
 		if err != nil {
 			return nil, err
@@ -152,8 +156,8 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 	}
 
 	// 正整数64位
-	if "+int" == paramType {
-		valueInt, err := FilterParam(c, paramName, paramValue, "int", allowEmpty)
+	if "+integer" == paramType {
+		valueInt, err := FilterParam(c, paramName, paramValue, "integer", allowEmpty)
 		if err != nil {
 			return nil, err
 		}
@@ -165,8 +169,8 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 	}
 
 	// 非负整数64位
-	if "!-int" == paramType {
-		valueInt, err := FilterParam(c, paramName, paramValue, "int", allowEmpty)
+	if "!-integer" == paramType {
+		valueInt, err := FilterParam(c, paramName, paramValue, "integer", allowEmpty)
 		if err != nil {
 			return nil, err
 		}
@@ -297,14 +301,14 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 	}
 
 	// int64数组
-	if "[]int" == paramType {
+	if "[]integer" == paramType {
 		valueArr, err := FilterParam(c, paramName, paramValue, "array", allowEmpty)
 		if err != nil {
 			return nil, err
 		}
 		intSlice := make([]int64, 0)
 		for _, item := range valueArr.([]any) {
-			itemAny, err := FilterParam(c, paramName, item, "int", false)
+			itemAny, err := FilterParam(c, paramName, item, "integer", false)
 			if err != nil {
 				return nil, err
 			}
@@ -335,12 +339,13 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 }
 
 // GetPageItems 获取分页数据
-//  @param c *gin.Context
-//  @param pageQuery PageQuery
-//  @return PageItems
-//  @return error
+//
+//	@param c *gin.Context
+//	@param pageQuery PageQuery
+//	@return PageItems
+//	@return error
 func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
-	queries, err := GetQueries(c, []string{"page:页码:+int:1", "per_page:页大小:+int:12"})
+	queries, err := GetQueries(c, []string{"page:页码:+integer:1", "per_page:页大小:+integer:12"})
 	if err != nil {
 		return PageItems{}, err
 	}

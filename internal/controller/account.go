@@ -96,7 +96,7 @@ func (account) GetUsers(c *gin.Context) {
 }
 
 func (account) GetUsersById(c *gin.Context) {
-	userId, err := ginx.FilterParam(c, "用户id", c.Param("user_id"), "+int", false)
+	userId, err := ginx.FilterParam(c, "用户id", c.Param("user_id"), "+integer", false)
 	if err != nil {
 		return
 	}
@@ -115,7 +115,7 @@ func (account) GetUsersById(c *gin.Context) {
 }
 
 func (account) PostUsers(c *gin.Context) {
-	jsonBody, err := ginx.GetJsonBody(c, []string{"counts:数量:+int:*"})
+	jsonBody, err := ginx.GetJsonBody(c, []string{"counts:数量:+integer:*"})
 	if err != nil {
 		return
 	}
@@ -142,7 +142,7 @@ func (account) PostUsers(c *gin.Context) {
 }
 
 func (account) PutUsersById(c *gin.Context) {
-	userId, err := ginx.FilterParam(c, "用户id", c.Param("user_id"), "+int", false)
+	userId, err := ginx.FilterParam(c, "用户id", c.Param("user_id"), "+integer", false)
 	if err != nil {
 		return
 	}
