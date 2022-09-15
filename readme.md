@@ -46,7 +46,7 @@
     - queue.go          消息队列服务
     - redis.go          redis服务
     - worker_pool.go    Goroutine池服务
-  - config.go           配置实现
+  - cfg.go              配置实现
   - common.go           公共配置
   - prod.go             生产环境配置
   - testing.go          测试环境配置

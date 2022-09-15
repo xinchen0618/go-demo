@@ -14,6 +14,7 @@ import (
 	"go.uber.org/zap"
 )
 
+/* sql log middleware start */
 // SQL log
 type sqlLogger struct{}
 
@@ -50,6 +51,8 @@ func (sqlLogger) EnableErrorLog() bool {
 func (sqlLogger) EnableSlowLog() float64 {
 	return 0
 }
+
+/* sql log middleware end */
 
 // MySQL DEMO, 从这里开始定义项目中的DB
 var (

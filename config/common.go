@@ -7,6 +7,8 @@ func init() {
 	}
 
 	for k, v := range map[string]any{
+		/* 公共配置start */
+
 		// 错误日志路径
 		"error_log": "/var/log/golang_error.log",
 
@@ -37,6 +39,8 @@ func init() {
 		"redis_index_jwt":     1, // JWT
 		"redis_index_storage": 2, // 存储
 		"redis_index_queue":   3, // 消息队列
+
+		/* 公共配置end */
 	} {
 		configure["common"][k] = v
 	}

@@ -11,6 +11,7 @@ import (
 var configure = map[string]map[string]any{}
 
 // GetRuntimeEnv 获取运行时环境
+//
 //	@return string
 func GetRuntimeEnv() string {
 	runtimeEnv := os.Getenv("RUNTIME_ENV")
