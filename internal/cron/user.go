@@ -24,7 +24,7 @@ func (user) DeleteUsers(counts int) {
 	for _, userId := range userIds {
 		userId := userId
 		di.WorkerPool().Submit(func() {
-			_, _ = dbcache.Delete(di.CacheRedis(), di.DemoDb(), "t_users", "user_id", "user_id = ?", userId)
+			_, _ = dbcache.Delete(di.CacheRedis(), di.DemoDb(), "t_users", "user_id = ?", userId)
 		})
 	}
 }

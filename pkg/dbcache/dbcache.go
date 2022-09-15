@@ -2,11 +2,15 @@ package dbcache
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"regexp"
+	"strings"
 	"time"
 
 	"go-demo/pkg/dbx"
 	"go-demo/pkg/gox"
+	"go-demo/pkg/xcache"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gohouse/gorose/v2"
@@ -16,19 +20,27 @@ import (
 	"golang.org/x/sync/singleflight"
 )
 
-const dbcacheKey = "dbcache:%s:%d" // DB缓存 dbcache:<table_name>:<primary_id>
+const (
+	dbcacheKey     = "dbcache:%s:%d"                // DB缓存key dbcache:<table_name>:<primary_id>
+	dbcachePrimary = "dbcache:table:%s:primary_key" // 表主键缓存 dbcache:table:<table_name>:primary_key
+)
 
 var sg singleflight.Group
 
 // set 设置DB缓存
-//  @param cache *redis.Client
-//  @param db gorose.IOrm
-//  @param table string
-//  @param primaryKey string
-//  @param id any
-//  @return bool
-//  @return error
-func set(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, id any) (bool, error) {
+//
+//	@param cache *redis.Client
+//	@param db gorose.IOrm
+//	@param table string
+//	@param id any
+//	@return bool
+//	@return error
+func set(cache *redis.Client, db gorose.IOrm, table string, id any) (bool, error) {
+	primaryKey, err := tablePrimaryKey(cache, db, table)
+	if err != nil {
+		return false, err
+	}
+
 	sql := fmt.Sprintf("SELECT * FROM %s WHERE %s = %d LIMIT 1", table, primaryKey, id)
 	data, err := dbx.FetchOne(db, sql)
 	if err != nil {
@@ -51,15 +63,15 @@ func set(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, i
 }
 
 // Get 获取DB记录返回map并维护缓存
-//  使用dbcache.Get()或dbcache.Take()方法获取DB记录, 在更新和删除DB记录时, 必须使用dbcache.Update()和dbcache.Delete()方法自动维护缓存, 或dbcache.Expired()手动清除缓存
-//  @param cache *redis.Client
-//  @param db gorose.IOrm
-//  @param table string
-//  @param primaryKey string
-//  @param id any
-//  @return map[string]any
-//  @return error
-func Get(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, id any) (map[string]any, error) {
+//
+//	使用dbcache.Get()或dbcache.Take()方法获取DB记录, 在更新和删除DB记录时, 必须使用dbcache.Update()和dbcache.Delete()方法自动维护缓存, 或dbcache.Expired()手动清除缓存
+//	@param cache *redis.Client
+//	@param db gorose.IOrm
+//	@param table string
+//	@param id any
+//	@return map[string]any
+//	@return error
+func Get(cache *redis.Client, db gorose.IOrm, table string, id any) (map[string]any, error) {
 	id = cast.ToInt64(id)
 	key := fmt.Sprintf(dbcacheKey, table, id)
 	v, err, _ := sg.Do(key, func() (any, error) {
@@ -67,7 +79,7 @@ func Get(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, i
 		switch err {
 		case nil:
 		case redis.Nil: // 缓存不存在
-			ok, err := set(cache, db, table, primaryKey, id)
+			ok, err := set(cache, db, table, id)
 			if err != nil {
 				return nil, err
 			}
@@ -99,16 +111,16 @@ func Get(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, i
 }
 
 // Take 获取DB记录至struct并维护缓存
-//  使用dbcache.Get()或dbcache.Take()方法获取DB记录, 在更新和删除DB记录时, 必须使用dbcache.Update()和dbcache.Delete()方法自动维护缓存, 或dbcache.Expired()手动清除缓存
-//  @param p any 接收结果的指针
-//  @param cache *redis.Client
-//  @param db gorose.IOrm
-//  @param table string
-//  @param primaryKey string
-//  @param id any
-//  @return error
-func Take(p any, cache *redis.Client, db gorose.IOrm, table string, primaryKey string, id any) error {
-	data, err := Get(cache, db, table, primaryKey, id)
+//
+//	使用dbcache.Get()或dbcache.Take()方法获取DB记录, 在更新和删除DB记录时, 必须使用dbcache.Update()和dbcache.Delete()方法自动维护缓存, 或dbcache.Expired()手动清除缓存
+//	@param p any 接收结果的指针
+//	@param cache *redis.Client
+//	@param db gorose.IOrm
+//	@param table string
+//	@param id any
+//	@return error
+func Take(p any, cache *redis.Client, db gorose.IOrm, table string, id any) error {
+	data, err := Get(cache, db, table, id)
 	if err != nil {
 		return err
 	}
@@ -123,17 +135,21 @@ func Take(p any, cache *redis.Client, db gorose.IOrm, table string, primaryKey s
 }
 
 // Update 更新DB记录并维护缓存
-//  @param cache *redis.Client
-//  @param db gorose.IOrm
-//  @param table string
-//  @param primaryKey string
-//  @param data map[string]any
-//  @param where string
-//  @param params ...any
-//  @return affectedRows int64
-//  @return err error
-func Update(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, data map[string]any, where string, params ...any) (affectedRows int64, err error) {
+//
+//	@param cache *redis.Client
+//	@param db gorose.IOrm
+//	@param table string
+//	@param data map[string]any
+//	@param where string
+//	@param params ...any
+//	@return affectedRows int64
+//	@return err error
+func Update(cache *redis.Client, db gorose.IOrm, table string, data map[string]any, where string, params ...any) (affectedRows int64, err error) {
 	// 清除缓存
+	primaryKey, err := tablePrimaryKey(cache, db, table)
+	if err != nil {
+		return 0, err
+	}
 	sql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", primaryKey, table, where)
 	ids, err := dbx.FetchColumn(db, sql, params...)
 	if err != nil {
@@ -156,16 +172,20 @@ func Update(cache *redis.Client, db gorose.IOrm, table string, primaryKey string
 }
 
 // Delete 删除DB记录并维护缓存
-//  @param cache *redis.Client
-//  @param db gorose.IOrm
-//  @param table string
-//  @param primaryKey string
-//  @param where string
-//  @param params ...any
-//  @return affectedRows int64
-//  @return err error
-func Delete(cache *redis.Client, db gorose.IOrm, table string, primaryKey string, where string, params ...any) (affectedRows int64, err error) {
+//
+//	@param cache *redis.Client
+//	@param db gorose.IOrm
+//	@param table string
+//	@param where string
+//	@param params ...any
+//	@return affectedRows int64
+//	@return err error
+func Delete(cache *redis.Client, db gorose.IOrm, table string, where string, params ...any) (affectedRows int64, err error) {
 	// 清除缓存
+	primaryKey, err := tablePrimaryKey(cache, db, table)
+	if err != nil {
+		return 0, err
+	}
 	sql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", primaryKey, table, where)
 	ids, err := dbx.FetchColumn(db, sql, params...)
 	if err != nil {
@@ -188,10 +208,11 @@ func Delete(cache *redis.Client, db gorose.IOrm, table string, primaryKey string
 }
 
 // Expired 过期缓存
-//  @param cache *redis.Client
-//  @param table string
-//  @param ids ...any
-//  @return error
+//
+//	@param cache *redis.Client
+//	@param table string
+//	@param ids ...any
+//	@return error
 func Expired(cache *redis.Client, table string, ids ...any) error {
 	if 0 == len(ids) {
 		return nil
@@ -207,4 +228,41 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 	}
 
 	return nil
+}
+
+// tablePrimaryKey 获取表主键
+//
+//	缓存一天
+//	@param cache *redis.Client
+//	@param db gorose.IOrm
+//	@param table string
+//	@return string
+//	@return error
+func tablePrimaryKey(cache *redis.Client, db gorose.IOrm, table string) (string, error) {
+	key := fmt.Sprintf(dbcachePrimary, table)
+	primaryKey, err := xcache.GetOrSet(cache, key, 24*time.Hour, func() (any, error) {
+		sql := "SHOW CREATE TABLE " + table
+		tableInfo, err := dbx.FetchOne(db, sql)
+		if err != nil {
+			return "", err
+		}
+		tableSchema := cast.ToString(tableInfo["Create Table"])
+
+		reg := regexp.MustCompile("PRIMARY KEY (.+)")
+		if nil == reg {
+			zap.L().Error("regexp compile error")
+			return "", errors.New("regexp compile error")
+		}
+		result := reg.FindAllStringSubmatch(tableSchema, 1)
+		r := strings.NewReplacer("(", "", "`", "", ")", "", ",", "")
+		primaryKey := r.Replace(result[0][1])
+		if "" == primaryKey {
+			zap.L().Error("fail to get " + table + " primary key")
+			return "", errors.New("fail to get " + table + " primary key")
+		}
+
+		return primaryKey, nil
+	})
+
+	return cast.ToString(primaryKey), err
 }

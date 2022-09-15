@@ -101,7 +101,7 @@ func (account) GetUsersById(c *gin.Context) {
 		return
 	}
 
-	user, err := dbcache.Get(di.CacheRedis(), di.DemoDb(), "t_users", "user_id", userId)
+	user, err := dbcache.Get(di.CacheRedis(), di.DemoDb(), "t_users", userId)
 	if err != nil {
 		ginx.InternalError(c, nil)
 		return
@@ -156,7 +156,7 @@ func (account) PutUsersById(c *gin.Context) {
 		return
 	}
 
-	user, err := dbcache.Get(di.CacheRedis(), di.DemoDb(), "t_users", "user_id", userId)
+	user, err := dbcache.Get(di.CacheRedis(), di.DemoDb(), "t_users", userId)
 	if err != nil {
 		ginx.InternalError(c, nil)
 		return
@@ -182,7 +182,7 @@ func (account) PutUsersById(c *gin.Context) {
 		jsonBody["password"] = gox.PasswordHash(password)
 	}
 
-	if _, err := dbcache.Update(di.CacheRedis(), di.DemoDb(), "t_users", "user_id", jsonBody, "user_id = ?", userId); err != nil {
+	if _, err := dbcache.Update(di.CacheRedis(), di.DemoDb(), "t_users", jsonBody, "user_id = ?", userId); err != nil {
 		ginx.InternalError(c, nil)
 		return
 	}

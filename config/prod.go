@@ -8,7 +8,6 @@ func init() {
 	if _, ok := configure["prod"]; !ok {
 		configure["prod"] = map[string]any{}
 	}
-
 	for k, v := range map[string]any{
 		/* 生产环境配置start */
 

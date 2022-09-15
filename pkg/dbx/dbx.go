@@ -1,4 +1,5 @@
 // Package dbx MySQL增删改查操作封装
+//
 //	MySQL=>Golang数据类型映射:
 //		bigint/int/smallint/tinyint => int64,
 //		float/double => float64,
@@ -18,11 +19,12 @@ import (
 )
 
 // FetchAll 获取多行记录返回map
-//  @param db gorose.IOrm
-//  @param sql string
-//  @param params ...any 不支持切片
-//  @return []map[string]any
-//  @return error
+//
+//	@param db gorose.IOrm
+//	@param sql string
+//	@param params ...any 不支持切片
+//	@return []map[string]any
+//	@return error
 func FetchAll(db gorose.IOrm, sql string, params ...any) ([]map[string]any, error) {
 	rows, err := db.Query(sql, params...)
 	if err != nil {
@@ -39,11 +41,12 @@ func FetchAll(db gorose.IOrm, sql string, params ...any) ([]map[string]any, erro
 }
 
 // TakeAll 获取多行记录至struct
-//  @param p any 接收结果的指针, json tag是必须的
-//  @param db gorose.IOrm
-//  @param sql string
-//  @param params ...any
-//  @return error
+//
+//	@param p any 接收结果的指针, json tag是必须的
+//	@param db gorose.IOrm
+//	@param sql string
+//	@param params ...any
+//	@return error
 func TakeAll(p any, db gorose.IOrm, sql string, params ...any) error {
 	items, err := FetchAll(db, sql, params...)
 	if err != nil {
@@ -57,15 +60,16 @@ func TakeAll(p any, db gorose.IOrm, sql string, params ...any) error {
 }
 
 // FetchOne 获取一行记录返回map
+//
 //	查询时会自动添加限制LIMIT 1
-//  @param db gorose.IOrm
-//  @param sql string
-//  @param params ...any
-//  @return map[string]any
-//  @return error
+//	@param db gorose.IOrm
+//	@param sql string
+//	@param params ...any
+//	@return map[string]any
+//	@return error
 func FetchOne(db gorose.IOrm, sql string, params ...any) (map[string]any, error) {
 	sql = strings.TrimSpace(sql)
-	if strings.ToUpper(gox.Substr(sql, -7, math.MaxInt)) != "LIMIT 1" {
+	if "SELECT" == strings.ToUpper(gox.Substr(sql, 0, 6)) && strings.ToUpper(gox.Substr(sql, -7, math.MaxInt)) != "LIMIT 1" {
 		sql += " LIMIT 1"
 	}
 
@@ -82,11 +86,12 @@ func FetchOne(db gorose.IOrm, sql string, params ...any) (map[string]any, error)
 }
 
 // TakeOne 获取一行记录至struct
-//  @param p any 接收结果的指针, json tag是必须的
-//  @param db gorose.IOrm
-//  @param sql string
-//  @param params ...any
-//  @return error
+//
+//	@param p any 接收结果的指针, json tag是必须的
+//	@param db gorose.IOrm
+//	@param sql string
+//	@param params ...any
+//	@return error
 func TakeOne(p any, db gorose.IOrm, sql string, params ...any) error {
 	item, err := FetchOne(db, sql, params...)
 	if err != nil {
@@ -100,11 +105,12 @@ func TakeOne(p any, db gorose.IOrm, sql string, params ...any) error {
 }
 
 // FetchValue 获取一个值
-//  @param db gorose.IOrm
-//  @param sql string
-//  @param params ...any
-//  @return any
-//  @return error
+//
+//	@param db gorose.IOrm
+//	@param sql string
+//	@param params ...any
+//	@return any
+//	@return error
 func FetchValue(db gorose.IOrm, sql string, params ...any) (any, error) {
 	row, err := FetchOne(db, sql, params...)
 	if err != nil {
@@ -120,11 +126,12 @@ func FetchValue(db gorose.IOrm, sql string, params ...any) (any, error) {
 }
 
 // TakeValue 获取一个值至指定类型
-//  @param p any 接收结果的指针
-//  @param db gorose.IOrm
-//  @param sql string
-//  @param params ...any
-//  @return error
+//
+//	@param p any 接收结果的指针
+//	@param db gorose.IOrm
+//	@param sql string
+//	@param params ...any
+//	@return error
 func TakeValue(p any, db gorose.IOrm, sql string, params ...any) error {
 	value, err := FetchValue(db, sql, params...)
 	if err != nil {
@@ -138,11 +145,12 @@ func TakeValue(p any, db gorose.IOrm, sql string, params ...any) error {
 }
 
 // FetchColumn 获取一列值
-//  @param db gorose.IOrm
-//  @param sql string
-//  @param params ...any
-//  @return []any
-//  @return error
+//
+//	@param db gorose.IOrm
+//	@param sql string
+//	@param params ...any
+//	@return []any
+//	@return error
 func FetchColumn(db gorose.IOrm, sql string, params ...any) ([]any, error) {
 	rows, err := FetchAll(db, sql, params...)
 	if err != nil {
@@ -161,11 +169,12 @@ func FetchColumn(db gorose.IOrm, sql string, params ...any) ([]any, error) {
 }
 
 // TakeColumn 获取一列值至指定类型
-//  @param p any 接收结果的指针
-//  @param db gorose.IOrm
-//  @param sql string
-//  @param params ...any
-//  @return error
+//
+//	@param p any 接收结果的指针
+//	@param db gorose.IOrm
+//	@param sql string
+//	@param params ...any
+//	@return error
 func TakeColumn(p any, db gorose.IOrm, sql string, params ...any) error {
 	values, err := FetchColumn(db, sql, params...)
 	if err != nil {
@@ -179,11 +188,12 @@ func TakeColumn(p any, db gorose.IOrm, sql string, params ...any) error {
 }
 
 // Slice2in Slice转IN条件
-// 	Golang SQL驱动不支持IN(?)
+//
+//	Golang SQL驱动不支持IN(?)
 //	使用fmt.Sprint("IN(%s)", Slice2in(s))
 //	MySQL整型字段查询添加引号无影响
-//  @param s any
-//  @return string
+//	@param s any
+//	@return string
 func Slice2in(s any) string {
 	stringSlice := cast.ToStringSlice(s)
 	cleaned := make([]string, 0)
@@ -194,11 +204,12 @@ func Slice2in(s any) string {
 }
 
 // Insert 新增记录
-//  @param db gorose.IOrm
-//  @param table string
-//  @param data map[string]any
-//  @return id int64
-//  @return err error
+//
+//	@param db gorose.IOrm
+//	@param table string
+//	@param data map[string]any
+//	@return id int64
+//	@return err error
 func Insert(db gorose.IOrm, table string, data map[string]any) (id int64, err error) {
 	id, err = db.Table(table).InsertGetId(data)
 	if err != nil {
@@ -210,11 +221,12 @@ func Insert(db gorose.IOrm, table string, data map[string]any) (id int64, err er
 }
 
 // InsertBatch 批量新增记录
-//  @param db gorose.IOrm
-//  @param table string
-//  @param data []map[string]any
-//  @return affectedRows int64
-//  @return err error
+//
+//	@param db gorose.IOrm
+//	@param table string
+//	@param data []map[string]any
+//	@return affectedRows int64
+//	@return err error
 func InsertBatch(db gorose.IOrm, table string, data []map[string]any) (affectedRows int64, err error) {
 	affectedRows, err = db.Table(table).Insert(data)
 	if err != nil {
@@ -226,13 +238,14 @@ func InsertBatch(db gorose.IOrm, table string, data []map[string]any) (affectedR
 }
 
 // Update 更新记录
-//  @param db gorose.IOrm
-//  @param table string
-//  @param data map[string]any
-//  @param where string
-//  @param params ...any
-//  @return affectedRows int64
-//  @return err error
+//
+//	@param db gorose.IOrm
+//	@param table string
+//	@param data map[string]any
+//	@param where string
+//	@param params ...any
+//	@return affectedRows int64
+//	@return err error
 func Update(db gorose.IOrm, table string, data map[string]any, where string, params ...any) (affectedRows int64, err error) {
 	dataPlaceholders := make([]string, 0)
 	dataValues := make([]any, 0)
@@ -256,12 +269,13 @@ func Update(db gorose.IOrm, table string, data map[string]any, where string, par
 }
 
 // Delete 删除记录
-//  @param db gorose.IOrm
-//  @param table string
-//  @param where string
-//  @param params ...any
-//  @return affectedRows int64
-//  @return err error
+//
+//	@param db gorose.IOrm
+//	@param table string
+//	@param where string
+//	@param params ...any
+//	@return affectedRows int64
+//	@return err error
 func Delete(db gorose.IOrm, table string, where string, params ...any) (affectedRows int64, err error) {
 	sql := fmt.Sprintf("DELETE FROM %s WHERE %s", table, where)
 	affectedRows, err = Execute(db, sql, params...)
@@ -273,11 +287,12 @@ func Delete(db gorose.IOrm, table string, where string, params ...any) (affected
 }
 
 // Execute 执行原生SQL
-//  @param db gorose.IOrm
-//  @param sql string
-//  @param params ...any
-//  @return affectedRows int64
-//  @return err error
+//
+//	@param db gorose.IOrm
+//	@param sql string
+//	@param params ...any
+//	@return affectedRows int64
+//	@return err error
 func Execute(db gorose.IOrm, sql string, params ...any) (affectedRows int64, err error) {
 	affectedRows, err = db.Execute(sql, params...)
 	if err != nil {
@@ -289,8 +304,9 @@ func Execute(db gorose.IOrm, sql string, params ...any) (affectedRows int64, err
 }
 
 // Begin 手动开始事务
-//  @param db gorose.IOrm
-//  @return error
+//
+//	@param db gorose.IOrm
+//	@return error
 func Begin(db gorose.IOrm) error {
 	if err := db.Begin(); err != nil {
 		zap.L().Error(err.Error())
@@ -300,9 +316,10 @@ func Begin(db gorose.IOrm) error {
 }
 
 // Commit 手动提交事务
+//
 //	提交失败会自动回滚
-//  @param db gorose.IOrm
-//  @return error
+//	@param db gorose.IOrm
+//	@return error
 func Commit(db gorose.IOrm) error {
 	if err := db.Commit(); err != nil {
 		zap.L().Error(err.Error())
@@ -313,7 +330,8 @@ func Commit(db gorose.IOrm) error {
 }
 
 // Rollback 手动回滚事务
-//  @param db gorose.IOrm
+//
+//	@param db gorose.IOrm
 func Rollback(db gorose.IOrm) {
 	if err := db.Rollback(); err != nil {
 		zap.L().Error(err.Error())

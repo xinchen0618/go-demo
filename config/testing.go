@@ -8,7 +8,6 @@ func init() {
 	if _, ok := configure["testing"]; !ok {
 		configure["testing"] = map[string]any{}
 	}
-
 	for k, v := range map[string]any{
 		/* 测试环境配置start */
 

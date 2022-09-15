@@ -5,7 +5,6 @@ func init() {
 	if _, ok := configure["common"]; !ok {
 		configure["common"] = map[string]any{}
 	}
-
 	for k, v := range map[string]any{
 		/* 公共配置start */
 
