@@ -21,8 +21,8 @@ import (
 )
 
 const (
-	dbcacheKey     = "dbcache:%s:%d"                // DB缓存key dbcache:<table_name>:<primary_id>
-	dbcachePrimary = "dbcache:table:%s:primary_key" // 表主键缓存 dbcache:table:<table_name>:primary_key
+	dbcacheKey             = "dbcache:%s:%d"                // DB缓存key dbcache:<table_name>:<primary_id>
+	dbcacheTablePrimaryKey = "dbcache:table:%s:primary_key" // 表主键缓存 dbcache:table:<table_name>:primary_key
 )
 
 var sg singleflight.Group
@@ -239,7 +239,7 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 //	@return string
 //	@return error
 func tablePrimaryKey(cache *redis.Client, db gorose.IOrm, table string) (string, error) {
-	key := fmt.Sprintf(dbcachePrimary, table)
+	key := fmt.Sprintf(dbcacheTablePrimaryKey, table)
 	primaryKey, err := xcache.GetOrSet(cache, key, 24*time.Hour, func() (any, error) {
 		sql := "SHOW CREATE TABLE " + table
 		tableInfo, err := dbx.FetchOne(db, sql)
