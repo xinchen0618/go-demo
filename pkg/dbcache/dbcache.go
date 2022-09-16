@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"strings"
 	"time"
 
 	"go-demo/pkg/dbx"
@@ -248,20 +247,18 @@ func tablePrimaryKey(cache *redis.Client, db gorose.IOrm, table string) (string,
 		}
 		tableSchema := cast.ToString(tableInfo["Create Table"])
 
-		reg := regexp.MustCompile("PRIMARY KEY (.+)")
+		reg := regexp.MustCompile(`PRIMARY KEY \(` + "`" + `(.+)` + "`" + `\)`)
 		if nil == reg {
 			zap.L().Error("regexp compile error")
 			return "", errors.New("regexp compile error")
 		}
-		result := reg.FindAllStringSubmatch(tableSchema, 1)
-		r := strings.NewReplacer("(", "", "`", "", ")", "", ",", "")
-		primaryKey := r.Replace(result[0][1])
-		if "" == primaryKey {
+		result := reg.FindStringSubmatch(tableSchema)
+		if 0 == len(result) {
 			zap.L().Error("fail to get " + table + " primary key")
 			return "", errors.New("fail to get " + table + " primary key")
 		}
 
-		return primaryKey, nil
+		return result[1], nil
 	})
 
 	return cast.ToString(primaryKey), err
