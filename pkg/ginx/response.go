@@ -6,6 +6,7 @@ import (
 )
 
 // Success 向客户端输出成功信息
+//
 //	@param c *gin.Context
 //	@param httpCode int
 //	@param body any 数据会json编码输出给客户端, nil表示无内容输出
@@ -17,6 +18,7 @@ func Success(c *gin.Context, httpCode int, body any) {
 }
 
 // Error 向客户端输出失败信息
+//
 //	@param c *gin.Context
 //	@param httpCode int
 //	@param code string
@@ -26,6 +28,7 @@ func Error(c *gin.Context, httpCode int, code, message string) {
 }
 
 // InternalError 向客户端输出500错误
+//
 //	@param c *gin.Context
 //	@param err error 记录错误日志, nil表示无需记录, 项目中定义的方法错误会就近记录, 无需重复记录
 func InternalError(c *gin.Context, err error) {

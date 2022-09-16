@@ -10,10 +10,11 @@ import (
 )
 
 // Enqueue 发送及时任务
-//  @param client *asynq.Client
-//  @param taskName string
-//  @param payload map[string]any
-//  @return error
+//
+//	@param client *asynq.Client
+//	@param taskName string
+//	@param payload map[string]any
+//	@return error
 func Enqueue(client *asynq.Client, taskName string, payload map[string]any) error {
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
@@ -30,10 +31,11 @@ func Enqueue(client *asynq.Client, taskName string, payload map[string]any) erro
 }
 
 // LowEnqueue 发送低优先级及时任务
-//  @param client *asynq.Client
-//  @param taskName string
-//  @param payload map[string]any
-//  @return error
+//
+//	@param client *asynq.Client
+//	@param taskName string
+//	@param payload map[string]any
+//	@return error
 func LowEnqueue(client *asynq.Client, taskName string, payload map[string]any) error {
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
@@ -50,11 +52,12 @@ func LowEnqueue(client *asynq.Client, taskName string, payload map[string]any) e
 }
 
 // EnqueueIn 发送延时任务
-//  @param client *asynq.Client
-//  @param taskName string
-//  @param payload map[string]any
-//  @param delay time.Duration
-//  @return error
+//
+//	@param client *asynq.Client
+//	@param taskName string
+//	@param payload map[string]any
+//	@param delay time.Duration
+//	@return error
 func EnqueueIn(client *asynq.Client, taskName string, payload map[string]any, delay time.Duration) error {
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
@@ -71,11 +74,12 @@ func EnqueueIn(client *asynq.Client, taskName string, payload map[string]any, de
 }
 
 // LowEnqueueIn 发送低优先级延时任务
-//  @param client *asynq.Client
-//  @param taskName string
-//  @param payload map[string]any
-//  @param delay time.Duration
-//  @return error
+//
+//	@param client *asynq.Client
+//	@param taskName string
+//	@param payload map[string]any
+//	@param delay time.Duration
+//	@return error
 func LowEnqueueIn(client *asynq.Client, taskName string, payload map[string]any, delay time.Duration) error {
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
@@ -92,9 +96,10 @@ func LowEnqueueIn(client *asynq.Client, taskName string, payload map[string]any,
 }
 
 // Payload 从Task中解析Payload
-//  @param t *asynq.Task
-//  @param p any 接收结果的指针, map指针或者struct指针皆可
-//  @return error 解析失败返回的是SkipRetry的包裹, task方法中返回这个error将不再重试
+//
+//	@param t *asynq.Task
+//	@param p any 接收结果的指针, map指针或者struct指针皆可
+//	@return error 解析失败返回的是SkipRetry的包裹, task方法中返回这个error将不再重试
 func Payload(t *asynq.Task, p any) error {
 	if err := json.Unmarshal(t.Payload(), &p); err != nil {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)

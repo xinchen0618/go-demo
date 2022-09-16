@@ -15,9 +15,10 @@ type user struct{}
 var User user
 
 // AddUser
-//  @receiver user
-//  @param c *cli.Context
-//  @return error
+//
+//	@receiver user
+//	@param c *cli.Context
+//	@return error
 func (user) AddUser(c *cli.Context) error {
 	userName := c.Args().Get(0)
 	if "" == userName {

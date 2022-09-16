@@ -11,8 +11,9 @@ import (
 )
 
 // UserJwtParse 用户JWT解析
-//  解析成功会将userId存入gin上下文
-//  @return gin.HandlerFunc
+//
+//	解析成功会将userId存入gin上下文
+//	@return gin.HandlerFunc
 func UserJwtParse() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.Request.Header.Get("Authorization") // Authorization: Bearer <token>
@@ -39,6 +40,7 @@ func UserJwtParse() gin.HandlerFunc {
 }
 
 // UserAuth 用户鉴权
+//
 //	@return gin.HandlerFunc
 func UserAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {

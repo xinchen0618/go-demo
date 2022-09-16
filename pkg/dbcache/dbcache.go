@@ -63,6 +63,7 @@ func set(cache *redis.Client, db gorose.IOrm, table string, id any) (bool, error
 
 // Get 获取DB记录返回map并维护缓存
 //
+//	这里使用msgpack编码缓存数据目的在于解码缓存保持数据类型不变
 //	使用dbcache.Get()或dbcache.Take()方法获取DB记录, 在更新和删除DB记录时, 必须使用dbcache.Update()和dbcache.Delete()方法自动维护缓存, 或dbcache.Expired()手动清除缓存
 //	@param cache *redis.Client
 //	@param db gorose.IOrm

@@ -16,12 +16,14 @@ import (
 var sg singleflight.Group
 
 // GetOrSet 获取或设置自定义缓存
-//  @param cache *redis.Client
-//  @param key string
-//  @param ttl time.Duration
-//  @param f func() (any, error)
-//  @return any 返回的是json.Unmarshal的数据
-//  @return error
+//
+//	缓存数据使用json编解码
+//	@param cache *redis.Client
+//	@param key string
+//	@param ttl time.Duration
+//	@param f func() (any, error)
+//	@return any 返回的是json.Unmarshal的数据
+//	@return error
 func GetOrSet(cache *redis.Client, key string, ttl time.Duration, f func() (any, error)) (any, error) {
 	result, err, _ := sg.Do(key, func() (any, error) {
 		var resultCache string
@@ -62,13 +64,15 @@ func GetOrSet(cache *redis.Client, key string, ttl time.Duration, f func() (any,
 }
 
 // GinCache 获取或者设置业务缓存
-//  @param c *gin.Context
-//  @param cache *redis.Client
-//  @param key string
-//  @param ttl time.Duration
-//  @param f func() (any, error)
-//  @return any 返回的是json.Unmarshal的数据
-//  @return error
+//
+//	发生错误会向客户端输出500错误
+//	@param c *gin.Context
+//	@param cache *redis.Client
+//	@param key string
+//	@param ttl time.Duration
+//	@param f func() (any, error)
+//	@return any 返回的是json.Unmarshal的数据
+//	@return error
 func GinCache(c *gin.Context, cache *redis.Client, key string, ttl time.Duration, f func() (any, error)) (any, error) {
 	result, err, _ := sg.Do(key, func() (any, error) {
 		var resultCache string

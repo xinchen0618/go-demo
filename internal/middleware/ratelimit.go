@@ -16,6 +16,7 @@ import (
 )
 
 // QpsLimit QPS限流
+//
 //	@param qps int
 //	@return gin.HandlerFunc
 func QpsLimit(qps int) gin.HandlerFunc {
@@ -31,8 +32,9 @@ func QpsLimit(qps int) gin.HandlerFunc {
 }
 
 // SubmitLimit 提交频率限制
-//  主要用于防重
-//  @return gin.HandlerFunc
+//
+//	主要用于防重
+//	@return gin.HandlerFunc
 func SubmitLimit() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var uid string // md5(id+method+path)
