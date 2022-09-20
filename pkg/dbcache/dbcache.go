@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"regexp"
 	"time"
 
 	"go-demo/pkg/dbx"
@@ -241,25 +240,19 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 func tablePrimaryKey(cache *redis.Client, db gorose.IOrm, table string) (string, error) {
 	key := fmt.Sprintf(dbcacheTablePrimaryKey, table)
 	primaryKey, err := xcache.GetOrSet(cache, key, 24*time.Hour, func() (any, error) {
-		sql := "SHOW CREATE TABLE " + table
-		tableInfo, err := dbx.FetchOne(db, sql)
+		sql := "SHOW COLUMNS FROM " + table
+		cols, err := dbx.FetchAll(db, sql)
 		if err != nil {
 			return "", err
 		}
-		tableSchema := cast.ToString(tableInfo["Create Table"])
-
-		reg := regexp.MustCompile(`PRIMARY KEY \(` + "`" + `(.+)` + "`" + `\)`)
-		if nil == reg {
-			zap.L().Error("regexp compile error")
-			return "", errors.New("regexp compile error")
-		}
-		result := reg.FindStringSubmatch(tableSchema)
-		if 0 == len(result) {
-			zap.L().Error("fail to get " + table + " primary key")
-			return "", errors.New("fail to get " + table + " primary key")
+		for _, col := range cols {
+			if "PRI" == cast.ToString(col["Key"]) {
+				return cast.ToString(col["Field"]), nil
+			}
 		}
 
-		return result[1], nil
+		zap.L().Error("fail to get " + table + " primary key")
+		return "", errors.New("fail to get " + table + " primary key")
 	})
 
 	return cast.ToString(primaryKey), err
