@@ -125,13 +125,17 @@
   ```
   # go func
   for i := 0; i < 10; i++ {
-    di.WorkerPool().Submit(func)
+    di.WorkerPool().Submit(func () {
+      // do something
+    })
   }
   
   # Wait Group
   wpg := di.WorkerPool().Group()
   for i := 0; i < 10; i++ {
-    wpg.Submit(func)
+    wpg.Submit(func () {
+      // do something
+    })
   }
   wpg.Wait()
   ```
@@ -144,13 +148,17 @@
   # go func
   wps := di.WorkerPoolSeparate(100)
   for i := 0; i < 10000; i++ {
-    wps.Submit(func)
+    wps.Submit(func () {
+      // do something
+    })
   }
   
   # Wait Group
   wpsg := di.WorkerPoolSeparate(100).Group()
   for i := 0; i < 10000; i++ {
-    wpsg.Submit(func)
+    wpsg.Submit(func () {
+      // do something
+    })
   }
   wpsg.Wait()  
   ```
@@ -203,7 +211,7 @@
 
 - 预发布&生产环境执行编译好的程序
 
-  实际上会提前编译好, 在机器上直接部署可执行文件. 注意build阶段与run阶段c库是否一致, build阶段设置`CGO_ENABLED=0`使用内置的实现来替代系统库则不需要关注此问题.
+  实际上会提前编译好, 在机器上直接部署可执行文件. 注意build阶段与run阶段c库是否一致, 若一致, build阶段设置`CGO_ENABLED=1`可减小执行文件体积, 不一致, 设置`CGO_ENABLED=0`保证移植性.
 
   ```
   # 启动
