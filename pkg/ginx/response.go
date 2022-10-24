@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// Success 向客户端输出成功信息
+// Success 输出成功信息
 //
 //	@param c *gin.Context
 //	@param httpCode int
@@ -17,7 +17,7 @@ func Success(c *gin.Context, httpCode int, body any) {
 	c.JSON(httpCode, body)
 }
 
-// Error 向客户端输出失败信息
+// Error 输出失败信息
 //
 //	@param c *gin.Context
 //	@param httpCode int
@@ -27,7 +27,7 @@ func Error(c *gin.Context, httpCode int, code, message string) {
 	c.AbortWithStatusJSON(httpCode, gin.H{"code": code, "message": message})
 }
 
-// InternalError 向客户端输出500错误
+// InternalError 输出500错误
 //
 //	@param c *gin.Context
 //	@param err error 记录错误日志, nil表示无需记录, 项目中定义的方法错误会就近记录, 无需重复记录
