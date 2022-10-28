@@ -73,6 +73,28 @@ func EnqueueIn(client *asynq.Client, taskName string, payload map[string]any, de
 	return nil
 }
 
+// EnqueueAt 发送定时任务
+//
+//	@param client *asynq.Client
+//	@param taskName string
+//	@param payload map[string]any
+//	@param timeAt time.Time
+//	@return error
+func EnqueueAt(client *asynq.Client, taskName string, payload map[string]any, timeAt time.Time) error {
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		zap.L().Error(err.Error())
+		return err
+	}
+	task := asynq.NewTask(taskName, payloadBytes)
+	if _, err := client.Enqueue(task, asynq.ProcessAt(timeAt)); err != nil {
+		zap.L().Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
 // LowEnqueueIn 发送低优先级延时任务
 //
 //	@param client *asynq.Client
@@ -88,6 +110,28 @@ func LowEnqueueIn(client *asynq.Client, taskName string, payload map[string]any,
 	}
 	task := asynq.NewTask(taskName, payloadBytes)
 	if _, err := client.Enqueue(task, asynq.Queue("low"), asynq.ProcessIn(delay)); err != nil {
+		zap.L().Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+// LowEnqueueAt 发送低优先级定时任务
+//
+//	@param client *asynq.Client
+//	@param taskName string
+//	@param payload map[string]any
+//	@param timeAt time.Time
+//	@return error
+func LowEnqueueAt(client *asynq.Client, taskName string, payload map[string]any, timeAt time.Time) error {
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		zap.L().Error(err.Error())
+		return err
+	}
+	task := asynq.NewTask(taskName, payloadBytes)
+	if _, err := client.Enqueue(task, asynq.Queue("low"), asynq.ProcessAt(timeAt)); err != nil {
 		zap.L().Error(err.Error())
 		return err
 	}
