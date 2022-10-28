@@ -146,6 +146,7 @@ func LowEnqueueAt(client *asynq.Client, taskName string, payload map[string]any,
 //	@return error 解析失败返回的是SkipRetry的包裹, task方法中返回这个error将不再重试
 func Payload(t *asynq.Task, p any) error {
 	if err := json.Unmarshal(t.Payload(), &p); err != nil {
+		zap.L().Error(err.Error())
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
 
