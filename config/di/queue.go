@@ -44,7 +44,7 @@ func QueueServer() *asynq.Server {
 				Concurrency: 100,
 				// Optionally specify multiple queues with different priority.
 				Queues: map[string]int{
-					"default": 99,
+					"default": 9,
 					"low":     1,
 				},
 				// See the godoc for other configuration options
