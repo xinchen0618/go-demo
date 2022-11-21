@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	dbcacheKey             = "dbcache:%s:%d"                // DB缓存key dbcache:<table_name>:<primary_id>
+	dbcacheTableRecord     = "dbcache:table:%s:key:%d"      // 表记录缓存 dbcache:table:<table_name>:key:<primary_id>
 	dbcacheTablePrimaryKey = "dbcache:table:%s:primary_key" // 表主键缓存 dbcache:table:<table_name>:primary_key
 )
 
@@ -51,7 +51,7 @@ func set(cache *redis.Client, db gorose.IOrm, table string, id any) (bool, error
 	if err != nil {
 		return false, err
 	}
-	key := fmt.Sprintf(dbcacheKey, table, id)
+	key := fmt.Sprintf(dbcacheTableRecord, table, id)
 	if err := cache.Set(context.Background(), key, dataBytes, 24*time.Hour).Err(); err != nil {
 		zap.L().Error(err.Error())
 		return false, err
@@ -72,7 +72,7 @@ func set(cache *redis.Client, db gorose.IOrm, table string, id any) (bool, error
 //	@return error
 func Get(cache *redis.Client, db gorose.IOrm, table string, id any) (map[string]any, error) {
 	id = cast.ToInt64(id)
-	key := fmt.Sprintf(dbcacheKey, table, id)
+	key := fmt.Sprintf(dbcacheTableRecord, table, id)
 	v, err, _ := sg.Do(key, func() (any, error) {
 		dataCache, err := cache.Get(context.Background(), key).Result()
 		switch err {
@@ -219,7 +219,7 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 
 	for _, id := range ids {
 		id = cast.ToInt64(id)
-		key := fmt.Sprintf(dbcacheKey, table, id)
+		key := fmt.Sprintf(dbcacheTableRecord, table, id)
 		if err := cache.Del(context.Background(), key).Err(); err != nil {
 			zap.L().Error(err.Error())
 			return err
