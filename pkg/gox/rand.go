@@ -16,16 +16,3 @@ func RandInt64(min, max int64) int64 {
 
 	return rand.Int63n(max-min) + min
 }
-
-// RandString 生成随机字符串
-//
-//	@param n int
-//	@return string
-func RandString(n int) string {
-	letterBytes := "23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
-	b := make([]byte, n)
-	for i := range b {
-		b[i] = letterBytes[rand.Intn(len(letterBytes))]
-	}
-	return string(b)
-}
