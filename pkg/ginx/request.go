@@ -17,6 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
 	"github.com/gohouse/gorose/v2"
+	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
 
@@ -198,7 +199,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 	}
 
 	// 浮点数, float.%d, 数字表示精度(没有后补零), 超过精度四舍五入, 点号同数字可省略, 表示无限制, 返回类型为float64
-	if "float" == gox.Substr(paramType, 0, 5) {
+	if "float" == lo.Substring(paramType, 0, 5) {
 		valueStr, err := FilterParam(c, paramName, paramValue, "string", allowEmpty)
 		if err != nil {
 			return nil, err
@@ -215,7 +216,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		}
 
 		prec := -1
-		precStr := gox.Substr(paramType, 6, math.MaxInt)
+		precStr := lo.Substring(paramType, 6, math.MaxInt)
 		if precStr != "" {
 			prec, err = cast.ToIntE(precStr)
 			if err != nil {
@@ -231,9 +232,9 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 	}
 
 	// 精度小数, decimal.%d, 数字表示精度(有后补零), 超过精度四舍五入, 点号同数字可省略, 默认为2位小数, 返回类型为字符串
-	if "decimal" == gox.Substr(paramType, 0, 7) {
+	if "decimal" == lo.Substring(paramType, 0, 7) {
 		prec := 2
-		precStr := gox.Substr(paramType, 8, math.MaxInt)
+		precStr := lo.Substring(paramType, 8, math.MaxInt)
 		if precStr != "" {
 			var err error
 			prec, err = cast.ToIntE(precStr)

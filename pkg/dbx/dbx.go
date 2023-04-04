@@ -14,6 +14,7 @@ import (
 	"go-demo/pkg/gox"
 
 	"github.com/gohouse/gorose/v2"
+	"github.com/samber/lo"
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
 )
@@ -69,7 +70,7 @@ func TakeAll(p any, db gorose.IOrm, sql string, params ...any) error {
 //	@return error
 func FetchOne(db gorose.IOrm, sql string, params ...any) (map[string]any, error) {
 	sql = strings.TrimSpace(sql)
-	if "SELECT" == strings.ToUpper(gox.Substr(sql, 0, 6)) && strings.ToUpper(gox.Substr(sql, -7, math.MaxInt)) != "LIMIT 1" {
+	if "SELECT" == strings.ToUpper(lo.Substring(sql, 0, 6)) && strings.ToUpper(lo.Substring(sql, -7, math.MaxInt)) != "LIMIT 1" {
 		sql += " LIMIT 1"
 	}
 
