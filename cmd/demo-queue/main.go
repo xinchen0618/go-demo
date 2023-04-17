@@ -17,7 +17,7 @@ func loggingMiddleware(h asynq.Handler) asynq.Handler {
 		log.Printf("Start processing %q --- %s", t.Type(), t.Payload())
 
 		if err := h.ProcessTask(ctx, t); err != nil {
-			log.Printf("Processing err %q --- %s, %v", t.Type(), t.Payload(), err)
+			di.Logger().Error(err.Error())
 			return err
 		}
 
@@ -35,6 +35,7 @@ func main() {
 	mux.HandleFunc("User:AddUser", task.User.AddUser)
 
 	if err := di.QueueServer().Run(mux); err != nil {
-		panic(err)
+		di.Logger().Error(err.Error())
+		return
 	}
 }

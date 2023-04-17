@@ -1,9 +1,9 @@
 package main
 
 import (
-	"log"
 	"os"
 
+	"go-demo/config/di"
 	"go-demo/internal/action"
 
 	"github.com/urfave/cli/v2"
@@ -28,6 +28,7 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+		di.Logger().Error(err.Error())
+		return
 	}
 }

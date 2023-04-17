@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"go-demo/config"
+	"go-demo/config/di"
 	"go-demo/internal/middleware"
 	"go-demo/internal/router"
 	"go-demo/pkg/ginx"
@@ -37,6 +38,7 @@ func main() {
 	// Run gin
 	addr := fmt.Sprintf(":%d", config.Get("server_port"))
 	if err := endless.ListenAndServe(addr, r); err != nil {
-		panic(err)
+		di.Logger().Error(err.Error())
+		return
 	}
 }

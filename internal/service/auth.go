@@ -13,7 +13,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/goccy/go-json"
 	"github.com/spf13/cast"
-	"go.uber.org/zap"
 )
 
 type auth struct{}
@@ -42,19 +41,19 @@ func (auth) JwtLogin(userType string, id int64, userName string) (string, error)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(config.GetString("jwt_secret")))
 	if err != nil {
-		zap.L().Error(err.Error())
+		di.Logger().Error(err.Error())
 		return "", err
 	}
 	// redis登录白名单
 	tokenAtoms := strings.Split(tokenString, ".")
 	payload, err := json.Marshal(claims)
 	if err != nil {
-		zap.L().Error(err.Error())
+		di.Logger().Error(err.Error())
 		return "", err
 	}
 	key := fmt.Sprintf(consts.JwtLogin, userType, claims.Id, tokenAtoms[2])
 	if err := di.JwtRedis().Set(context.Background(), key, payload, loginTtl).Err(); err != nil {
-		zap.L().Error(err.Error())
+		di.Logger().Error(err.Error())
 		return "", err
 	}
 
@@ -85,7 +84,7 @@ func (auth) JwtCheck(userType string, token string) (int64, error) {
 	tokenAtoms := strings.Split(token, ".")
 	key := fmt.Sprintf(consts.JwtLogin, userType, claims["jti"], tokenAtoms[2])
 	if n, err := di.JwtRedis().Exists(context.Background(), key).Result(); err != nil {
-		zap.L().Error(err.Error())
+		di.Logger().Error(err.Error())
 		return 0, err
 	} else if 0 == n { // 不在白名单内
 		return 0, nil
@@ -106,7 +105,7 @@ func (auth) JwtLogout(userType, token string, id int64) error {
 	tokenAtoms := strings.Split(token, ".")
 	key := fmt.Sprintf(consts.JwtLogin, userType, id, tokenAtoms[2])
 	if err := di.JwtRedis().Del(context.Background(), key).Err(); err != nil {
-		zap.L().Error(err.Error())
+		di.Logger().Error(err.Error())
 		return err
 	}
 

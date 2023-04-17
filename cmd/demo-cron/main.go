@@ -3,22 +3,23 @@ package main
 import (
 	"time"
 
+	"go-demo/config/di"
 	"go-demo/internal/cron"
 
 	"github.com/go-co-op/gocron"
-	"go.uber.org/zap"
 )
 
 func main() {
 	loc, err := time.LoadLocation("Asia/Shanghai")
 	if err != nil {
-		zap.L().Error(err.Error())
+		di.Logger().Error(err.Error())
+		return
 	}
 	s := gocron.NewScheduler(loc)
 
 	// 计划任务路由 DEMO
 	if _, err = s.Cron("* * * * *").Do(cron.User.DeleteUsers, 10); err != nil {
-		zap.L().Error(err.Error())
+		di.Logger().Error(err.Error())
 	}
 
 	// starts the scheduler asynchronously

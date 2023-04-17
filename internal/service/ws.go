@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 
+	"go-demo/config/di"
+
 	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
-	"go.uber.org/zap"
 )
 
 type WsClient struct {
@@ -32,7 +33,7 @@ var Ws ws
 //	@return error
 func (ws) Send(client *WsClient, msgType string, msgData map[string]any) error {
 	if client.IsClosed {
-		zap.L().Error(fmt.Sprintf("%p client is closed", client))
+		di.Logger().Error(fmt.Sprintf("%p client is closed", client))
 		return errors.New("client is closed")
 	}
 
@@ -44,11 +45,11 @@ func (ws) Send(client *WsClient, msgType string, msgData map[string]any) error {
 		Data: msgData,
 	})
 	if err != nil {
-		zap.L().Error(err.Error())
+		di.Logger().Error(err.Error())
 		return err
 	}
 	if err := client.Conn.WriteMessage(websocket.TextMessage, message); err != nil {
-		zap.L().Error(err.Error())
+		di.Logger().Error(err.Error())
 		return err
 	}
 
@@ -64,7 +65,7 @@ func (ws) Close(client *WsClient) {
 		return
 	}
 	if err := client.Conn.Close(); err != nil {
-		zap.L().Error(err.Error())
+		di.Logger().Error(err.Error())
 	}
 	client.IsClosed = true
 }

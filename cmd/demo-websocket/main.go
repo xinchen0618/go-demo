@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -17,7 +16,6 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
-	"go.uber.org/zap"
 )
 
 var (
@@ -31,7 +29,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	// Upgrade our raw HTTP connection to a websocket based one
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		zap.L().Error(err.Error())
+		di.Logger().Error(err.Error())
 		return
 	}
 	client.Conn = conn
@@ -74,7 +72,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 
 	// 心跳
 	if err := client.Conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
-		zap.L().Error(err.Error())
+		di.Logger().Error(err.Error())
 	}
 	gox.Go(func() {
 		ticker := time.NewTicker(pingPeriod)
@@ -84,13 +82,13 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			if err := client.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-				zap.L().Error(err.Error())
+				di.Logger().Error(err.Error())
 			}
 		}
 	})
 	client.Conn.SetPongHandler(func(appData string) error {
 		if err := client.Conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
-			zap.L().Error(err.Error())
+			di.Logger().Error(err.Error())
 		}
 		return nil
 	})
@@ -100,7 +98,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		_, message, err := client.Conn.ReadMessage()
 		if err != nil {
 			if websocket.IsCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				zap.L().Error(err.Error())
+				di.Logger().Error(err.Error())
 			}
 			break
 		}
@@ -128,5 +126,8 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/websocket", socketHandler)
-	log.Fatal(http.ListenAndServe(":9090", nil))
+	if err := http.ListenAndServe(":9090", nil); err != nil {
+		di.Logger().Error(err.Error())
+		return
+	}
 }
