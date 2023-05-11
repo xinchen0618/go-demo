@@ -148,7 +148,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		if "" == valueStr.(string) {
 			return int64(0), nil
 		}
-		valueInt, err := cast.ToInt64E(valueStr)
+		valueInt, err := strconv.ParseInt(cast.ToString(valueStr), 10, 64) // 解决前导0被识别为8进制的问题
 		if err != nil {
 			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
