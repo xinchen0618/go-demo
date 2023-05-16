@@ -19,8 +19,9 @@ import (
 )
 
 const (
-	dbcacheTableRecord     = "dbcache:table:%s:key:%d"      // 表记录缓存 dbcache:table:<table_name>:key:<primary_id>
-	dbcacheTablePrimaryKey = "dbcache:table:%s:primary_key" // 表主键缓存 dbcache:table:<table_name>:primary_key
+	dbcacheTableRecord     = "dbcache:table:%s:version:%d:key:%d"      // 表记录缓存 dbcache:table:<table_name>:version:<version>:key:<primary_id>
+	dbcacheTablePrimaryKey = "dbcache:table:%s:version:%d:primary_key" // 表主键缓存 dbcache:table:<table_name>:version:<version>:primary_key
+	dbcacheTableVersion    = "dbcache:table:%s:version"                // 表版本 dbcache:table:<table_name>:version
 )
 
 var sg singleflight.Group
@@ -38,6 +39,10 @@ func set(cache *redis.Client, db gorose.IOrm, table string, id any) (bool, error
 	if err != nil {
 		return false, err
 	}
+	version, err := tableVersion(cache, table)
+	if err != nil {
+		return false, err
+	}
 
 	sql := fmt.Sprintf("SELECT * FROM %s WHERE %s = %d LIMIT 1", table, primaryKey, id)
 	data, err := dbx.FetchOne(db, sql)
@@ -51,7 +56,7 @@ func set(cache *redis.Client, db gorose.IOrm, table string, id any) (bool, error
 	if err != nil {
 		return false, err
 	}
-	key := fmt.Sprintf(dbcacheTableRecord, table, id)
+	key := fmt.Sprintf(dbcacheTableRecord, table, version, id)
 	if err := cache.Set(context.Background(), key, dataBytes, 24*time.Hour).Err(); err != nil {
 		zap.L().Error(err.Error())
 		return false, err
@@ -71,8 +76,12 @@ func set(cache *redis.Client, db gorose.IOrm, table string, id any) (bool, error
 //	@return map[string]any
 //	@return error
 func Get(cache *redis.Client, db gorose.IOrm, table string, id any) (map[string]any, error) {
+	version, err := tableVersion(cache, table)
+	if err != nil {
+		return nil, err
+	}
 	id = cast.ToInt64(id)
-	key := fmt.Sprintf(dbcacheTableRecord, table, id)
+	key := fmt.Sprintf(dbcacheTableRecord, table, version, id)
 	v, err, _ := sg.Do(key, func() (any, error) {
 		dataCache, err := cache.Get(context.Background(), key).Result()
 		switch err {
@@ -217,9 +226,14 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 		return nil
 	}
 
+	version, err := tableVersion(cache, table)
+	if err != nil {
+		return err
+	}
+
 	for _, id := range ids {
 		id = cast.ToInt64(id)
-		key := fmt.Sprintf(dbcacheTableRecord, table, id)
+		key := fmt.Sprintf(dbcacheTableRecord, table, version, id)
 		if err := cache.Del(context.Background(), key).Err(); err != nil {
 			zap.L().Error(err.Error())
 			return err
@@ -238,8 +252,12 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 //	@return string
 //	@return error
 func tablePrimaryKey(cache *redis.Client, db gorose.IOrm, table string) (string, error) {
-	key := fmt.Sprintf(dbcacheTablePrimaryKey, table)
-	primaryKey, err := xcache.GetOrSet(cache, key, 24*time.Hour, func() (any, error) {
+	version, err := tableVersion(cache, table)
+	if err != nil {
+		return "", err
+	}
+	key := fmt.Sprintf(dbcacheTablePrimaryKey, table, version)
+	primaryKey, err := xcache.GetOrSet(cache, key, 90*24*time.Hour, func() (any, error) {
 		sql := "SHOW COLUMNS FROM " + table
 		cols, err := dbx.FetchAll(db, sql)
 		if err != nil {
@@ -256,4 +274,20 @@ func tablePrimaryKey(cache *redis.Client, db gorose.IOrm, table string) (string,
 	})
 
 	return cast.ToString(primaryKey), err
+}
+
+// tableVersion 表版本
+//
+//	更新表版本用于过期与之相关的所有缓存数据
+//	@param cache *redis.Client
+//	@param table string
+//	@return int64
+//	@return error
+func tableVersion(cache *redis.Client, table string) (int64, error) {
+	key := fmt.Sprintf(dbcacheTableVersion, table)
+	version, err := xcache.GetOrSet(cache, key, 90*24*time.Hour, func() (any, error) {
+		return time.Now().Unix(), nil
+	})
+
+	return cast.ToInt64(version), err
 }
