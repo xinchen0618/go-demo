@@ -344,7 +344,7 @@ go build
  
   使用`dbcache.Get()`或`dbcache.Take()`方法获取DB记录, 在更新和删除DB记录时, 必须使用`dbcache.Update()`和`dbcache.Delete()`方法自动维护缓存, 或`dbcache.Expired()`手动清除缓存.
   
-  变更表结构导致缓存数据不正确的问题, 更新表版本`dbcache:table:%s:version`可过期与之相关的所有缓存数据.
+  变更表结构会导致缓存数据不正确, 更新表版本`dbcache:table:%s:version`可过期与之相关的所有缓存数据.
 
   - `dbcache.Get()` 获取DB记录返回`map`并维护缓存
   - `dbcache.Take()` 获取DB记录至`struct`并维护缓存

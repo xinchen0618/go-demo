@@ -245,7 +245,6 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 
 // tablePrimaryKey 获取表主键
 //
-//	缓存一天
 //	@param cache *redis.Client
 //	@param db gorose.IOrm
 //	@param table string
