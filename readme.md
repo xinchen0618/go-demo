@@ -240,7 +240,7 @@
 ```
 cd cmd/demo-cli
 go build
-RUNTIME_ENV=testing ./demo-cli <task> <action> [param]
+RUNTIME_ENV=testing ./demo-cli <commond> <action> [ARG...]
 ```
 
 ### Cron
