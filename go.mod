@@ -4,13 +4,13 @@ go 1.20
 
 require (
 	github.com/alitto/pond v1.8.3
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-co-op/gocron v1.28.0
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/goccy/go-json v0.10.2
 	github.com/gohouse/gorose/v2 v2.1.12
+	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/golang-module/carbon/v2 v2.2.3
 	github.com/gorilla/websocket v1.5.0
 	github.com/hibiken/asynq v0.24.1

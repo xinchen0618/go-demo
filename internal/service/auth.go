@@ -10,8 +10,8 @@ import (
 	"go-demo/config/consts"
 	"go-demo/config/di"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/goccy/go-json"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/cast"
 )
 
@@ -30,13 +30,13 @@ var Auth auth
 //	@return error
 func (auth) JwtLogin(userType string, id int64, userName string) (string, error) {
 	// JWT登录
-	loginTtl := 30 * 24 * time.Hour // 登录有效时长
-	claims := &jwt.StandardClaims{
-		Audience:  userName,
-		ExpiresAt: time.Now().Add(loginTtl).Unix(),
-		Id:        cast.ToString(id),
-		IssuedAt:  time.Now().Unix(),
-		Issuer:    userType,
+	loginTtl := 30 * 24 * time.Hour  // 登录有效时长
+	claims := &jwt.RegisteredClaims{ // **这样赋值并不符合JWT定义中的声明, 如此处理仅是为了方便**
+		Issuer:    userType, // 角色
+		Subject:   userName, // 用户名
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(loginTtl)),
+		IssuedAt:  jwt.NewNumericDate(time.Now()),
+		ID:        cast.ToString(id), // ID
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(config.GetString("jwt_secret")))
@@ -51,7 +51,7 @@ func (auth) JwtLogin(userType string, id int64, userName string) (string, error)
 		di.Logger().Error(err.Error())
 		return "", err
 	}
-	key := fmt.Sprintf(consts.JwtLogin, userType, claims.Id, tokenAtoms[2])
+	key := fmt.Sprintf(consts.JwtLogin, userType, claims.ID, tokenAtoms[2])
 	if err := di.JwtRedis().Set(context.Background(), key, payload, loginTtl).Err(); err != nil {
 		di.Logger().Error(err.Error())
 		return "", err
