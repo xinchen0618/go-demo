@@ -19,9 +19,9 @@ import (
 )
 
 const (
-	dbcacheTableRecord     = "dbcache:table:%s:version:%d:key:%d"      // 表记录缓存 dbcache:table:<table_name>:version:<version>:key:<primary_id>
-	dbcacheTablePrimaryKey = "dbcache:table:%s:version:%d:primary_key" // 表主键缓存 dbcache:table:<table_name>:version:<version>:primary_key
-	dbcacheTableVersion    = "dbcache:table:%s:version"                // 表版本 dbcache:table:<table_name>:version
+	_dbcacheTableRecord     = "dbcache:table:%s:version:%d:key:%d"      // 表记录缓存 dbcache:table:<table_name>:version:<version>:key:<primary_id>
+	_dbcacheTablePrimaryKey = "dbcache:table:%s:version:%d:primary_key" // 表主键缓存 dbcache:table:<table_name>:version:<version>:primary_key
+	_dbcacheTableVersion    = "dbcache:table:%s:version"                // 表版本 dbcache:table:<table_name>:version
 )
 
 var sg singleflight.Group
@@ -56,7 +56,7 @@ func set(cache *redis.Client, db gorose.IOrm, table string, id any) (bool, error
 	if err != nil {
 		return false, err
 	}
-	key := fmt.Sprintf(dbcacheTableRecord, table, version, id)
+	key := fmt.Sprintf(_dbcacheTableRecord, table, version, id)
 	if err := cache.Set(context.Background(), key, dataBytes, 24*time.Hour).Err(); err != nil {
 		zap.L().Error(err.Error())
 		return false, err
@@ -81,7 +81,7 @@ func Get(cache *redis.Client, db gorose.IOrm, table string, id any) (map[string]
 		return nil, err
 	}
 	id = cast.ToInt64(id)
-	key := fmt.Sprintf(dbcacheTableRecord, table, version, id)
+	key := fmt.Sprintf(_dbcacheTableRecord, table, version, id)
 	v, err, _ := sg.Do(key, func() (any, error) {
 		dataCache, err := cache.Get(context.Background(), key).Result()
 		switch err {
@@ -233,7 +233,7 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 
 	for _, id := range ids {
 		id = cast.ToInt64(id)
-		key := fmt.Sprintf(dbcacheTableRecord, table, version, id)
+		key := fmt.Sprintf(_dbcacheTableRecord, table, version, id)
 		if err := cache.Del(context.Background(), key).Err(); err != nil {
 			zap.L().Error(err.Error())
 			return err
@@ -255,7 +255,7 @@ func tablePrimaryKey(cache *redis.Client, db gorose.IOrm, table string) (string,
 	if err != nil {
 		return "", err
 	}
-	key := fmt.Sprintf(dbcacheTablePrimaryKey, table, version)
+	key := fmt.Sprintf(_dbcacheTablePrimaryKey, table, version)
 	primaryKey, err := xcache.GetOrSet(cache, key, 90*24*time.Hour, func() (any, error) {
 		sql := "SHOW COLUMNS FROM " + table
 		cols, err := dbx.FetchAll(db, sql)
@@ -283,7 +283,7 @@ func tablePrimaryKey(cache *redis.Client, db gorose.IOrm, table string) (string,
 //	@return int64
 //	@return error
 func tableVersion(cache *redis.Client, table string) (int64, error) {
-	key := fmt.Sprintf(dbcacheTableVersion, table)
+	key := fmt.Sprintf(_dbcacheTableVersion, table)
 	version, err := xcache.GetOrSet(cache, key, 90*24*time.Hour, func() (any, error) {
 		return time.Now().Unix(), nil
 	})
