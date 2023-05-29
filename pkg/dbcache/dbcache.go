@@ -10,8 +10,8 @@ import (
 	"go-demo/pkg/gox"
 	"go-demo/pkg/xcache"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/gohouse/gorose/v2"
+	"github.com/redis/go-redis/v9"
 	"github.com/spf13/cast"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.uber.org/zap"

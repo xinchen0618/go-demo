@@ -7,8 +7,8 @@ import (
 	"go-demo/pkg/ginx"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v8"
 	"github.com/goccy/go-json"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"golang.org/x/sync/singleflight"
 )
