@@ -124,16 +124,16 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
 // FilterParam 校验参数类型
 //
 //	paramType 参数类型:
-//		integer 整型64位,
-//		+integer 正整型64位,
-//		!-integer 非负整型64位,
-//		string 字符串,
-//		float.%d 浮点数,
-//		decimal.%d 精度小数,
-//		[] 枚举(支持数字float64与字符串string混合枚举),
-//		array 数组,
-//		[]integer 整型64位数组,
-//		[]string 字符串数组.
+//		integer 整型64位;
+//		+integer 正整型64位;
+//		!-integer 非负整型64位;
+//		string 字符串, 去首尾空格;
+//		float.%d 浮点数, 数字表示精度(没有后补零), 超过精度四舍五入, 点号同数字可省略, 表示无限制, 返回类型为float64;
+//		decimal.%d 精度小数, 数字表示精度(有后补零), 超过精度四舍五入, 点号同数字可省略, 默认为2位小数, 返回类型为字符串;
+//		[] 枚举, 支持数字float64与字符串string混合枚举;
+//		array 数组;
+//		[]integer 整型64位数组;
+//		[]string 字符串数组;
 func FilterParam(c *gin.Context, paramName string, paramValue any, paramType string, allowEmpty bool) (any, error) {
 	valueType := reflect.TypeOf(paramValue).String() // 用户输入值类型
 
@@ -154,7 +154,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		return valueInt, nil
 	}
 
-	// 正整数64位
+	// 正整型64位
 	if "+integer" == paramType {
 		valueInt, err := FilterParam(c, paramName, paramValue, "integer", allowEmpty)
 		if err != nil {
@@ -167,7 +167,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		return valueInt, nil
 	}
 
-	// 非负整数64位
+	// 非负整型64位
 	if "!-integer" == paramType {
 		valueInt, err := FilterParam(c, paramName, paramValue, "integer", allowEmpty)
 		if err != nil {
