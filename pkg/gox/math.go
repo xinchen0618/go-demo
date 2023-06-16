@@ -11,9 +11,6 @@ func Round(val float64, precision int) float64 {
 }
 
 // Fib 斐波那契数列
-//
-//	@param n int
-//	@return int
 func Fib(n int) int {
 	x, y := 0, 1
 	for i := 0; i < n; i++ {

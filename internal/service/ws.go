@@ -25,12 +25,6 @@ type ws struct{}
 var Ws ws
 
 // Send 发送消息
-//
-//	@receiver ws
-//	@param client *WsClient
-//	@param msgType string
-//	@param msgData map[string]any
-//	@return error
 func (ws) Send(client *WsClient, msgType string, msgData map[string]any) error {
 	if client.IsClosed {
 		di.Logger().Error(fmt.Sprintf("%p client is closed", client))
@@ -57,9 +51,6 @@ func (ws) Send(client *WsClient, msgType string, msgData map[string]any) error {
 }
 
 // Close 关闭client
-//
-//	@receiver ws
-//	@param client *WsClient
 func (ws) Close(client *WsClient) {
 	if client.IsClosed {
 		return

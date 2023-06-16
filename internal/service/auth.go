@@ -21,13 +21,9 @@ var Auth auth
 
 // JwtLogin JWT登录
 //
-//	先生成JWT, 再记录redis白名单
-//	@receiver auth
-//	@param userType string JWT登录用户类型, 集中在consts/auth.go中定义
-//	@param id int64 用户id
-//	@param userName string
-//	@return string jwt token
-//	@return error
+//	先生成JWT, 再记录redis白名单.
+//	userType 为JWT登录用户类型, 集中在consts/auth.go中定义. id 为用户id.
+//	返回字符串为 jwt token.
 func (auth) JwtLogin(userType string, id int64, userName string) (string, error) {
 	// JWT登录
 	loginTtl := 30 * 24 * time.Hour  // 登录有效时长
@@ -62,11 +58,8 @@ func (auth) JwtLogin(userType string, id int64, userName string) (string, error)
 
 // JwtCheck JWT校验
 //
-//	@receiver auth
-//	@param userType string JWT登录用户类型, 集中在consts/auth.go中定义
-//	@param token string
-//	@return int64 用户id, 0表示校验不通过
-//	@return error
+//	userType 为JWT登录用户类型, 集中在consts/auth.go中定义.
+//	返回用户id, 0表示校验不通过.
 func (auth) JwtCheck(userType string, token string) (int64, error) {
 	// JWT解析
 	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (any, error) {
@@ -95,12 +88,8 @@ func (auth) JwtCheck(userType string, token string) (int64, error) {
 
 // JwtLogout JWT登出
 //
-//	从redis白名单删除
-//	@receiver auth
-//	@param userType string JWT登录用户类型, 集中在consts/auth.go中定义
-//	@param token string
-//	@param id int64
-//	@return error
+//	从redis白名单删除.
+//	userType 为JWT登录用户类型, 集中在consts/auth.go中定义. token 为JWT token. id 为用户id.
 func (auth) JwtLogout(userType, token string, id int64) error {
 	tokenAtoms := strings.Split(token, ".")
 	key := fmt.Sprintf(consts.JwtLogin, userType, id, tokenAtoms[2])

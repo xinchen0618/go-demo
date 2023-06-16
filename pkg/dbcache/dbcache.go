@@ -27,13 +27,6 @@ const (
 var sg singleflight.Group
 
 // set 设置DB缓存
-//
-//	@param cache *redis.Client
-//	@param db gorose.IOrm
-//	@param table string
-//	@param id any
-//	@return bool
-//	@return error
 func set(cache *redis.Client, db gorose.IOrm, table string, id any) (bool, error) {
 	primaryKey, err := tablePrimaryKey(cache, db, table)
 	if err != nil {
@@ -67,14 +60,8 @@ func set(cache *redis.Client, db gorose.IOrm, table string, id any) (bool, error
 
 // Get 获取DB记录返回map并维护缓存
 //
-//	这里使用msgpack编码缓存数据目的在于解码缓存保持数据类型不变
-//	使用dbcache.Get()或dbcache.Take()方法获取DB记录, 在更新和删除DB记录时, 必须使用dbcache.Update()和dbcache.Delete()方法自动维护缓存, 或dbcache.Expired()手动清除缓存
-//	@param cache *redis.Client
-//	@param db gorose.IOrm
-//	@param table string
-//	@param id any
-//	@return map[string]any
-//	@return error
+//	这里使用msgpack编码缓存数据目的在于解码缓存保持数据类型不变.
+//	使用dbcache.Get()或dbcache.Take()方法获取DB记录, 在更新和删除DB记录时, 必须使用dbcache.Update()和dbcache.Delete()方法自动维护缓存, 或dbcache.Expired()手动清除缓存.
 func Get(cache *redis.Client, db gorose.IOrm, table string, id any) (map[string]any, error) {
 	version, err := tableVersion(cache, table)
 	if err != nil {
@@ -120,13 +107,8 @@ func Get(cache *redis.Client, db gorose.IOrm, table string, id any) (map[string]
 
 // Take 获取DB记录至struct并维护缓存
 //
-//	使用dbcache.Get()或dbcache.Take()方法获取DB记录, 在更新和删除DB记录时, 必须使用dbcache.Update()和dbcache.Delete()方法自动维护缓存, 或dbcache.Expired()手动清除缓存
-//	@param p any 接收结果的指针
-//	@param cache *redis.Client
-//	@param db gorose.IOrm
-//	@param table string
-//	@param id any
-//	@return error
+//	使用dbcache.Get()或dbcache.Take()方法获取DB记录, 在更新和删除DB记录时, 必须使用dbcache.Update()和dbcache.Delete()方法自动维护缓存, 或dbcache.Expired()手动清除缓存.
+//	p 为接收结果的指针.
 func Take(p any, cache *redis.Client, db gorose.IOrm, table string, id any) error {
 	data, err := Get(cache, db, table, id)
 	if err != nil {
@@ -143,15 +125,6 @@ func Take(p any, cache *redis.Client, db gorose.IOrm, table string, id any) erro
 }
 
 // Update 更新DB记录并维护缓存
-//
-//	@param cache *redis.Client
-//	@param db gorose.IOrm
-//	@param table string
-//	@param data map[string]any
-//	@param where string
-//	@param params ...any
-//	@return affectedRows int64
-//	@return err error
 func Update(cache *redis.Client, db gorose.IOrm, table string, data map[string]any, where string, params ...any) (affectedRows int64, err error) {
 	// 清除缓存
 	primaryKey, err := tablePrimaryKey(cache, db, table)
@@ -180,14 +153,6 @@ func Update(cache *redis.Client, db gorose.IOrm, table string, data map[string]a
 }
 
 // Delete 删除DB记录并维护缓存
-//
-//	@param cache *redis.Client
-//	@param db gorose.IOrm
-//	@param table string
-//	@param where string
-//	@param params ...any
-//	@return affectedRows int64
-//	@return err error
 func Delete(cache *redis.Client, db gorose.IOrm, table string, where string, params ...any) (affectedRows int64, err error) {
 	// 清除缓存
 	primaryKey, err := tablePrimaryKey(cache, db, table)
@@ -216,11 +181,6 @@ func Delete(cache *redis.Client, db gorose.IOrm, table string, where string, par
 }
 
 // Expired 过期缓存
-//
-//	@param cache *redis.Client
-//	@param table string
-//	@param ids ...any
-//	@return error
 func Expired(cache *redis.Client, table string, ids ...any) error {
 	if 0 == len(ids) {
 		return nil
@@ -244,12 +204,6 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 }
 
 // tablePrimaryKey 获取表主键
-//
-//	@param cache *redis.Client
-//	@param db gorose.IOrm
-//	@param table string
-//	@return string
-//	@return error
 func tablePrimaryKey(cache *redis.Client, db gorose.IOrm, table string) (string, error) {
 	version, err := tableVersion(cache, table)
 	if err != nil {
@@ -277,11 +231,7 @@ func tablePrimaryKey(cache *redis.Client, db gorose.IOrm, table string) (string,
 
 // tableVersion 表版本
 //
-//	更新表版本用于过期与之相关的所有缓存数据
-//	@param cache *redis.Client
-//	@param table string
-//	@return int64
-//	@return error
+//	更新表版本用于过期与之相关的所有缓存数据.
 func tableVersion(cache *redis.Client, table string) (int64, error) {
 	key := fmt.Sprintf(_dbcacheTableVersion, table)
 	version, err := xcache.GetOrSet(cache, key, 90*24*time.Hour, func() (any, error) {

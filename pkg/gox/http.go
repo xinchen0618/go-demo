@@ -15,13 +15,8 @@ import (
 
 // Restful 发起Restful请求
 //
-//	@param method string
-//	@param rawUrl string
-//	@param params map[string]any GET/DELETE为url参数, url参数会进行url转义, 其他方法为entity参数
-//	@param headers map[string]string
-//	@return body map[string]any 返回的是json.Unmarshal的数据
-//	@return httpCode int
-//	@return err error
+//	params 为GET/DELETE为url参数, url参数会进行url转义, 其他方法为entity参数.
+//	返回 body 是json.Unmarshal的数据.
 func Restful(method, rawUrl string, params map[string]any, headers map[string]string) (body map[string]any, httpCode int, err error) {
 	method = strings.ToUpper(method)
 

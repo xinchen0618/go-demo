@@ -12,10 +12,9 @@ type user struct{}
 // User 这里仅需结构体零值
 var User user
 
-// DeleteUsers
+// DeleteUsers 批量删除用户
 //
-//	@receiver user
-//	@param counts int
+//	counts 为需要删除的数量.
 func (user) DeleteUsers(counts int) {
 	userIds, err := dbx.FetchColumn(di.DemoDb(), "SELECT user_id FROM t_users ORDER BY user_id LIMIT ?", counts)
 	if err != nil {

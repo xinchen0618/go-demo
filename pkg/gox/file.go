@@ -9,10 +9,7 @@ import (
 
 // PutCsv 创建CSV文件
 //
-//	文件不存在会创建, 文件存在会覆盖写入
-//	@param name string
-//	@param data [][]string
-//	@return error
+//	文件不存在会创建, 文件存在会覆盖写入.
 func PutCsv(name string, data [][]string) error {
 	f, err := os.Create(name) // 创建文件
 	if err != nil {

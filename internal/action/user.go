@@ -14,11 +14,7 @@ type user struct{}
 // User 这里仅需结构体零值
 var User user
 
-// AddUser
-//
-//	@receiver user
-//	@param c *cli.Context
-//	@return error
+// AddUser 添加一个用户
 func (user) AddUser(c *cli.Context) error {
 	userName := c.Args().Get(0)
 	if "" == userName {

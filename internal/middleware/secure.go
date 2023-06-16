@@ -10,8 +10,6 @@ import (
 )
 
 // Recovery 主Goroutine中panic处理
-//
-//	@return gin.HandlerFunc
 func Recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
@@ -24,8 +22,6 @@ func Recovery() gin.HandlerFunc {
 }
 
 // Cors 跨域处理
-//
-//	@return gin.HandlerFunc
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.Header.Get("Origin") != "" {

@@ -12,10 +12,8 @@ var User user
 
 // CreateUser 创建用户
 //
-//	@receiver user
-//	@param userData map[string]any
-//	@return int64 用户id
-//	@return error
+//	userData 用户信息键值对.
+//	成功返回用户id.
 func (user) CreateUser(userData map[string]any) (int64, error) {
 	user, err := dbx.FetchOne(di.DemoDb(), "SELECT user_id FROM t_users WHERE user_name=?", userData["user_name"])
 	if err != nil {

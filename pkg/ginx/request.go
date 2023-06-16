@@ -44,12 +44,9 @@ type PageItems struct {
 
 // GetJsonBody 获取Json参数
 //
-//	@param c *gin.Context
-//	@param patterns []string ["paramKey:paramName:paramType:paramPattern"]
+//	patterns 模式格式 ["paramKey:paramName:paramType:paramPattern"]
 //	  paramType: 类型. 详情见FilterParam()方法paramType参数.
-//	  paramPattern: 传值模式. +表示字段必传,值不可为空; *表示字段选传,值可为空; ?表示字段选传,值不可为空.
-//	@return map[string]any
-//	@return error
+//	  paramPattern: 传值模式. + 表示字段必传,值不可为空; * 表示字段选传,值可为空; ? 表示字段选传,值不可为空.
 func GetJsonBody(c *gin.Context, patterns []string) (map[string]any, error) {
 	jsonBody := make(map[string]any)
 	_ = c.ShouldBindJSON(&jsonBody) // 这里的error不要处理, 因为空body会报error
@@ -92,12 +89,9 @@ func GetJsonBody(c *gin.Context, patterns []string) (map[string]any, error) {
 
 // GetQueries 获取Query参数
 //
-//	@param c *gin.Context
-//	@param patterns []string ["paramKey:paramName:paramType:defaultValue"]
+//	patterns 模式格式 ["paramKey:paramName:paramType:defaultValue"]
 //	  paramType: 类型. 详情见FilterParam()方法paramType参数.
-//	  defaultValue: 默认值. required表示参数必填, ""表示空字符串; 字符串不需要引号.
-//	@return map[string]any
-//	@return error
+//	  defaultValue: 默认值. required 表示参数必填, "" 表示空字符串; 字符串不需要引号.
 func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
 	result := make(map[string]any)
 	var err error
@@ -129,13 +123,17 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
 
 // FilterParam 校验参数类型
 //
-//	@param c *gin.Context
-//	@param paramName string
-//	@param paramValue any
-//	@param paramType string integer整型64位, +integer正整型64位, !-integer非负整型64位, string字符串, float.%d浮点数, decimal.%d精度小数, []枚举(支持数字float64与字符串string混合枚举), array数组, []integer整型64位数组, []string字符串数组
-//	@param allowEmpty bool
-//	@return any
-//	@return error
+//	paramType 参数类型:
+//		integer 整型64位,
+//		+integer 正整型64位,
+//		!-integer 非负整型64位,
+//		string 字符串,
+//		float.%d 浮点数,
+//		decimal.%d 精度小数,
+//		[] 枚举(支持数字float64与字符串string混合枚举),
+//		array 数组,
+//		[]integer 整型64位数组,
+//		[]string 字符串数组.
 func FilterParam(c *gin.Context, paramName string, paramValue any, paramType string, allowEmpty bool) (any, error) {
 	valueType := reflect.TypeOf(paramValue).String() // 用户输入值类型
 
@@ -340,11 +338,6 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 }
 
 // GetPageItems 获取分页数据
-//
-//	@param c *gin.Context
-//	@param pageQuery PageQuery
-//	@return PageItems
-//	@return error
 func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
 	queries, err := GetQueries(c, []string{"page:页码:+integer:1", "per_page:页大小:+integer:12"})
 	if err != nil {
