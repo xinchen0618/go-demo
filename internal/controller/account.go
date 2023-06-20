@@ -82,7 +82,7 @@ func (account) GetUsers(c *gin.Context) {
 
 	pageItems, err := ginx.GetPageItems(c, ginx.PageQuery{
 		Db:         di.DemoDb(),
-		Select:     "user_id,user_name,created_at,updated_at",
+		Select:     "user_id,user_name,created_at",
 		From:       "t_users",
 		Where:      where,
 		BindParams: bindParams,

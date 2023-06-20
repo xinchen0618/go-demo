@@ -18,7 +18,7 @@ require (
 	github.com/redis/go-redis/v9 v9.0.5
 	github.com/samber/lo v1.38.1
 	github.com/spf13/cast v1.5.1
-	github.com/urfave/cli/v2 v2.25.6
+	github.com/urfave/cli/v2 v2.25.7
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	go.uber.org/zap v1.24.0
 	golang.org/x/sync v0.3.0
