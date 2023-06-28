@@ -28,7 +28,7 @@ func UserJWTParse() gin.HandlerFunc {
 			ginx.InternalError(c, nil)
 			return
 		}
-		if 0 == userID {
+		if userID == 0 {
 			c.Next()
 			return
 		}
@@ -41,7 +41,7 @@ func UserJWTParse() gin.HandlerFunc {
 // UserAuth 用户鉴权
 func UserAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if 0 == c.GetInt64("userID") {
+		if c.GetInt64("userID") == 0 {
 			ginx.Error(c, 401, "UserUnauthorized", "您未登录或登录已过期, 请重新登录")
 			return
 		}

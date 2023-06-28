@@ -30,7 +30,7 @@ func Cors() gin.HandlerFunc {
 			c.Header("Access-Control-Allow-Headers", "Authorization, Content-Length, Accept, Origin, Host, Connection, Accept-Encoding, Accept-Language, DNT, Keep-Alive, User-Agent, If-Modified-Since, Cache-Control, Content-Type, Pragma")
 			c.Header("Access-Control-Max-Age", "1728000")
 			c.Header("Access-Control-Allow-Credentials", "false")
-			if "OPTIONS" == c.Request.Method {
+			if c.Request.Method == "OPTIONS" {
 				ginx.Success(c, 200, nil)
 				return
 			}

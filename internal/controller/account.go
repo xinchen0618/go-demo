@@ -38,7 +38,7 @@ func (account) PostUserLogin(c *gin.Context) {
 		ginx.InternalError(c, nil)
 		return
 	}
-	if 0 == user.UserID || !gox.PasswordVerify(jsonBody["password"].(string), user.Password) {
+	if user.UserID == 0 || !gox.PasswordVerify(jsonBody["password"].(string), user.Password) {
 		ginx.Error(c, 400, "UserInvalid", "用户名或密码不正确")
 		return
 	}
@@ -106,7 +106,7 @@ func (account) GetUsersByID(c *gin.Context) {
 		ginx.InternalError(c, nil)
 		return
 	}
-	if 0 == len(user) {
+	if len(user) == 0 {
 		ginx.Error(c, 404, "UserNotFound", "用户不存在")
 		return
 	}
@@ -151,7 +151,7 @@ func (account) PutUsersByID(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	if 0 == len(jsonBody) {
+	if len(jsonBody) == 0 {
 		ginx.Error(c, 400, "ParamError", "请至少传递一个参数")
 		return
 	}
@@ -161,7 +161,7 @@ func (account) PutUsersByID(c *gin.Context) {
 		ginx.InternalError(c, nil)
 		return
 	}
-	if 0 == len(user) {
+	if len(user) == 0 {
 		ginx.Error(c, 404, "UserNotFound", "用户不存在")
 		return
 	}

@@ -26,7 +26,7 @@ func (user) AddUser(ctx context.Context, t *asynq.Task) error {
 	}
 
 	// 参数校验
-	if "" == user.UserName {
+	if user.UserName == "" {
 		return fmt.Errorf("用户名不得为空. %w", asynq.SkipRetry)
 	}
 

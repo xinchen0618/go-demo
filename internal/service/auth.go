@@ -79,7 +79,7 @@ func (auth) JWTCheck(userType string, token string) (int64, error) {
 	if n, err := di.JWTRedis().Exists(context.Background(), key).Result(); err != nil {
 		di.Logger().Error(err.Error())
 		return 0, err
-	} else if 0 == n { // 不在白名单内
+	} else if n == 0 { // 不在白名单内
 		return 0, nil
 	}
 

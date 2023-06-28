@@ -17,7 +17,7 @@ var User user
 // AddUser 添加一个用户
 func (user) AddUser(c *cli.Context) error {
 	userName := c.Args().Get(0)
-	if "" == userName {
+	if userName == "" {
 		fmt.Println("请输入用户名")
 		return nil
 	}

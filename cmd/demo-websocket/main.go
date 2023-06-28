@@ -62,7 +62,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 			"message": "服务异常, 请稍后重试",
 		})
 		return
-	} else if 0 == n {
+	} else if n == 0 {
 		_ = service.WS.Send(client, "ClientError", map[string]any{
 			"code":    "UserUnauthorized",
 			"message": "您未登录或登录已过期, 请重新登录",

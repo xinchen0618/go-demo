@@ -42,7 +42,7 @@ func set(cache *redis.Client, db gorose.IOrm, table string, id any) (bool, error
 	if err != nil {
 		return false, err
 	}
-	if 0 == len(data) {
+	if len(data) == 0 {
 		return false, nil
 	}
 	dataBytes, err := msgpack.Marshal(data)
@@ -114,7 +114,7 @@ func Take(p any, cache *redis.Client, db gorose.IOrm, table string, id any) erro
 	if err != nil {
 		return err
 	}
-	if 0 == len(data) {
+	if len(data) == 0 {
 		return nil
 	}
 	if err := gox.TypeCast(data, p); err != nil {
@@ -136,7 +136,7 @@ func Update(cache *redis.Client, db gorose.IOrm, table string, data map[string]a
 	if err != nil {
 		return 0, err
 	}
-	if 0 == len(ids) {
+	if len(ids) == 0 {
 		return 0, nil
 	}
 	if err := Expired(cache, table, ids...); err != nil {
@@ -164,7 +164,7 @@ func Delete(cache *redis.Client, db gorose.IOrm, table string, where string, par
 	if err != nil {
 		return 0, err
 	}
-	if 0 == len(ids) {
+	if len(ids) == 0 {
 		return 0, nil
 	}
 	if err := Expired(cache, table, ids...); err != nil {
@@ -182,7 +182,7 @@ func Delete(cache *redis.Client, db gorose.IOrm, table string, where string, par
 
 // Expired 过期缓存
 func Expired(cache *redis.Client, table string, ids ...any) error {
-	if 0 == len(ids) {
+	if len(ids) == 0 {
 		return nil
 	}
 
@@ -217,7 +217,7 @@ func tablePrimaryKey(cache *redis.Client, db gorose.IOrm, table string) (string,
 			return "", err
 		}
 		for _, col := range cols {
-			if "PRI" == cast.ToString(col["Key"]) {
+			if cast.ToString(col["Key"]) == "PRI" {
 				return cast.ToString(col["Field"]), nil
 			}
 		}

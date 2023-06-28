@@ -12,7 +12,7 @@ var MicroChat microChat
 
 func (microChat) SendMessage(client *service.WSClient, data map[string]any) {
 	content := cast.ToString(data["content"])
-	if "" == content {
+	if content == "" {
 		return
 	}
 	content = "yes, " + content

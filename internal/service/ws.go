@@ -31,7 +31,7 @@ func (ws) Send(client *WSClient, msgType string, msgData map[string]any) error {
 		return errors.New("client is closed")
 	}
 
-	if nil == msgData {
+	if msgData == nil {
 		msgData = map[string]any{}
 	}
 	message, err := json.Marshal(WSMsg{

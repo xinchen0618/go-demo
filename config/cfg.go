@@ -13,7 +13,7 @@ var configure = map[string]map[string]any{}
 // GetRuntimeEnv 获取运行时环境
 func GetRuntimeEnv() string {
 	runtimeEnv := os.Getenv("RUNTIME_ENV")
-	if "" == runtimeEnv { // 默认为生产环境
+	if runtimeEnv == "" { // 默认为生产环境
 		runtimeEnv = "prod"
 	}
 

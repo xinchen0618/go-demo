@@ -9,7 +9,7 @@ import (
 //
 //	body 数据会json编码输出给客户端, nil表示无内容输出.
 func Success(c *gin.Context, httpCode int, body any) {
-	if nil == body {
+	if body == nil {
 		body = gin.H{}
 	}
 	c.JSON(httpCode, body)
