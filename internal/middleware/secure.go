@@ -21,8 +21,8 @@ func Recovery() gin.HandlerFunc {
 	}
 }
 
-// Cors 跨域处理
-func Cors() gin.HandlerFunc {
+// CORS 跨域处理
+func CORS() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.Header.Get("Origin") != "" {
 			c.Header("Access-Control-Allow-Origin", c.Request.Header.Get("Origin"))

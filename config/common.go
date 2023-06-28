@@ -20,6 +20,9 @@ func init() {
 		// 限流QPS
 		"qps_limit": 40000,
 
+		// 超时控制, 秒
+		"timeout": 30,
+
 		// DB DEMO
 		"mysql_host":           "127.0.0.1",
 		"mysql_port":           3306,

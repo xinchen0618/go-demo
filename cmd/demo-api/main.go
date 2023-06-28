@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"go-demo/config"
 	"go-demo/config/di"
@@ -23,8 +24,9 @@ func main() {
 
 	r.Use(
 		middleware.Recovery(),                           // panic处理
-		middleware.Cors(),                               // 跨域处理
-		middleware.QpsLimit(config.GetInt("qps_limit")), // 限流
+		middleware.CORS(),                               // 跨域处理
+		middleware.QPSLimit(config.GetInt("qps_limit")), // 限流
+		middleware.Timeout(time.Duration(config.GetInt("timeout"))*time.Second), // 超时控制
 	)
 
 	// 加载路由 DEMO

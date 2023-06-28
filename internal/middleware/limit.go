@@ -10,13 +10,14 @@ import (
 	"go-demo/pkg/ginx"
 	"go-demo/pkg/gox"
 
+	"github.com/gin-contrib/timeout"
 	"github.com/gin-gonic/gin"
 	"github.com/juju/ratelimit"
 	"github.com/spf13/cast"
 )
 
-// QpsLimit QPS限流
-func QpsLimit(qps int) gin.HandlerFunc {
+// QPSLimit QPS限流
+func QPSLimit(qps int) gin.HandlerFunc {
 	quantum := cast.ToInt64(qps)
 	bucket := ratelimit.NewBucketWithQuantum(time.Second, quantum, quantum)
 	return func(c *gin.Context) {
@@ -55,4 +56,17 @@ func SubmitLimit() gin.HandlerFunc {
 		}
 		c.Next()
 	}
+}
+
+// Timeout 超时控制
+func Timeout(t time.Duration) gin.HandlerFunc {
+	return timeout.New(
+		timeout.WithTimeout(t),
+		timeout.WithHandler(func(c *gin.Context) {
+			c.Next()
+		}),
+		timeout.WithResponse(func(c *gin.Context) {
+			ginx.Error(c, 408, "RequestTimeout", "请求超时, 请稍后重试")
+		}),
+	)
 }
