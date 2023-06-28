@@ -2,7 +2,7 @@ package consts
 
 // 鉴权
 const (
-	JwtLogin = "jwt:%s:%v:%s" // JWT登录凭证 jwt:<userType>:<userId>:<JwtSignature>
+	JWTLogin = "jwt:%s:%v:%s" // JWT登录凭证 jwt:<userType>:<userId>:<jwtSignature>
 )
 
 // 安全

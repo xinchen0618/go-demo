@@ -57,8 +57,8 @@ var (
 	jwtRedisOnce sync.Once
 )
 
-// JwtRedis JWT redis实例
-func JwtRedis() *redis.Client {
+// JWTRedis JWT redis实例
+func JWTRedis() *redis.Client {
 	jwtRedisOnce.Do(func() {
 		jwtRedis = redis.NewClient(&redis.Options{
 			Addr:     fmt.Sprintf("%s:%d", config.Get("redis_host"), config.Get("redis_port")),

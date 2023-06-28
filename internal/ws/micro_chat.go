@@ -10,14 +10,14 @@ type microChat struct{}
 
 var MicroChat microChat
 
-func (microChat) SendMessage(client *service.WsClient, data map[string]any) {
+func (microChat) SendMessage(client *service.WSClient, data map[string]any) {
 	content := cast.ToString(data["content"])
 	if "" == content {
 		return
 	}
 	content = "yes, " + content
 
-	_ = service.Ws.Send(client, "MicroChat:SendMessage", map[string]any{
+	_ = service.WS.Send(client, "MicroChat:SendMessage", map[string]any{
 		"content": content,
 	})
 }

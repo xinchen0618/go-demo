@@ -25,7 +25,8 @@
   
 - 编码规范 
   
-  <a href="https://github.com/xxjwxc/uber_go_guide_cn" target="_blank">Uber Go 语言编码规范</a>
+  - <a href="https://github.com/xxjwxc/uber_go_guide_cn" target="_blank">Uber Go 语言编码规范</a>
+  - <a href="https://google.github.io/styleguide/go/" target="_blank">Google Style Guides</a>
 
 ### 目录结构
 
@@ -59,12 +60,12 @@
   - task/               消息队列任务 
   - service/            内部应用业务原子级服务. 业务应优先考虑是否可以封装为原子级操作以提高代码复用性
 - pkg/                  外部应用可以使用的代码. 不依赖内部应用的代码
-  - dbx/                db操作封装. MySQL增删改查操作封装
-  - ginx/               gin增强方法. 此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
-  - gox/                golang增强方法
-  - queuex/             消息队列操作封装
-  - dbcache/            db缓存
-  - xcache/             自定义缓存
+  - dbx/                db增删改查操作函数
+  - ginx/               gin增强函数. 此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
+  - gox/                golang增强函数
+  - queuex/             消息队列操作函数
+  - dbcache/            db缓存操作函数
+  - xcache/             自定义缓存操作函数
 - go.mod                包管理  
 ```
 
@@ -184,7 +185,7 @@
 
   - 校验账户信息
   - 生成JWT Token
-  - 以 `jwt:<userType>:<userId>:<JwtSignature>`的格式记录入Redis白名单
+  - 以 `jwt:<userType>:<userID>:<jwtSignature>`的格式记录入Redis白名单
   - JWT Token返回给客户端
 
 - 校验登录

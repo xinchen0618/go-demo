@@ -6,7 +6,7 @@ require (
 	github.com/alitto/pond v1.8.3
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-co-op/gocron v1.28.3
+	github.com/go-co-op/gocron v1.30.0
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/goccy/go-json v0.10.2
 	github.com/gohouse/gorose/v2 v2.1.12
@@ -25,7 +25,7 @@ require (
 )
 
 require (
-	github.com/bytedance/sonic v1.9.1 // indirect
+	github.com/bytedance/sonic v1.9.2 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect

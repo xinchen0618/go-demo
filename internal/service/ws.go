@@ -10,22 +10,22 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type WsClient struct {
+type WSClient struct {
 	Conn     *websocket.Conn
 	IsClosed bool
 }
 
-type WsMsg struct {
+type WSMsg struct {
 	Type string         `json:"type"`
 	Data map[string]any `json:"data"`
 }
 
 type ws struct{}
 
-var Ws ws
+var WS ws
 
 // Send 发送消息
-func (ws) Send(client *WsClient, msgType string, msgData map[string]any) error {
+func (ws) Send(client *WSClient, msgType string, msgData map[string]any) error {
 	if client.IsClosed {
 		di.Logger().Error(fmt.Sprintf("%p client is closed", client))
 		return errors.New("client is closed")
@@ -34,7 +34,7 @@ func (ws) Send(client *WsClient, msgType string, msgData map[string]any) error {
 	if nil == msgData {
 		msgData = map[string]any{}
 	}
-	message, err := json.Marshal(WsMsg{
+	message, err := json.Marshal(WSMsg{
 		Type: msgType,
 		Data: msgData,
 	})
@@ -51,7 +51,7 @@ func (ws) Send(client *WsClient, msgType string, msgData map[string]any) error {
 }
 
 // Close 关闭client
-func (ws) Close(client *WsClient) {
+func (ws) Close(client *WSClient) {
 	if client.IsClosed {
 		return
 	}

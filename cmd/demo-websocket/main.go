@@ -25,7 +25,7 @@ var (
 )
 
 func socketHandler(w http.ResponseWriter, r *http.Request) {
-	client := &service.WsClient{Conn: nil, IsClosed: true}
+	client := &service.WSClient{Conn: nil, IsClosed: true}
 	// Upgrade our raw HTTP connection to a websocket based one
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -35,35 +35,35 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	client.Conn = conn
 	client.IsClosed = false
 	// Close
-	defer service.Ws.Close(client)
+	defer service.WS.Close(client)
 
 	// 鉴权, jwt redis白名单
-	clientId := r.URL.Query().Get("client_id") // url_base64(userId:jwtSignature)
-	clientIdDecoded, err := base64.RawURLEncoding.DecodeString(clientId)
+	clientID := r.URL.Query().Get("client_id") // url_base64(userID:jwtSignature)
+	clientIDDecoded, err := base64.RawURLEncoding.DecodeString(clientID)
 	if err != nil {
-		_ = service.Ws.Send(client, "ClientError", map[string]any{
+		_ = service.WS.Send(client, "ClientError", map[string]any{
 			"code":    "UserUnauthorized",
 			"message": "您未登录或登录已过期, 请重新登录",
 		})
 		return
 	}
-	userJwt := strings.Split(string(clientIdDecoded), ":")
-	if len(userJwt) != 2 {
-		_ = service.Ws.Send(client, "ClientError", map[string]any{
+	userJWT := strings.Split(string(clientIDDecoded), ":")
+	if len(userJWT) != 2 {
+		_ = service.WS.Send(client, "ClientError", map[string]any{
 			"code":    "UserUnauthorized",
 			"message": "您未登录或登录已过期, 请重新登录",
 		})
 		return
 	}
-	key := fmt.Sprintf(consts.JwtLogin, consts.UserJwt, userJwt[0], userJwt[1])
-	if n, err := di.JwtRedis().Exists(context.Background(), key).Result(); err != nil {
-		_ = service.Ws.Send(client, "ClientError", map[string]any{
+	key := fmt.Sprintf(consts.JWTLogin, consts.UserJWT, userJWT[0], userJWT[1])
+	if n, err := di.JWTRedis().Exists(context.Background(), key).Result(); err != nil {
+		_ = service.WS.Send(client, "ClientError", map[string]any{
 			"code":    "InternalError",
 			"message": "服务异常, 请稍后重试",
 		})
 		return
 	} else if 0 == n {
-		_ = service.Ws.Send(client, "ClientError", map[string]any{
+		_ = service.WS.Send(client, "ClientError", map[string]any{
 			"code":    "UserUnauthorized",
 			"message": "您未登录或登录已过期, 请重新登录",
 		})
@@ -102,9 +102,9 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			break
 		}
-		msg := service.WsMsg{}
+		msg := service.WSMsg{}
 		if err := json.Unmarshal(message, &msg); err != nil {
-			_ = service.Ws.Send(client, "ClientError", map[string]any{
+			_ = service.WS.Send(client, "ClientError", map[string]any{
 				"code":    "MessageError",
 				"message": "消息格式不正确",
 			})
@@ -116,7 +116,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		case "MicroChat:SendMessage": // DEMO
 			ws.MicroChat.SendMessage(client, msg.Data)
 		default: // 未知路由
-			_ = service.Ws.Send(client, "ClientError", map[string]any{
+			_ = service.WS.Send(client, "ClientError", map[string]any{
 				"code":    "TypeError",
 				"message": "未知消息类型",
 			})

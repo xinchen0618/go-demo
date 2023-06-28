@@ -23,7 +23,7 @@ import (
 
 // PageQuery 分页参数
 type PageQuery struct {
-	Db         gorose.IOrm
+	DB         gorose.IOrm
 	Select     string
 	From       string
 	Where      string
@@ -35,11 +35,11 @@ type PageQuery struct {
 
 // PageItems 分页结果
 type PageItems struct {
-	Page        int64            `json:"page"`
-	PerPage     int64            `json:"per_page"`
-	TotalPages  int64            `json:"total_pages"`
-	TotalCounts int64            `json:"total_counts"`
-	Items       []map[string]any `json:"items"`
+	Page         int64            `json:"page"`          // 页码
+	PerPage      int64            `json:"per_page"`      // 页大小
+	TotalPages   int64            `json:"total_pages"`   // 总页数
+	TotalResults int64            `json:"total_results"` // 总记录数
+	Items        []map[string]any `json:"items"`         // 列表
 }
 
 // GetJsonBody 获取Json参数
@@ -356,29 +356,29 @@ func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
 		where = "1"
 	}
 
-	var countSql string
+	var countSQL string
 	if pageQuery.GroupBy != "" { // GROUP BY存在总记录数计算方式会不同
 		where += " GROUP BY " + pageQuery.GroupBy
 		if pageQuery.Having != "" {
 			where += " HAVING " + pageQuery.Having
 		}
-		countSql = fmt.Sprintf("SELECT COUNT(*) AS counts FROM (SELECT %s FROM %s WHERE %s) AS t", pageQuery.Select, pageQuery.From, where)
+		countSQL = fmt.Sprintf("SELECT COUNT(*) FROM (SELECT %s FROM %s WHERE %s) AS t", pageQuery.Select, pageQuery.From, where)
 	} else {
-		countSql = fmt.Sprintf("SELECT COUNT(*) AS counts FROM %s WHERE %s", pageQuery.From, where)
+		countSQL = fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE %s", pageQuery.From, where)
 	}
-	countsData, err := dbx.FetchValue(pageQuery.Db, countSql, bindParams...) // 计算总记录数
+	countValue, err := dbx.FetchValue(pageQuery.DB, countSQL, bindParams...) // 计算总记录数
 	if err != nil {
 		InternalError(c, nil)
 		return PageItems{}, errors.New("InternalError")
 	}
-	counts := countsData.(int64)
-	if 0 == counts { // 没有数据
+	totalResults := countValue.(int64)
+	if 0 == totalResults { // 没有数据
 		result := PageItems{
-			Page:        page,
-			PerPage:     perPage,
-			TotalPages:  0,
-			TotalCounts: 0,
-			Items:       []map[string]any{},
+			Page:         page,
+			PerPage:      perPage,
+			TotalPages:   0,
+			TotalResults: 0,
+			Items:        []map[string]any{},
 		}
 		return result, nil
 	}
@@ -389,17 +389,17 @@ func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
 	}
 	offset := (page - 1) * perPage
 	sql += fmt.Sprintf(" LIMIT %d, %d", offset, perPage)
-	items, err := dbx.FetchAll(pageQuery.Db, sql, bindParams...)
+	items, err := dbx.FetchAll(pageQuery.DB, sql, bindParams...)
 	if err != nil {
 		InternalError(c, nil)
 		return PageItems{}, errors.New("InternalError")
 	}
 	result := PageItems{
-		Page:        page,
-		PerPage:     perPage,
-		TotalPages:  int64(math.Ceil(float64(counts) / float64(perPage))),
-		TotalCounts: counts,
-		Items:       items,
+		Page:         page,
+		PerPage:      perPage,
+		TotalPages:   int64(math.Ceil(float64(totalResults) / float64(perPage))),
+		TotalResults: totalResults,
+		Items:        items,
 	}
 	return result, nil
 }

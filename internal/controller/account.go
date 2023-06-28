@@ -29,34 +29,34 @@ func (account) PostUserLogin(c *gin.Context) {
 
 	// 校验密码
 	var user struct {
-		UserId   int64  `json:"user_id"`
+		UserID   int64  `json:"user_id"`
 		UserName string `json:"user_name"`
 		Password string `json:"password"`
 	}
 	sql := "SELECT user_id,user_name,password FROM t_users WHERE user_name=? LIMIT 1"
-	if err := dbx.TakeOne(&user, di.DemoDb(), sql, jsonBody["user_name"]); err != nil {
+	if err := dbx.TakeOne(&user, di.DemoDB(), sql, jsonBody["user_name"]); err != nil {
 		ginx.InternalError(c, nil)
 		return
 	}
-	if 0 == user.UserId || !gox.PasswordVerify(jsonBody["password"].(string), user.Password) {
+	if 0 == user.UserID || !gox.PasswordVerify(jsonBody["password"].(string), user.Password) {
 		ginx.Error(c, 400, "UserInvalid", "用户名或密码不正确")
 		return
 	}
 
 	// JWT登录
-	token, err := service.Auth.JwtLogin(consts.UserJwt, user.UserId, user.UserName)
+	token, err := service.Auth.JWTLogin(consts.UserJWT, user.UserID, user.UserName)
 	if err != nil {
 		ginx.InternalError(c, nil)
 		return
 	}
 
-	ginx.Success(c, 200, gin.H{"user_id": user.UserId, "token": token})
+	ginx.Success(c, 200, gin.H{"user_id": user.UserID, "token": token})
 }
 
 func (account) DeleteUserLogout(c *gin.Context) {
-	userId := c.GetInt64("userId")
+	userID := c.GetInt64("userID")
 	token := c.Request.Header.Get("Authorization")[7:]
-	if err := service.Auth.JwtLogout(consts.UserJwt, token, userId); err != nil {
+	if err := service.Auth.JWTLogout(consts.UserJWT, token, userID); err != nil {
 		ginx.InternalError(c, nil)
 		return
 	}
@@ -81,7 +81,7 @@ func (account) GetUsers(c *gin.Context) {
 	}
 
 	pageItems, err := ginx.GetPageItems(c, ginx.PageQuery{
-		Db:         di.DemoDb(),
+		DB:         di.DemoDB(),
 		Select:     "user_id,user_name,created_at",
 		From:       "t_users",
 		Where:      where,
@@ -95,13 +95,13 @@ func (account) GetUsers(c *gin.Context) {
 	ginx.Success(c, 200, pageItems)
 }
 
-func (account) GetUsersById(c *gin.Context) {
-	userId, err := ginx.FilterParam(c, "用户id", c.Param("user_id"), "+integer", false)
+func (account) GetUsersByID(c *gin.Context) {
+	userID, err := ginx.FilterParam(c, "用户id", c.Param("user_id"), "+integer", false)
 	if err != nil {
 		return
 	}
 
-	user, err := dbcache.Get(di.CacheRedis(), di.DemoDb(), "t_users", userId)
+	user, err := dbcache.Get(di.CacheRedis(), di.DemoDB(), "t_users", userID)
 	if err != nil {
 		ginx.InternalError(c, nil)
 		return
@@ -115,19 +115,19 @@ func (account) GetUsersById(c *gin.Context) {
 }
 
 func (account) PostUsers(c *gin.Context) {
-	jsonBody, err := ginx.GetJsonBody(c, []string{"counts:数量:+integer:*"})
+	jsonBody, err := ginx.GetJsonBody(c, []string{"user_count:数量:+integer:*"})
 	if err != nil {
 		return
 	}
 
-	counts := 100
-	if _, ok := jsonBody["counts"]; ok {
-		counts = cast.ToInt(jsonBody["counts"])
+	userCount := 100
+	if _, ok := jsonBody["user_count"]; ok {
+		userCount = cast.ToInt(jsonBody["user_count"])
 	}
 
 	// 多线程写Demo
 	wpsg := di.WorkerPoolSeparate(100).Group()
-	for i := 0; i < counts; i++ {
+	for i := 0; i < userCount; i++ {
 		wpsg.Submit(func() {
 			userData := map[string]any{
 				"user_name": fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999)),
@@ -138,11 +138,11 @@ func (account) PostUsers(c *gin.Context) {
 	}
 	wpsg.Wait()
 
-	ginx.Success(c, 201, gin.H{"counts": counts})
+	ginx.Success(c, 201, gin.H{"user_count": userCount})
 }
 
-func (account) PutUsersById(c *gin.Context) {
-	userId, err := ginx.FilterParam(c, "用户id", c.Param("user_id"), "+integer", false)
+func (account) PutUsersByID(c *gin.Context) {
+	userID, err := ginx.FilterParam(c, "用户id", c.Param("user_id"), "+integer", false)
 	if err != nil {
 		return
 	}
@@ -156,7 +156,7 @@ func (account) PutUsersById(c *gin.Context) {
 		return
 	}
 
-	user, err := dbcache.Get(di.CacheRedis(), di.DemoDb(), "t_users", userId)
+	user, err := dbcache.Get(di.CacheRedis(), di.DemoDB(), "t_users", userID)
 	if err != nil {
 		ginx.InternalError(c, nil)
 		return
@@ -168,7 +168,7 @@ func (account) PutUsersById(c *gin.Context) {
 
 	if _, ok := jsonBody["user_name"]; ok {
 		sql := "SELECT user_id FROM t_users WHERE user_name = ? AND user_id != ?"
-		userConflict, err := dbx.FetchOne(di.DemoDb(), sql, jsonBody["user_name"], userId)
+		userConflict, err := dbx.FetchOne(di.DemoDB(), sql, jsonBody["user_name"], userID)
 		if err != nil {
 			ginx.InternalError(c, nil)
 			return
@@ -182,7 +182,7 @@ func (account) PutUsersById(c *gin.Context) {
 		jsonBody["password"] = gox.PasswordHash(password)
 	}
 
-	if _, err := dbcache.Update(di.CacheRedis(), di.DemoDb(), "t_users", jsonBody, "user_id = ?", userId); err != nil {
+	if _, err := dbcache.Update(di.CacheRedis(), di.DemoDB(), "t_users", jsonBody, "user_id = ?", userID); err != nil {
 		ginx.InternalError(c, nil)
 		return
 	}

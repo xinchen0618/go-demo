@@ -14,16 +14,16 @@ var User user
 
 // DeleteUsers 批量删除用户
 //
-//	counts 为需要删除的数量.
-func (user) DeleteUsers(counts int) {
-	userIds, err := dbx.FetchColumn(di.DemoDb(), "SELECT user_id FROM t_users ORDER BY user_id LIMIT ?", counts)
+//	userCount 为需要删除的数量.
+func (user) DeleteUsers(userCount int) {
+	userIDs, err := dbx.FetchColumn(di.DemoDB(), "SELECT user_id FROM t_users ORDER BY user_id LIMIT ?", userCount)
 	if err != nil {
 		return
 	}
-	for _, userId := range userIds {
-		userId := userId
+	for _, userID := range userIDs {
+		userID := userID
 		di.WorkerPool().Submit(func() {
-			_, _ = dbcache.Delete(di.CacheRedis(), di.DemoDb(), "t_users", "user_id = ?", userId)
+			_, _ = dbcache.Delete(di.CacheRedis(), di.DemoDB(), "t_users", "user_id = ?", userID)
 		})
 	}
 }

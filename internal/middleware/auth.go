@@ -10,10 +10,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// UserJwtParse 用户JWT解析
+// UserJWTParse 用户JWT解析
 //
-//	解析成功会将userId存入gin上下文
-func UserJwtParse() gin.HandlerFunc {
+//	解析成功会将userId存入gin上下文.
+func UserJWTParse() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.Request.Header.Get("Authorization") // Authorization: Bearer <token>
 		if !strings.HasPrefix(tokenString, "Bearer ") {
@@ -23,17 +23,17 @@ func UserJwtParse() gin.HandlerFunc {
 		tokenString = tokenString[7:]
 
 		// JWT校验
-		userId, err := service.Auth.JwtCheck(consts.UserJwt, tokenString)
+		userID, err := service.Auth.JWTCheck(consts.UserJWT, tokenString)
 		if err != nil {
 			ginx.InternalError(c, nil)
 			return
 		}
-		if 0 == userId {
+		if 0 == userID {
 			c.Next()
 			return
 		}
 
-		c.Set("userId", userId) // 后续的处理函数可以用过c.GetInt64("userId")来获取当前请求的用户信息
+		c.Set("userID", userID) // 后续的处理函数可以用过c.GetInt64("userID")来获取当前请求的用户信息
 		c.Next()
 	}
 }
@@ -41,7 +41,7 @@ func UserJwtParse() gin.HandlerFunc {
 // UserAuth 用户鉴权
 func UserAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if 0 == c.GetInt64("userId") {
+		if 0 == c.GetInt64("userID") {
 			ginx.Error(c, 401, "UserUnauthorized", "您未登录或登录已过期, 请重新登录")
 			return
 		}

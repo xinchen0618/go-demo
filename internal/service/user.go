@@ -15,7 +15,7 @@ var User user
 //	userData 用户信息键值对.
 //	成功返回用户id.
 func (user) CreateUser(userData map[string]any) (int64, error) {
-	user, err := dbx.FetchOne(di.DemoDb(), "SELECT user_id FROM t_users WHERE user_name=?", userData["user_name"])
+	user, err := dbx.FetchOne(di.DemoDB(), "SELECT user_id FROM t_users WHERE user_name=?", userData["user_name"])
 	if err != nil {
 		return 0, err
 	}
@@ -23,5 +23,5 @@ func (user) CreateUser(userData map[string]any) (int64, error) {
 		return user["user_id"].(int64), nil
 	}
 
-	return dbx.Insert(di.DemoDb(), "t_users", userData)
+	return dbx.Insert(di.DemoDB(), "t_users", userData)
 }

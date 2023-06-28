@@ -35,10 +35,10 @@ func SubmitLimit() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var uid string // md5(id+method+path)
 		// 优先取用户id作为唯一标识, 如果没有则取ip+agent作为唯一标识
-		if c.GetInt64("userId") > 0 {
-			uid = cast.ToString(c.GetInt64("userId"))
-		} else if c.GetInt64("adminId") > 0 {
-			uid = cast.ToString(c.GetInt64("adminId"))
+		if c.GetInt64("userID") > 0 {
+			uid = cast.ToString(c.GetInt64("userID"))
+		} else if c.GetInt64("adminID") > 0 {
+			uid = cast.ToString(c.GetInt64("adminID"))
 		} else {
 			uid = c.ClientIP() + ":" + c.Request.UserAgent()
 		}
