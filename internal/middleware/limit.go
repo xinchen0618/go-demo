@@ -10,10 +10,10 @@ import (
 	"go-demo/pkg/ginx"
 	"go-demo/pkg/gox"
 
-	"github.com/gin-contrib/timeout"
 	"github.com/gin-gonic/gin"
 	"github.com/juju/ratelimit"
 	"github.com/spf13/cast"
+	"github.com/vearne/gin-timeout"
 )
 
 // QPSLimit QPS限流
@@ -60,13 +60,9 @@ func SubmitLimit() gin.HandlerFunc {
 
 // Timeout 超时控制
 func Timeout(t time.Duration) gin.HandlerFunc {
-	return timeout.New(
+	return timeout.Timeout(
 		timeout.WithTimeout(t),
-		timeout.WithHandler(func(c *gin.Context) {
-			c.Next()
-		}),
-		timeout.WithResponse(func(c *gin.Context) {
-			ginx.Error(c, 408, "RequestTimeout", "请求超时, 请稍后重试")
-		}),
+		timeout.WithErrorHttpCode(408), // optional
+		timeout.WithDefaultMsg(`{"code": "RequestTimeout", "message":"请求超时, 请稍后重试"}`), // optional
 	)
 }
