@@ -13,11 +13,11 @@ import (
 	"go.uber.org/zap"
 )
 
-// Restful 发起Restful请求
+// RESTful 发起RESTful请求
 //
 //	params 为GET/DELETE为url参数, url参数会进行url转义, 其他方法为entity参数.
 //	返回 body 是json.Unmarshal的数据.
-func Restful(method, rawUrl string, params map[string]any, headers map[string]string) (body map[string]any, httpCode int, err error) {
+func RESTful(method, rawUrl string, params map[string]any, headers map[string]string) (body map[string]any, httpCode int, err error) {
 	method = strings.ToUpper(method)
 
 	// 参数
