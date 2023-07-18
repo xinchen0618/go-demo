@@ -22,7 +22,7 @@ type account struct{}
 var Account account
 
 func (account) PostUserLogin(c *gin.Context) {
-	jsonBody, err := ginx.GetJsonBody(c, []string{"user_name:用户名:string:+", "password:密码:string:+"})
+	jsonBody, err := ginx.GetJSONBody(c, []string{"user_name:用户名:string:+", "password:密码:string:+"})
 	if err != nil {
 		return
 	}
@@ -115,7 +115,7 @@ func (account) GetUsersByID(c *gin.Context) {
 }
 
 func (account) PostUsers(c *gin.Context) {
-	jsonBody, err := ginx.GetJsonBody(c, []string{"user_count:数量:+integer:*"})
+	jsonBody, err := ginx.GetJSONBody(c, []string{"user_count:数量:+integer:*"})
 	if err != nil {
 		return
 	}
@@ -147,7 +147,7 @@ func (account) PutUsersByID(c *gin.Context) {
 		return
 	}
 
-	jsonBody, err := ginx.GetJsonBody(c, []string{"user_name:用户名:string:?", "password:密码:string:?"})
+	jsonBody, err := ginx.GetJSONBody(c, []string{"user_name:用户名:string:?", "password:密码:string:?"})
 	if err != nil {
 		return
 	}

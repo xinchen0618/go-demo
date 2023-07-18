@@ -42,12 +42,12 @@ type PageItems struct {
 	Items        []map[string]any `json:"items"`         // 列表
 }
 
-// GetJsonBody 获取Json参数
+// GetJSONBody 获取JSON参数
 //
 //	patterns 模式格式 ["paramKey:paramName:paramType:paramPattern"]
 //	  paramType: 类型. 详情见FilterParam()方法paramType参数.
 //	  paramPattern: 传值模式. + 表示字段必传,值不可为空; * 表示字段选传,值可为空; ? 表示字段选传,值不可为空.
-func GetJsonBody(c *gin.Context, patterns []string) (map[string]any, error) {
+func GetJSONBody(c *gin.Context, patterns []string) (map[string]any, error) {
 	jsonBody := make(map[string]any)
 	_ = c.ShouldBindJSON(&jsonBody) // 这里的error不要处理, 因为空body会报error
 
