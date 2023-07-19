@@ -43,7 +43,7 @@ func SubmitLimit() gin.HandlerFunc {
 		} else {
 			uid = c.ClientIP() + ":" + c.Request.UserAgent()
 		}
-		uid = gox.Md5(uid + ":" + c.Request.Method + ":" + c.Request.URL.Path)
+		uid = gox.MD5(uid + ":" + c.Request.Method + ":" + c.Request.URL.Path)
 		key := fmt.Sprintf(consts.SubmitLimit, uid)
 		ok, err := di.CacheRedis().SetNX(context.Background(), key, 1, 2*time.Second).Result() // 2秒/次
 		if err != nil {
