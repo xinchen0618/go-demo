@@ -1,3 +1,6 @@
+// Package dbcache MySQL增删改查操作函数并维护缓存
+//
+//	这里数据使用的msgpack编码, 这种编码可以保留字段的类型.
 package dbcache
 
 import (

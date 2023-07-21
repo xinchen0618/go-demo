@@ -45,7 +45,7 @@
     - db.go             db服务
     - logger.go         日志服务
     - queue.go          消息队列服务
-    - redis.go          redis服务
+    - redis.go          Redis服务
     - worker_pool.go    Goroutine池服务
   - cfg.go              配置实现
   - common.go           公共配置

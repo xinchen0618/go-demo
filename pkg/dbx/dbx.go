@@ -1,4 +1,4 @@
-// Package dbx MySQL增删改查操作封装
+// Package dbx MySQL增删改查操作函数
 //
 //	MySQL=>Golang数据类型映射:
 //		bigint/int/smallint/tinyint => int64,

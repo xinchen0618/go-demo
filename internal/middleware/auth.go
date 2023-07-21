@@ -12,7 +12,7 @@ import (
 
 // UserJWTParse 用户JWT解析
 //
-//	解析成功会将userId存入gin上下文.
+//	解析成功会将userID存入gin上下文.
 func UserJWTParse() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.Request.Header.Get("Authorization") // Authorization: Bearer <token>
