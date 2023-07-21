@@ -48,12 +48,14 @@ type PageItems struct {
 //	  paramType: 类型. 详情见FilterParam()方法paramType参数.
 //	  paramPattern: 传值模式. + 表示字段必传,值不可为空; * 表示字段选传,值可为空; ? 表示字段选传,值不可为空.
 func GetJSONBody(c *gin.Context, patterns []string) (map[string]any, error) {
+	// body
 	jsonBody := make(map[string]any)
 	_ = c.ShouldBindJSON(&jsonBody) // 这里的error不要处理, 因为空body会报error
-
+	// 逐字段校验
 	result := make(map[string]any)
 	var err error
 	for _, pattern := range patterns {
+		// pattern
 		patternAtoms := strings.Split(pattern, ":")
 		required := true
 		allowEmpty := false
@@ -67,7 +69,7 @@ func GetJSONBody(c *gin.Context, patterns []string) (map[string]any, error) {
 			required = false
 			allowEmpty = false
 		}
-
+		// key
 		paramValue, ok := jsonBody[patternAtoms[0]]
 		if !ok {
 			if required {
@@ -77,7 +79,7 @@ func GetJSONBody(c *gin.Context, patterns []string) (map[string]any, error) {
 				continue
 			}
 		}
-
+		// 类型值
 		result[patternAtoms[0]], err = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
 		if err != nil {
 			return nil, err
@@ -93,15 +95,18 @@ func GetJSONBody(c *gin.Context, patterns []string) (map[string]any, error) {
 //	  paramType: 类型. 详情见FilterParam()方法paramType参数.
 //	  defaultValue: 默认值. required 表示参数必填, "" 表示空字符串; 字符串不需要引号.
 func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
+	// 逐字段校验
 	result := make(map[string]any)
 	var err error
 	for _, pattern := range patterns {
 		patternAtoms := strings.Split(pattern, ":")
+		// default
 		allowEmpty := false
 		if patternAtoms[3] == `""` { // 默认值""表示空字符串
 			patternAtoms[3] = ""
 			allowEmpty = true
 		}
+		// key
 		paramValue := c.Query(patternAtoms[0])
 		if paramValue == "" {
 			if patternAtoms[3] == "required" { // 必填
@@ -111,7 +116,7 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
 				paramValue = patternAtoms[3]
 			}
 		}
-
+		// 类型值
 		result[patternAtoms[0]], err = FilterParam(c, patternAtoms[1], paramValue, patternAtoms[2], allowEmpty)
 		if err != nil {
 			return nil, err
@@ -198,21 +203,22 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 
 	// 浮点数, float.%d, 数字表示精度(没有后补零), 超过精度四舍五入, 点号同数字可省略, 表示无限制, 返回类型为float64
 	if lo.Substring(paramType, 0, 5) == "float" {
+		// 值
 		valueStr, err := FilterParam(c, paramName, paramValue, "string", allowEmpty)
 		if err != nil {
 			return nil, err
 		}
-
+		// 空值
 		if valueStr.(string) == "" && allowEmpty {
 			return 0.0, nil
 		}
-
+		// float
 		valueFloat, err := cast.ToFloat64E(valueStr)
 		if err != nil {
 			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
 			return nil, errors.New("ParamInvalid")
 		}
-
+		// 精度
 		prec := -1
 		precStr := lo.Substring(paramType, 6, math.MaxUint)
 		if precStr != "" {
@@ -339,23 +345,24 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 
 // GetPageItems 获取分页数据
 func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
+	// 页码
 	queries, err := GetQueries(c, []string{"page:页码:+integer:1", "per_page:页大小:+integer:12"})
 	if err != nil {
 		return PageItems{}, err
 	}
 	page := queries["page"].(int64)
 	perPage := queries["per_page"].(int64)
-
+	// 绑定参数
 	bindParams := make([]any, 0)
 	if pageQuery.BindParams != nil {
 		bindParams = pageQuery.BindParams
 	}
-
+	// WHERE
 	where := pageQuery.Where
 	if where == "" {
 		where = "1"
 	}
-
+	// 总记录数
 	var countSQL string
 	if pageQuery.GroupBy != "" { // GROUP BY存在总记录数计算方式会不同
 		where += " GROUP BY " + pageQuery.GroupBy
@@ -382,7 +389,7 @@ func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
 		}
 		return result, nil
 	}
-
+	// items
 	sql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", pageQuery.Select, pageQuery.From, where)
 	if pageQuery.OrderBy != "" {
 		sql += fmt.Sprintf(" ORDER BY %s", pageQuery.OrderBy)

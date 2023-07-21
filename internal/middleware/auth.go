@@ -1,3 +1,4 @@
+// Package middleware gin中间件
 package middleware
 
 import (
@@ -23,7 +24,6 @@ import (
 func JWTParse(userType string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := lo.Substring(c.Request.Header.Get("Authorization"), 7, math.MaxUint) // Authorization: Bearer <token>
-
 		// JWT校验
 		jwtToken, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 			return []byte(config.GetString("jwt_secret")), nil
@@ -37,7 +37,6 @@ func JWTParse(userType string) gin.HandlerFunc {
 			c.Next()
 			return
 		}
-
 		// 白名单校验
 		tokenAtoms := strings.Split(tokenString, ".")
 		key := fmt.Sprintf(consts.JWTLogin, userType, claims["jti"], tokenAtoms[2])
@@ -49,7 +48,6 @@ func JWTParse(userType string) gin.HandlerFunc {
 			c.Next()
 			return
 		}
-
 		// id存入gin上下文
 		id := cast.ToInt64(claims["jti"])
 		if userType == consts.UserJWT {
