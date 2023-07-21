@@ -23,7 +23,7 @@ var Auth auth
 //
 //	先生成JWT, 再记录redis白名单.
 //	userType 为JWT登录用户类型, 集中在consts/auth.go中定义. id 为用户id.
-//	返回字符串为 jwt token.
+//	返回字符串为 JWT token.
 func (auth) JWTLogin(userType string, id int64, userName string) (string, error) {
 	// JWT登录
 	loginTtl := 30 * 24 * time.Hour  // 登录有效时长
@@ -54,36 +54,6 @@ func (auth) JWTLogin(userType string, id int64, userName string) (string, error)
 	}
 
 	return tokenString, nil
-}
-
-// JWTCheck JWT校验
-//
-//	userType 为JWT登录用户类型, 集中在consts/auth.go中定义.
-//	返回用户id, 0表示校验不通过.
-func (auth) JWTCheck(userType string, token string) (int64, error) {
-	// JWT解析
-	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (any, error) {
-		return []byte(config.GetString("jwt_secret")), nil
-	})
-	if err != nil { // token无效
-		return 0, nil
-	}
-	claims, ok := jwtToken.Claims.(jwt.MapClaims)
-	if !ok || !jwtToken.Valid { // token秘钥/时间等校验未通过
-		return 0, nil
-	}
-
-	// 白名单
-	tokenAtoms := strings.Split(token, ".")
-	key := fmt.Sprintf(consts.JWTLogin, userType, claims["jti"], tokenAtoms[2])
-	if n, err := di.JWTRedis().Exists(context.Background(), key).Result(); err != nil {
-		di.Logger().Error(err.Error())
-		return 0, err
-	} else if n == 0 { // 不在白名单内
-		return 0, nil
-	}
-
-	return cast.ToInt64(claims["jti"]), nil
 }
 
 // JWTLogout JWT登出

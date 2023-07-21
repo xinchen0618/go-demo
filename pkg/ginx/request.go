@@ -1,6 +1,6 @@
-// Package ginx gin增强方法
+// Package ginx gin增强函数
 //
-//	此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
+//	此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可.
 package ginx
 
 import (
@@ -214,7 +214,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		}
 
 		prec := -1
-		precStr := lo.Substring(paramType, 6, math.MaxInt)
+		precStr := lo.Substring(paramType, 6, math.MaxUint)
 		if precStr != "" {
 			prec, err = cast.ToIntE(precStr)
 			if err != nil {
@@ -232,7 +232,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 	// 精度小数, decimal.%d, 数字表示精度(有后补零), 超过精度四舍五入, 点号同数字可省略, 默认为2位小数, 返回类型为字符串
 	if lo.Substring(paramType, 0, 7) == "decimal" {
 		prec := 2
-		precStr := lo.Substring(paramType, 8, math.MaxInt)
+		precStr := lo.Substring(paramType, 8, math.MaxUint)
 		if precStr != "" {
 			var err error
 			prec, err = cast.ToIntE(precStr)

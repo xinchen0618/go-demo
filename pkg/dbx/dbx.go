@@ -57,7 +57,7 @@ func TakeAll(p any, db gorose.IOrm, sql string, params ...any) error {
 //	查询时会自动添加限制LIMIT 1.
 func FetchOne(db gorose.IOrm, sql string, params ...any) (map[string]any, error) {
 	sql = strings.TrimSpace(sql)
-	if strings.ToUpper(lo.Substring(sql, 0, 6)) == "SELECT" && strings.ToUpper(lo.Substring(sql, -7, math.MaxInt)) != "LIMIT 1" {
+	if strings.ToUpper(lo.Substring(sql, 0, 6)) == "SELECT" && strings.ToUpper(lo.Substring(sql, -7, math.MaxUint)) != "LIMIT 1" {
 		sql += " LIMIT 1"
 	}
 

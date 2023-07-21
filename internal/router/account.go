@@ -1,6 +1,7 @@
 package router
 
 import (
+	"go-demo/config/consts"
 	"go-demo/internal/controller"
 	"go-demo/internal/middleware"
 
@@ -9,7 +10,7 @@ import (
 
 // Account 账号模块 DEMO
 func Account(r *gin.Engine) {
-	accountGroup := r.Group("/account/v1", middleware.UserJWTParse())
+	accountGroup := r.Group("/account/v1", middleware.JWTParse(consts.UserJWT))
 	{
 		accountGroup.POST("/login", middleware.SubmitLimit(), controller.Account.PostUserLogin)    // 用户登录
 		accountGroup.DELETE("/logout", middleware.UserAuth(), controller.Account.DeleteUserLogout) // 用户退出登录
