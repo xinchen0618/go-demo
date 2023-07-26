@@ -187,6 +187,7 @@ func Delete(cache *redis.Client, db gorose.IOrm, table string, where string, par
 // Expired 过期缓存
 //
 //	多线程执行.
+//	error 为发生的第一个错误.
 func Expired(cache *redis.Client, table string, ids ...any) error {
 	length := len(ids)
 	if length == 0 {
@@ -217,13 +218,8 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 		wg.Wait()
 		close(ch)
 	})
-	for err := range ch {
-		if err != nil {
-			return err
-		}
-	}
 
-	return nil
+	return <-ch
 }
 
 // tablePrimaryKey 获取表主键
