@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"go-demo/pkg/dbx"
@@ -184,8 +185,11 @@ func Delete(cache *redis.Client, db gorose.IOrm, table string, where string, par
 }
 
 // Expired 过期缓存
+//
+//	多线程执行.
 func Expired(cache *redis.Client, table string, ids ...any) error {
-	if len(ids) == 0 {
+	length := len(ids)
+	if length == 0 {
 		return nil
 	}
 
@@ -194,11 +198,27 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 		return err
 	}
 
+	// 多线程执行
+	var wg sync.WaitGroup
+	ch := make(chan error, length)
 	for _, id := range ids {
-		id = cast.ToInt64(id)
-		key := fmt.Sprintf(_dbcacheTableRecord, table, version, id)
-		if err := cache.Del(context.Background(), key).Err(); err != nil {
-			zap.L().Error(err.Error())
+		wg.Add(1)
+		id := cast.ToInt64(id)
+		gox.Go(func() {
+			defer wg.Done()
+			key := fmt.Sprintf(_dbcacheTableRecord, table, version, id)
+			if err := cache.Del(context.Background(), key).Err(); err != nil {
+				zap.L().Error(err.Error())
+				ch <- err
+			}
+		})
+	}
+	gox.Go(func() { // 这样处理, 没有错误所有线程执行完毕才返回, 有错误出现可以提前返回
+		wg.Wait()
+		close(ch)
+	})
+	for err := range ch {
+		if err != nil {
 			return err
 		}
 	}
