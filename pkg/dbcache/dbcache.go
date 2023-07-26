@@ -201,7 +201,7 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 
 	// 多线程执行
 	var wg sync.WaitGroup
-	ch := make(chan error, length)
+	ch := make(chan error, length) // 如果这里size使用0或1, 当错误不止一个时会造成死锁
 	for _, id := range ids {
 		wg.Add(1)
 		id := cast.ToInt64(id)
