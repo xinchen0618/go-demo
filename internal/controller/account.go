@@ -126,6 +126,7 @@ func (account) PostUsers(c *gin.Context) {
 	}
 
 	// 多线程写Demo
+	ch := make(chan error, userCount)
 	wpsg := di.WorkerPoolSeparate(100).Group()
 	for i := 0; i < userCount; i++ {
 		wpsg.Submit(func() {
@@ -133,12 +134,16 @@ func (account) PostUsers(c *gin.Context) {
 				"user_name": fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999)),
 				"password":  gox.PasswordHash("111111"),
 			}
-			_, _ = service.User.CreateUser(userData)
+			if _, err := service.User.CreateUser(userData); err != nil {
+				ch <- err
+			}
 		})
 	}
 	wpsg.Wait()
+	close(ch)
+	okCount := userCount - len(ch)
 
-	ginx.Success(c, 201, gin.H{"user_count": userCount})
+	ginx.Success(c, 201, gin.H{"ok_count": okCount})
 }
 
 func (account) PutUsersByID(c *gin.Context) {
