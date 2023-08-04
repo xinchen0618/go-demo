@@ -17,16 +17,20 @@
 |    类型转换    |    cast    | https://github.com/spf13/cast      |
 |    json    |  go-json   | https://github.com/goccy/go-json   |
 
-###  规范
+### 规范
 
-- 项目布局 
+- 代码管理策略
+
+  - [为什么Google上十亿行代码都放在同一个仓库里](https://cacm.acm.org/magazines/2016/7/204032-why-google-stores-billions-of-lines-of-code-in-a-single-repository/fulltext)
+
+- 项目布局
   
-  <a href="https://github.com/golang-standards/project-layout" target="_blank">Standard Go Project Layout</a>
+  - [Standard Go Project Layout](https://github.com/golang-standards/project-layout)
   
 - 编码规范 
   
-  - <a href="https://github.com/xxjwxc/uber_go_guide_cn" target="_blank">Uber Go 语言编码规范</a>
-  - <a href="https://google.github.io/styleguide/go/" target="_blank">Google Style Guides</a>
+  - [Uber Go 语言编码规范](https://github.com/xxjwxc/uber_go_guide_cn)
+  - [Google Style Guides](https://google.github.io/styleguide/go/)
 
 ### 目录结构
 
@@ -71,7 +75,7 @@
 
 ### 环境定义
 
-环境定义使用`DTAP`, 参考 <a href="https://en.wikipedia.org/wiki/Deployment_environment" target="_blank">Deployment environment</a>
+环境定义使用`DTAP`, 参考[Deployment environment](https://en.wikipedia.org/wiki/Deployment_environment)
 
 环境变量`RUNTIME_ENV`指定运行环境, 可以在系统中设置, 也可以在命令行中指定, 默认为生产环境. 
 
@@ -168,7 +172,7 @@
 
 #### 规范
 
-遵循RESTful规范, 参考指南<a href="https://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api" target="_blank">Best Practices for Designing a Pragmatic RESTful API</a>
+遵循RESTful规范, 参考指南[Best Practices for Designing a Pragmatic RESTful API](https://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api)
 
 #### 流程
 
@@ -335,7 +339,7 @@ go build
 
 #### 规范
 
-<a href="https://developer.aliyun.com/article/531067" target="_blank">阿里云Redis开发规范</a>
+[阿里云Redis开发规范](https://developer.aliyun.com/article/531067)
 
 #### 缓存
 

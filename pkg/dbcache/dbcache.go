@@ -201,7 +201,7 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 
 	// 多线程执行
 	var wg sync.WaitGroup
-	ch := make(chan error, length) // 如果这里size使用0或1, 当错误有多个时会造成死锁
+	ch := make(chan error, length) // size不可固定为0或1, 否则错误有多个时会造成死锁
 	for _, id := range ids {
 		wg.Add(1)
 		id := cast.ToInt64(id)
@@ -214,7 +214,7 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 			}
 		})
 	}
-	gox.Go(func() { // 这样处理, 没有错误所有线程执行完毕才返回, 有错误出现可以提前返回
+	gox.Go(func() { // 没有错误所有线程执行完毕才返回, 有错误出现提前返回
 		wg.Wait()
 		close(ch)
 	})
