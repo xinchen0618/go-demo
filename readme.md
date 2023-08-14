@@ -250,6 +250,8 @@ RUNTIME_ENV=testing ./demo-cli <commond> <action> [ARG...]
 
 ### Cron
 
+Cron的停止并非优雅停止, 尤其要注意数据完整性的问题
+
 #### 流程
 
 `cmd/demo-cron/main.go` -> `internal/cron/` [-> `internal/service/`]  

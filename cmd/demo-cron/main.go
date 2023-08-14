@@ -22,8 +22,6 @@ func main() {
 		di.Logger().Error(err.Error())
 	}
 
-	// starts the scheduler asynchronously
-	s.StartAsync()
 	// starts the scheduler and blocks current execution path
 	s.StartBlocking()
 }

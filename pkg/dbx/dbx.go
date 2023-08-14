@@ -29,7 +29,7 @@ func FetchAll(db gorose.IOrm, sql string, params ...any) ([]map[string]any, erro
 		return nil, err
 	}
 
-	result := make([]map[string]any, 0)
+	result := make([]map[string]any, 0, len(rows))
 	for _, v := range rows {
 		result = append(result, v)
 	}
