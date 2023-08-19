@@ -62,13 +62,13 @@
   - router/             API路由
   - middleware/         API中间件  
   - task/               消息队列任务 
-  - service/            内部应用业务原子级服务. 业务应优先考虑是否可以封装为原子级操作以提高代码复用性
+  - service/            内部应用业务原子级服务. 需要公共使用的业务逻辑在这里实现
 - pkg/                  外部应用可以使用的代码. 不依赖内部应用的代码
   - dbx/                db增删改查操作函数
-  - ginx/               gin增强函数. 此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
-  - gox/                golang增强函数
+  - ginx/               Gin增强函数. 此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
+  - gox/                Golang增强函数
   - queuex/             消息队列操作函数
-  - dbcache/            db缓存操作函数
+  - dbcache/            db增删改查操作函数并维护缓存
   - xcache/             自定义缓存操作函数
 - go.mod                包管理  
 ```
@@ -231,13 +231,13 @@
   kill -SIGINT $(ps aux | grep -v grep | grep demo-api | awk '{print $2}')
   ```
 
-### Cli
+### CLI
 
 #### 流程
 
 `cmd/demo-cli/main.go` -> `internal/action/` [-> `internal/service/`]
 
-- `cmd/demo-cli/main.go` 定义Cli路由, 按业务维度分两级
+- `cmd/demo-cli/main.go` 定义CLI路由, 按业务维度分两级
 - `internal/action/` 执行逻辑
 
 #### 使用

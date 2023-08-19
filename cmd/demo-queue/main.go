@@ -1,3 +1,4 @@
+// 消息队列入口
 package main
 
 import (

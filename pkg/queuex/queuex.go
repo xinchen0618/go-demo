@@ -1,3 +1,4 @@
+// Package queuex 消息队列操作函数
 package queuex
 
 import (

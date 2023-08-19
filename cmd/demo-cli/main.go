@@ -1,3 +1,4 @@
+// 命令行入口
 package main
 
 import (

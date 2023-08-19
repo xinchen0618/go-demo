@@ -1,3 +1,4 @@
+// Package config 配置实现
 package config
 
 // 生产环境配置
@@ -9,7 +10,7 @@ func init() {
 		configure["prod"] = map[string]any{}
 	}
 	for k, v := range map[string]any{
-		/* 生产环境配置start */
+		/************ 生产环境配置START **************/
 
 		// 运行端口
 		"server_port": 8090,
@@ -17,7 +18,7 @@ func init() {
 		// JWT密钥, JWT配套有白名单功能不必担心秘钥泄露的问题
 		"jwt_secret": "btRZ5QHXX9VjfYhfGGHdCTcWiwQ6WFJXq9ZCwdqZwzk2ZfhceM9K3V5UGKsYLd9m",
 
-		/* 生产环境配置end */
+		/************ 生产环境配置END ****************/
 	} {
 		configure["prod"][k] = v
 	}

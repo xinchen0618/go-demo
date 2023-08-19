@@ -1,3 +1,4 @@
+// RESTful API入口
 package main
 
 import (
@@ -16,7 +17,7 @@ import (
 )
 
 func main() {
-	// 实例化gin
+	// 实例化Gin
 	if lo.Contains([]string{"prod", "stage"}, config.GetRuntimeEnv()) {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -37,7 +38,7 @@ func main() {
 		ginx.Error(c, 404, "ResourceNotFound", "您请求的资源不存在")
 	})
 
-	// Run gin
+	// Run Gin
 	addr := fmt.Sprintf(":%d", config.Get("server_port"))
 	if err := endless.ListenAndServe(addr, r); err != nil {
 		di.Logger().Error(err.Error())

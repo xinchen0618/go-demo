@@ -1,3 +1,6 @@
+// Package service 内部应用业务原子级服务
+//
+//	需要公共使用的业务逻辑在这里实现.
 package service
 
 import (

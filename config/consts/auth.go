@@ -1,3 +1,4 @@
+// Package consts 常量定义
 package consts
 
 // JWT登录用户类型

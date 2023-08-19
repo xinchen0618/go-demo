@@ -1,3 +1,4 @@
+// Package config 配置实现
 package config
 
 // 公共配置
@@ -6,7 +7,7 @@ func init() {
 		configure["common"] = map[string]any{}
 	}
 	for k, v := range map[string]any{
-		/* 公共配置start */
+		/************ 公共配置START ****************/
 
 		// 错误日志路径
 		"error_log": "/var/log/golang_error.log",
@@ -42,7 +43,7 @@ func init() {
 		"redis_index_storage": 2, // 存储
 		"redis_index_queue":   3, // 消息队列
 
-		/* 公共配置end */
+		/************ 公共配置END ******************/
 	} {
 		configure["common"][k] = v
 	}

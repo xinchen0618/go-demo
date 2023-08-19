@@ -1,4 +1,4 @@
-// Package gox golang增强方法
+// Package gox Golang增强函数
 package gox
 
 import (

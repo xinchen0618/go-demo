@@ -1,4 +1,4 @@
-// Package middleware gin中间件
+// Package middleware Gin中间件
 package middleware
 
 import (
@@ -20,7 +20,7 @@ import (
 
 // JWTParse JWT解析
 //
-//	解析成功会将userID或者adminID存入gin上下文.
+//	解析成功会将userID或者adminID存入Gin上下文.
 func JWTParse(userType string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := lo.Substring(c.Request.Header.Get("Authorization"), 7, math.MaxUint) // Authorization: Bearer <token>
@@ -48,7 +48,7 @@ func JWTParse(userType string) gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		// id存入gin上下文
+		// id存入Gin上下文
 		id := cast.ToInt64(claims["jti"])
 		if userType == consts.UserJWT {
 			c.Set("userID", id) // 后续的处理函数可以用过c.GetInt64("userID")来获取当前请求的用户id

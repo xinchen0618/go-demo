@@ -1,3 +1,4 @@
+// Package xcache 自定义缓存操作函数
 package xcache
 
 import (

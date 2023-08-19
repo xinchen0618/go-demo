@@ -1,4 +1,4 @@
-// Package middleware gin中间件
+// Package middleware Gin中间件
 package middleware
 
 import (

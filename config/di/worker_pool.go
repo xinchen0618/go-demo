@@ -1,3 +1,4 @@
+// Package di 服务注入
 package di
 
 import (
@@ -28,7 +29,7 @@ func WorkerPool() *pond.WorkerPool {
 
 // WorkerPoolSeparate 独享Goroutine池
 //
-//	一次请求提交大量数据, 使用独享Goroutine池起限流作用
+//	一次请求提交大量数据, 使用独享Goroutine池起限流作用.
 func WorkerPoolSeparate(maxWorkers int) *pond.WorkerPool {
 	return pond.New(maxWorkers, 0, pond.PanicHandler(func(a any) {
 		zap.L().Error(fmt.Sprint(a))
