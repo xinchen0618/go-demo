@@ -15,8 +15,8 @@ import (
 	"go.uber.org/zap"
 )
 
-/* sql log middleware start */
-// SQL log
+/********************** sql log middleware ********************/
+// 这里重新实现 sql log, 是为了可以配置 sql log 的位置
 type sqlLogger struct{}
 
 func (sqlLogger) Sql(sqlStr string, runtime time.Duration) {
@@ -53,14 +53,14 @@ func (sqlLogger) EnableSlowLog() float64 {
 	return 0
 }
 
-/* sql log middleware end */
+/********************** 下面开始定义项目中的DB ********************/
 
-// MySQL DEMO, 从这里开始定义项目中的DB
 var (
 	demoDBEngine *gorose.Engin
 	demoDBOnce   gox.Once
 )
 
+// DemoDB DEMO MySQL
 func DemoDB() gorose.IOrm {
 	_ = demoDBOnce.Do(func() error {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",

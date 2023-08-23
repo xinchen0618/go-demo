@@ -10,7 +10,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-// 缓存redis
+/******************** 缓存 redis ********************/
 var (
 	cacheRedis     *redis.Client
 	cacheRedisOnce sync.Once
@@ -31,7 +31,7 @@ func CacheRedis() *redis.Client {
 	return cacheRedis
 }
 
-// 存储redis
+/******************** 存储 redis ********************/
 var (
 	storageRedis     *redis.Client
 	storageRedisOnce sync.Once
@@ -52,7 +52,7 @@ func StorageRedis() *redis.Client {
 	return storageRedis
 }
 
-// jwt redis
+/******************** jwt redis ********************/
 var (
 	jwtRedis     *redis.Client
 	jwtRedisOnce sync.Once

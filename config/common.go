@@ -7,7 +7,7 @@ func init() {
 		configure["common"] = map[string]any{}
 	}
 	for k, v := range map[string]any{
-		/************ 公共配置START ****************/
+		/************ 公共配置 START ****************/
 
 		// 错误日志路径
 		"error_log": "/var/log/golang_error.log",
@@ -43,7 +43,7 @@ func init() {
 		"redis_index_storage": 2, // 存储
 		"redis_index_queue":   3, // 消息队列
 
-		/************ 公共配置END ******************/
+		/************ 公共配置 END ******************/
 	} {
 		configure["common"][k] = v
 	}

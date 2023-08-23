@@ -10,7 +10,7 @@ func init() {
 		configure["testing"] = map[string]any{}
 	}
 	for k, v := range map[string]any{
-		/************ 测试环境配置START ***************/
+		/************ 测试环境配置 START **************/
 
 		// 运行端口
 		"server_port": 8080,
@@ -18,7 +18,7 @@ func init() {
 		// JWT密钥, JWT配套有白名单功能不必担心秘钥泄露的问题
 		"jwt_secret": "Xx4KJQ2AguFL5gWurcRJvVfDC5a2itLi53vFJN9wthYkrxtQbdeRDkWTHzAjnn5n",
 
-		/************ 测试环境配置END *****************/
+		/************ 测试环境配置 END *****************/
 	} {
 		configure["testing"][k] = v
 	}

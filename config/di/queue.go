@@ -15,6 +15,7 @@ var (
 	queueClientOnce sync.Once
 )
 
+// QueueClient 消息队列 client
 func QueueClient() *asynq.Client {
 	queueClientOnce.Do(func() {
 		queueClient = asynq.NewClient(asynq.RedisClientOpt{
@@ -32,6 +33,7 @@ var (
 	queueServerOnce sync.Once
 )
 
+// QueueServer 消息队列 server
 func QueueServer() *asynq.Server {
 	queueServerOnce.Do(func() {
 		queueServer = asynq.NewServer(

@@ -27,6 +27,7 @@ func init() { // 日志服务最为基础, 日志初始化失败, 程序不允�
 	zap.ReplaceGlobals(logger)                                                                                                    // 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()调用即可
 }
 
+// Logger 日志
 func Logger() *zap.Logger {
 	return logger
 }
