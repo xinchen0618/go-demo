@@ -151,10 +151,10 @@ func TakeColumn(p any, db gorose.IOrm, sql string, params ...any) error {
 	return nil
 }
 
-// Slice2in Slice转IN条件
+// Slice2In Slice转IN条件
 //
-//	Golang SQL驱动不支持IN(?), 使用fmt.Sprint("IN(%s)", Slice2in(s)).
-func Slice2in(s any) string {
+//	Golang SQL驱动不支持IN(?), 使用fmt.Sprint("IN(%s)", Slice2In(s)).
+func Slice2In(s any) string {
 	stringSlice := cast.ToStringSlice(s)
 	cleaned := make([]string, 0)
 	for _, v := range stringSlice {

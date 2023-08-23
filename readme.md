@@ -45,7 +45,7 @@
 - config/               配置
   - consts/             常量定义
     - redis_key.go      Redis key统一在此定义避免冲突
-  - di/                 服务注入. 仅日志服务为初始化时加载, 日志服务加载不成功程序不允许启动, 其他服务均为惰性加载, 即第一次使用时才加载
+  - di/                 服务注入
     - db.go             db服务
     - logger.go         日志服务
     - queue.go          消息队列服务
@@ -107,6 +107,16 @@
   配置值支持整型/字符串/布尔/整型切片/字符串切片. 
 
   获取配置值 `config.Get()`, `config.GetInt()`, `config.GetString()`, `config.GetBool()`, `config.GetIntSlice()`, `config.GetStringSlice()`
+
+### 依赖注入
+
+DI的实现理念参考了 [Dependency Injection / Service Location](https://docs.phalcon.io/5.0/en/di#dependency-injection--service-location)
+
+`config/di` 下每一个导出函数即为一个服务, 需要添加服务, 添加导出函数即可; 包中文件按服务类型分为了多个, 方便管理
+
+仅日志服务为初始化时加载, 日志服务加载不成功程序不允许启动, 因为在生产环境程序的所有异常都需要通过日志来排查, 日志加载不成功开发者就失去了与生产环境程序的联系
+
+其他服务均为惰性加载, 即第一次使用时才加载
 
 ### 日志
 
@@ -329,7 +339,7 @@ go build
 - `TakeValue()` 获取一个值至指定类型
 - `FetchColumn()` 获取一列值返回`any`切片
 - `TakeColumn()` 获取一列值至指定类型切片
-- `Slice2in()` Slice转IN条件
+- `Slice2In()` `slice`转`IN`条件
 - `Insert()` 新增记录
 - `InsertBatch()` 批量新增记录
 - `Update()` 更新记录
