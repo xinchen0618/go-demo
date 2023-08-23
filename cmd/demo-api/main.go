@@ -39,7 +39,7 @@ func main() {
 	})
 
 	// Run Gin
-	addr := fmt.Sprintf(":%d", config.Get("server_port"))
+	addr := fmt.Sprintf(":%d", config.GetInt("server_port"))
 	if err := endless.ListenAndServe(addr, r); err != nil {
 		di.Logger().Error(err.Error())
 		return

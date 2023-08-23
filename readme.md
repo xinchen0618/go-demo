@@ -45,7 +45,7 @@
 - config/               配置
   - consts/             常量定义
     - redis_key.go      Redis key统一在此定义避免冲突
-  - di/                 服务注入
+  - di/                 服务注入. 仅日志服务为初始化时加载, 日志服务加载不成功程序不允许启动, 其他服务均为惰性加载, 即第一次使用时才加载
     - db.go             db服务
     - logger.go         日志服务
     - queue.go          消息队列服务

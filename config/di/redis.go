@@ -22,7 +22,7 @@ var (
 func CacheRedis() *redis.Client {
 	cacheRedisOnce.Do(func() {
 		cacheRedis = redis.NewClient(&redis.Options{
-			Addr:     fmt.Sprintf("%s:%d", config.Get("redis_host"), config.Get("redis_port")),
+			Addr:     fmt.Sprintf("%s:%d", config.GetString("redis_host"), config.GetInt("redis_port")),
 			Password: config.GetString("redis_auth"),
 			DB:       config.GetInt("redis_index_cache"),
 		})
@@ -43,7 +43,7 @@ var (
 func StorageRedis() *redis.Client {
 	storageRedisOnce.Do(func() {
 		storageRedis = redis.NewClient(&redis.Options{
-			Addr:     fmt.Sprintf("%s:%d", config.Get("redis_host"), config.Get("redis_port")),
+			Addr:     fmt.Sprintf("%s:%d", config.GetString("redis_host"), config.GetInt("redis_port")),
 			Password: config.GetString("redis_auth"),
 			DB:       config.GetInt("redis_index_storage"),
 		})
@@ -62,7 +62,7 @@ var (
 func JWTRedis() *redis.Client {
 	jwtRedisOnce.Do(func() {
 		jwtRedis = redis.NewClient(&redis.Options{
-			Addr:     fmt.Sprintf("%s:%d", config.Get("redis_host"), config.Get("redis_port")),
+			Addr:     fmt.Sprintf("%s:%d", config.GetString("redis_host"), config.GetInt("redis_port")),
 			Password: config.GetString("redis_auth"),
 			DB:       config.GetInt("redis_index_jwt"),
 		})

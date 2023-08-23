@@ -64,12 +64,12 @@ var (
 func DemoDB() gorose.IOrm {
 	_ = demoDBOnce.Do(func() error {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",
-			config.Get("mysql_username"),
-			config.Get("mysql_password"),
-			config.Get("mysql_host"),
-			config.Get("mysql_port"),
-			config.Get("mysql_dbname"),
-			config.Get("mysql_charset"),
+			config.GetString("mysql_username"),
+			config.GetString("mysql_password"),
+			config.GetString("mysql_host"),
+			config.GetInt("mysql_port"),
+			config.GetString("mysql_dbname"),
+			config.GetString("mysql_charset"),
 		)
 		var err error
 		demoDBEngine, err = gorose.Open(&gorose.Config{
@@ -79,7 +79,8 @@ func DemoDB() gorose.IOrm {
 			SetMaxIdleConns: config.GetInt("mysql_max_idle_conns"),
 		})
 		if err != nil {
-			panic(err) // 即便这里不panic, 调用者在nil指针上调用db方法也会panic
+			Logger().Error(err.Error())
+			return err
 		}
 
 		if config.GetString("sql_log") != "" {
