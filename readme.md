@@ -43,7 +43,7 @@
   - demo-cli/           命令行
   - demo-cron/          计划任务
   - demo-queue/         消息队列
-  - demo-websoket/      websocket
+  - demo-websocket/      WebSocket
 - config/               配置
   - consts/             常量定义
     - redis_key.go      Redis key统一在此定义避免冲突
