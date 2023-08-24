@@ -1,4 +1,4 @@
-// websocket入口
+// WebSocket入口
 package main
 
 import (

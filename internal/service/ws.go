@@ -18,6 +18,7 @@ type WSClient struct {
 	IsClosed bool
 }
 
+// WSMsg 客户端与服务器通信的消息格式
 type WSMsg struct {
 	Type string         `json:"type"`
 	Data map[string]any `json:"data"`

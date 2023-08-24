@@ -2,20 +2,21 @@
 
 ### 技术栈
 
-|     技术     |     名称     | 地址                                 |
-|:----------:|:----------:|------------------------------------|
-|    API     |    Gin     | https://github.com/gin-gonic/gin   |
-|   MySQL    |   GoRose   | https://github.com/gohouse/gorose  |
-|   Redis    |  go-redis  | https://github.com/go-redis/redis  |
-|     登录     |   jwt-go   | https://github.com/golang-jwt/jwt  |
-|     日志     |    zap     | https://github.com/uber-go/zap     |
-|    优雅停止    |  endless   | https://github.com/fvbock/endless  |
-|    命令行     | urfave/cli | https://github.com/urfave/cli      |
-|    计划任务    |   gocron   | https://github.com/go-co-op/gocron |
-| WorkerPool |    pond    | https://github.com/alitto/pond     |
-|    消息队列    |   Asynq    | https://github.com/hibiken/asynq   |
-|    类型转换    |    cast    | https://github.com/spf13/cast      |
-|    json    |  go-json   | https://github.com/goccy/go-json   |
+|     技术     |        名称         | 地址                                   |
+|:----------:|:-----------------:|--------------------------------------|
+|    API     |        Gin        | https://github.com/gin-gonic/gin     |
+|   MySQL    |      GoRose       | https://github.com/gohouse/gorose    |
+|   Redis    |     go-redis      | https://github.com/go-redis/redis    |
+|     登录     |      jwt-go       | https://github.com/golang-jwt/jwt    |
+|     日志     |        zap        | https://github.com/uber-go/zap       |
+|    优雅停止    |      endless      | https://github.com/fvbock/endless    |
+|    命令行     |    urfave/cli     | https://github.com/urfave/cli        |
+|    计划任务    |      gocron       | https://github.com/go-co-op/gocron   |
+| WorkerPool |       pond        | https://github.com/alitto/pond       |
+|    消息队列    |       Asynq       | https://github.com/hibiken/asynq     |
+|    类型转换    |       cast        | https://github.com/spf13/cast        |
+|    json    |      go-json      | https://github.com/goccy/go-json     |
+| WebSocket  | Gorilla WebSocket | https://github.com/gorilla/websocket |
 
 ### 规范
 
@@ -42,6 +43,7 @@
   - demo-cli/           命令行
   - demo-cron/          计划任务
   - demo-queue/         消息队列
+  - demo-websoket/      websocket
 - config/               配置
   - consts/             常量定义
     - redis_key.go      Redis key统一在此定义避免冲突
@@ -63,6 +65,7 @@
   - middleware/         API中间件  
   - task/               消息队列任务 
   - service/            内部应用业务原子级服务. 需要公共使用的业务逻辑在这里实现
+  - ws/                 websocket业务
 - pkg/                  外部应用可以使用的代码. 不依赖内部应用的代码
   - dbx/                db增删改查操作函数
   - ginx/               Gin增强函数. 此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
@@ -311,6 +314,39 @@ go build
   消息队列按任务优先级分两个队列: 默认队列, 该队列分配了较多的系统资源, 任务一般发送至此队列; 低优先级队列, 该队列分配了较少的系统资源, 数据量大不紧急的任务发送至此队列
 
   默认队列: 及时消息`queuex.Enqueue()`, 延时消息`queuex.EnqueueIn()`, 定时消息`queuex.EnqueueAt()`; 低优先级队列: 及时消息`queuex.LowEnqueue()`, 延时消息`queuex.LowEnqueueIn()`, 定时消息`queuex.LowEnqueueAt()`
+
+### WebSocket
+
+目前的`WebSocket`实现定性为`beta`版
+
+#### 鉴权 
+
+与API鉴权保持一致, 使用的JWT. 客户端通过URL参数`client_id`, 值为`url_base64(userID:jwtSignature)`, 传入鉴权信息
+
+#### 通信
+
+客户端与服务器通信的消息格式为`{type: "", data: {}}`, `type`-消息类型, `data`-消息内容
+  
+比如, 客户端发送消息
+```
+{
+  "type": "MicroChat:SendMessage",
+  "data": {
+    "content": "Hello, word!"
+  }
+}
+```
+
+服务器响应消息
+```
+{
+  "type": "ClientError",
+  "data": {
+    "code": "UserUnauthorized",
+    "message": "您未登录或登录已过期, 请重新登录"
+  }
+}
+```
 
 ### MySQL
 
