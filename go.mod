@@ -11,7 +11,7 @@ require (
 	github.com/goccy/go-json v0.10.2
 	github.com/gohouse/gorose/v2 v2.1.12
 	github.com/golang-jwt/jwt/v5 v5.0.0
-	github.com/golang-module/carbon/v2 v2.2.4
+	github.com/golang-module/carbon/v2 v2.2.5
 	github.com/gorilla/websocket v1.5.0
 	github.com/hibiken/asynq v0.24.1
 	github.com/juju/ratelimit v1.0.2

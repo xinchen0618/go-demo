@@ -242,10 +242,10 @@ DI的实现理念参考了 [Dependency Injection / Service Location](https://doc
   (RUNTIME_ENV=prod ./demo-api &> /dev/null &)
 
   # 优雅重启
-  kill -SIGHUP $(ps aux | grep -v grep | grep demo-api | awk '{print $2}')
+  pkill -SIGHUP -f "demo-api"
 
   # 优雅停止
-  kill -SIGINT $(ps aux | grep -v grep | grep demo-api | awk '{print $2}')
+  pkill -SIGINT -f "demo-api"
   ```
 
 ### CLI
@@ -306,7 +306,7 @@ go build
 - 优雅停止Worker
 
   ```
-  kill -TERM $(ps aux | grep -v grep | grep demo-queue | awk '{print $2}')
+  pkill -TERM -f "demo-queue"
   ```
 
 - 发送Job
@@ -325,7 +325,7 @@ go build
 
 #### 通信
 
-客户端与服务器通信的消息格式为`{type: "", data: {}}`, `type`-消息类型, `data`-消息内容
+客户端与服务端通信的消息格式为`{type: "", data: {}}`, `type`-消息类型, `data`-消息内容
   
 比如, 客户端发送消息
 ```
@@ -337,7 +337,7 @@ go build
 }
 ```
 
-服务器响应消息
+服务端响应消息
 ```
 {
   "type": "ClientError",
