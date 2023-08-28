@@ -164,7 +164,7 @@ DI的实现理念参考了 [Dependency Injection / Service Location](https://doc
 
 - 独享Goroutine池
 
-  独享Goroutine池通常起到类似分页处理或者限流的作用  
+  独享Goroutine池通常起到类似限流的作用  
 
   ```
   # go func
