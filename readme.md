@@ -233,12 +233,12 @@ DI的实现理念参考了 [Dependency Injection / Service Location](https://doc
 
 - 预发布&生产环境执行编译好的程序
 
-  实际上会提前编译好, 在机器上直接部署可执行文件. 注意build阶段与run阶段c库是否一致, 若一致, build阶段设置`CGO_ENABLED=1`可减小执行文件体积, 不一致, 设置`CGO_ENABLED=0`保证移植性.
+  实际上会提前编译好, 在机器上直接部署可执行文件. 如果程序不需要使用C库或者嵌入C代码，那么`CGO_ENABLED=0`可以让编译更简单和快速, 如果程序里调用了cgo命令, 此参数必须设置为1, 否则编译时将出错.
 
   ```
   # 启动
   cd cmd/demo-api
-  go build  
+  go build -ldflags="-s -w"
   (RUNTIME_ENV=prod ./demo-api &> /dev/null &)
 
   # 优雅重启
@@ -261,7 +261,7 @@ DI的实现理念参考了 [Dependency Injection / Service Location](https://doc
 
 ```
 cd cmd/demo-cli
-go build
+go build -ldflags="-s -w"
 RUNTIME_ENV=testing ./demo-cli <commond> <action> [ARG...]
 ```
 
@@ -280,7 +280,7 @@ Cron的停止并非优雅停止, 尤其要注意数据完整性的问题
 
 ```
 cd cmd/demo-cron
-go build
+go build -ldflags="-s -w"
 (RUNTIME_ENV=testing ./demo-cron &> /dev/nul &)
 ```
 
@@ -299,7 +299,7 @@ go build
 
   ```
   cd cmd/demo-queue
-  go build
+  go build -ldflags="-s -w"
   (RUNTIME_ENV=testing ./demo-queue &> /dev/nul &)
   ```
 
@@ -350,7 +350,7 @@ go build
 
 ### MySQL
 
-`dbx` 提供以`map[string]any`类型操作和读取数据库的封装, 同时支持读取结果至`struct`或指定类型
+`dbx` 提供以`map[string]any`类型操作和读取数据库的函数, 同时支持读取结果至`struct`或指定类型
 
 #### 数据类型映射
 
@@ -365,7 +365,7 @@ go build
 
 - 写操作, Golang写MySQL对数据没有强类型要求
 
-#### 操作封装
+#### 操作函数
 
 - `FetchAll()` 获取多行记录返回`map`切片
 - `TakeAll()` 获取多行记录至`struct`切片
@@ -381,7 +381,7 @@ go build
 - `Update()` 更新记录
 - `Delete()` 删除记录
 - `Execute()` 执行原生SQL
-- `Begin()` 手动开始事务. 事务应优先考虑`Transaction()`闭包操作是否会更加方便
+- `Begin()` 手动开始事务
 - `Commit()` 手动提交事务
 - `Rollback()` 手动回滚事务
 
