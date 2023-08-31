@@ -71,7 +71,7 @@ func GetJSONBody(c *gin.Context, patterns []string) (map[string]any, error) {
 		}
 		// key
 		paramValue, ok := jsonBody[patternAtoms[0]]
-		if !ok {
+		if !ok || paramValue == nil {
 			if required {
 				Error(c, 400, "ParamEmpty", fmt.Sprintf("%s不得为空", patternAtoms[1]))
 				return nil, errors.New("ParamEmpty")
