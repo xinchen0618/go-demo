@@ -21,7 +21,7 @@ func GetRuntimeEnv() string {
 	return runtimeEnv
 }
 
-func Get(key string) any {
+func get(key string) any {
 	runtimeEnv := GetRuntimeEnv()
 
 	if envConfigure, ok := configure[runtimeEnv]; ok { // 环境配置
@@ -39,7 +39,7 @@ func Get(key string) any {
 }
 
 func GetInt(key string) int {
-	value, err := cast.ToIntE(Get(key))
+	value, err := cast.ToIntE(get(key))
 	if err != nil {
 		zap.L().Error(err.Error())
 	}
@@ -47,7 +47,7 @@ func GetInt(key string) int {
 }
 
 func GetString(key string) string {
-	value, err := cast.ToStringE(Get(key))
+	value, err := cast.ToStringE(get(key))
 	if err != nil {
 		zap.L().Error(err.Error())
 	}
@@ -55,7 +55,7 @@ func GetString(key string) string {
 }
 
 func GetBool(key string) bool {
-	value, err := cast.ToBoolE(Get(key))
+	value, err := cast.ToBoolE(get(key))
 	if err != nil {
 		zap.L().Error(err.Error())
 	}
@@ -63,7 +63,7 @@ func GetBool(key string) bool {
 }
 
 func GetStringSlice(key string) []string {
-	value, err := cast.ToStringSliceE(Get(key))
+	value, err := cast.ToStringSliceE(get(key))
 	if err != nil {
 		zap.L().Error(err.Error())
 	}
@@ -71,7 +71,7 @@ func GetStringSlice(key string) []string {
 }
 
 func GetIntSlice(key string) []int {
-	value, err := cast.ToIntSliceE(Get(key))
+	value, err := cast.ToIntSliceE(get(key))
 	if err != nil {
 		zap.L().Error(err.Error())
 	}

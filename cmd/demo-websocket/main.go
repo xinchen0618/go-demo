@@ -17,6 +17,7 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
+	"github.com/spf13/cast"
 )
 
 var (
@@ -26,7 +27,9 @@ var (
 )
 
 func socketHandler(w http.ResponseWriter, r *http.Request) {
+	// 将 ws 连接信息和 user_id 记录到 WSClient 对象
 	client := &service.WSClient{Conn: nil, IsClosed: true}
+
 	// Upgrade our raw HTTP connection to a websocket based one
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -70,6 +73,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
+	client.UserID = cast.ToInt64(userJWT[0])
 
 	// 心跳
 	if err := client.Conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
@@ -94,7 +98,45 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		return nil
 	})
 
-	// 接收消息, 格式 {type: "", data: {}}
+	/************************* 服务端主动给客户端发送消息 **************************/
+	// 这里通过 redis 订阅来实现, 服务端监听名为 wsMessageChannel 的 redis 频道
+	// 向频道发送消息的格式为 json 字符串 `{"user_id": int, "type": string, data: {}}`
+	// user_id 为 0 表示向所有用户发送消息,否则为向指定用户发送消息
+	pubsub := di.StorageRedis().Subscribe(context.Background(), "wsMessageChannel") // 订阅一个或多个频道
+	// 检查订阅是否成功
+	if _, err := pubsub.Receive(context.Background()); err != nil {
+		di.Logger().Error(err.Error())
+		_ = service.WS.Send(client, "InternalError", map[string]any{ // 订阅失败
+			"code":    "InternalError",
+			"message": "服务异常, 请稍后重试",
+		})
+		return
+	}
+	// 创建一个通道来接收订阅的消息
+	msgCh := pubsub.Channel()
+	// 启动一个 goroutine 来处理订阅的消息
+	gox.Go(func() {
+		for msg := range msgCh {
+			submsg := service.SubMsg{}
+			if err := json.Unmarshal([]byte(msg.Payload), &submsg); err != nil {
+				di.Logger().Error(err.Error())
+				continue
+			}
+			if submsg.UserID != 0 && submsg.UserID != client.UserID { // 并非当前客户端的消息
+				continue
+			}
+			// 业务路由
+			switch submsg.Type {
+			case "MicroChat:SendMessage": // DEMO
+				ws.MicroChat.SendMessage(client, submsg.Data)
+			default: // 未知路由
+				di.Logger().Error(fmt.Sprintf("ws 错误订阅消息 %s", msg.Payload))
+			}
+		}
+	})
+
+	/************************* 服务端接收客户端发来的消息 **************************/
+	// 消息格式为 json 字符串 `{type: "", data: {}}`
 	for {
 		_, message, err := client.Conn.ReadMessage()
 		if err != nil {
