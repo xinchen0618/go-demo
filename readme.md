@@ -392,7 +392,7 @@ go build -ldflags="-s -w"
 - `InsertBatch()` 批量新增记录
 - `Update()` 更新记录
 - `Delete()` 删除记录
-- `Execute()` 执行原生SQL
+- `Execute()` 执行原生 SQL
 - `Begin()` 手动开始事务
 - `Commit()` 手动提交事务
 - `Rollback()` 手动回滚事务
@@ -411,14 +411,14 @@ go build -ldflags="-s -w"
 
   以资源对象(实体表一行记录为一个资源对象)为单位, 使用旁路缓存策略.
  
-  使用`dbcache.Get()`或`dbcache.Take()`方法获取 DB 记录, 在更新和删除DB记录时, 必须使用`dbcache.Update()`和`dbcache.Delete()`方法自动维护缓存, 或`dbcache.Expired()`手动清除缓存.
+  使用`dbcache.Get()`或`dbcache.Take()`方法获取 DB 记录, 在更新和删除 DB 记录时, 必须使用`dbcache.Update()`和`dbcache.Delete()`方法自动维护缓存, 或`dbcache.Expired()`手动清除缓存.
   
   变更表结构会导致缓存数据不正确, 更新表版本`dbcache:table:<table_name>:version`可过期与之相关的所有缓存数据.
 
-  - `dbcache.Get()` 获取DB记录返回`map`并维护缓存
-  - `dbcache.Take()` 获取DB记录至`struct`并维护缓存
-  - `dbcache.Update()` 更新DB记录并维护缓存
-  - `dbcache.Delete()` 删除DB记录并维护缓存
+  - `dbcache.Get()` 获取 DB 记录返回`map`并维护缓存
+  - `dbcache.Take()` 获取 DB 记录至`struct`并维护缓存
+  - `dbcache.Update()` 更新 DB 记录并维护缓存
+  - `dbcache.Delete()` 删除 DB 记录并维护缓存
   - `dbcache.Expired()` 过期缓存
 
 - 业务缓存
