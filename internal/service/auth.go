@@ -22,10 +22,10 @@ type auth struct{}
 
 var Auth auth
 
-// JWTLogin JWT登录
+// JWTLogin JWT 登录
 //
-//	先生成JWT, 再记录redis白名单.
-//	userType 为JWT登录用户类型, 集中在consts/auth.go中定义. id 为用户id.
+//	先生成 JWT, 再记录 redis 白名单.
+//	userType 为 JWT 登录用户类型, 集中在 consts/auth.go 中定义. id 为用户 id.
 //	返回字符串为 JWT token.
 func (auth) JWTLogin(userType string, id int64, userName string) (string, error) {
 	// JWT登录
@@ -43,7 +43,7 @@ func (auth) JWTLogin(userType string, id int64, userName string) (string, error)
 		di.Logger().Error(err.Error())
 		return "", err
 	}
-	// redis登录白名单
+	// redis 登录白名单
 	tokenAtoms := strings.Split(tokenString, ".")
 	payload, err := json.Marshal(claims)
 	if err != nil {
@@ -59,10 +59,10 @@ func (auth) JWTLogin(userType string, id int64, userName string) (string, error)
 	return tokenString, nil
 }
 
-// JWTLogout JWT登出
+// JWTLogout JWT 登出
 //
-//	从redis白名单删除.
-//	userType 为JWT登录用户类型, 集中在consts/auth.go中定义. token 为JWT token. id 为用户id.
+//	从 redis 白名单删除.
+//	userType 为 JWT 登录用户类型, 集中在 consts/auth.go 中定义. token 为 JWT token. id 为用户 id.
 func (auth) JWTLogout(userType, token string, id int64) error {
 	tokenAtoms := strings.Split(token, ".")
 	key := fmt.Sprintf(consts.JWTLogin, userType, id, tokenAtoms[2])

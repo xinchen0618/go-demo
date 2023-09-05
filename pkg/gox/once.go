@@ -1,4 +1,4 @@
-// Package gox Golang增强函数
+// Package gox Golang 增强函数
 package gox
 
 import (
@@ -6,13 +6,13 @@ import (
 	"sync/atomic"
 )
 
-// Once 一个功能更加强大的Once
+// Once 一个功能更加强大的 Once
 type Once struct {
 	m    sync.Mutex
 	done uint32
 }
 
-// Do 传入的函数f有返回值error，如果初始化失败，需要返回失败的error, Do方法会把这个error返回给调用者
+// Do 传入的函数 f 有返回值 error，如果初始化失败，需要返回失败的 error, Do 方法会把这个 error 返回给调用者
 func (o *Once) Do(f func() error) error {
 	if atomic.LoadUint32(&o.done) == 1 { // fast path
 		return nil

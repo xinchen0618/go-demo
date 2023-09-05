@@ -1,4 +1,4 @@
-// Package gox Golang增强函数
+// Package gox Golang 增强函数
 package gox
 
 import (
@@ -8,7 +8,7 @@ import (
 
 // TypeCast 类型转换
 //
-//	o 为原数据, p 为接收目标结果的指针, 目标结果为结构体时json tag是必须的.
+//	o 为原数据, p 为接收目标结果的指针, 目标结果为结构体时 json tag 是必须的.
 func TypeCast(o any, p any) error {
 	b, err := json.Marshal(o)
 	if err != nil {

@@ -1,4 +1,4 @@
-// WebSocket入口
+// WebSocket 入口
 package main
 
 import (
@@ -41,7 +41,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	// Close
 	defer service.WS.Close(client)
 
-	// 鉴权, jwt redis白名单
+	// 鉴权, jwt redis 白名单
 	clientID := r.URL.Query().Get("client_id") // url_base64(userID:jwtSignature)
 	clientIDDecoded, err := base64.RawURLEncoding.DecodeString(clientID)
 	if err != nil {
@@ -98,10 +98,10 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		return nil
 	})
 
-	/************************* 服务端主动给客户端发送消息 **************************/
+	/************************* 服务端主动向客户端推送消息 **************************/
 	// 这里通过 redis 订阅来实现, 服务端监听名为 wsMessageChannel 的 redis 频道
 	// 向频道发送消息的格式为 json 字符串 `{"user_id": int, "type": string, data: {}}`
-	// user_id 为 0 表示向所有用户发送消息,否则为向指定用户发送消息
+	// user_id 为 0 表示向所有用户推送消息, 否则为向指定用户推送消息
 	pubsub := di.StorageRedis().Subscribe(context.Background(), "wsMessageChannel") // 订阅一个或多个频道
 	// 检查订阅是否成功
 	if _, err := pubsub.Receive(context.Background()); err != nil {
@@ -117,6 +117,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	// 启动一个 goroutine 来处理订阅的消息
 	gox.Go(func() {
 		for msg := range msgCh {
+			// 读取订阅消息并格式化
 			submsg := service.SubMsg{}
 			if err := json.Unmarshal([]byte(msg.Payload), &submsg); err != nil {
 				di.Logger().Error(err.Error())
@@ -125,6 +126,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 			if submsg.UserID != 0 && submsg.UserID != client.UserID { // 并非当前客户端的消息
 				continue
 			}
+
 			// 业务路由
 			switch submsg.Type {
 			case "MicroChat:SendMessage": // DEMO
@@ -138,6 +140,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	/************************* 服务端接收客户端发来的消息 **************************/
 	// 消息格式为 json 字符串 `{type: "", data: {}}`
 	for {
+		// 读取客户端发送的消息并格式化
 		_, message, err := client.Conn.ReadMessage()
 		if err != nil {
 			if websocket.IsCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {

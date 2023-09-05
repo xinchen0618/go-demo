@@ -1,4 +1,4 @@
-// Package action 命令行action
+// Package action 命令行 action
 package action
 
 import (
@@ -9,7 +9,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// 用户相关命令行 DEMO 这里定义一个空结构体用于为大量的action方法做分类
+// 用户相关命令行 DEMO 这里定义一个空结构体用于为大量的 action 方法做分类
 type user struct{}
 
 // User 这里仅需结构体零值

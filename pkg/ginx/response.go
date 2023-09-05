@@ -1,6 +1,6 @@
-// Package ginx Gin增强函数
+// Package ginx Gin 增强函数
 //
-//	此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可.
+//	此包中出现 error 会向客户端输出4xx/500错误, 调用时捕获到 error 直接结束业务逻辑即可.
 package ginx
 
 import (
@@ -10,7 +10,7 @@ import (
 
 // Success 输出成功信息
 //
-//	body 数据会json编码输出给客户端, nil表示无内容输出.
+//	body 数据会 json 编码输出给客户端, nil 表示无内容输出.
 func Success(c *gin.Context, httpCode int, body any) {
 	if body == nil {
 		body = gin.H{}
@@ -25,7 +25,7 @@ func Error(c *gin.Context, httpCode int, code, message string) {
 
 // InternalError 输出500错误
 //
-//	err 为nil时表示无需记录, 项目中定义的方法错误会就近记录, 无需重复记录.
+//	err 为 nil 时表示无需记录, 项目中定义的方法错误会就近记录, 无需重复记录.
 func InternalError(c *gin.Context, err error) {
 	if err != nil {
 		zap.L().Error(err.Error())

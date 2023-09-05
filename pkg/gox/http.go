@@ -1,4 +1,4 @@
-// Package gox Golang增强函数
+// Package gox Golang 增强函数
 package gox
 
 import (
@@ -14,17 +14,17 @@ import (
 	"go.uber.org/zap"
 )
 
-// RESTful 发起RESTful请求
+// RESTful 发起 RESTful 请求
 //
-//	params GET/DELETE请求为url参数, 并会进行url转义, 其他请求为entity参数.
-//	返回 body 是json.Unmarshal的数据.
+//	params GET/DELETE 请求为 url 参数, 并会进行 url 转义, 其他请求为 entity 参数.
+//	返回 body 是 json.Unmarshal 的数据.
 func RESTful(method, rawUrl string, params map[string]any, headers map[string]string) (body map[string]any, httpCode int, err error) {
 	method = strings.ToUpper(method)
 
 	// 参数
 	var entityParams io.Reader
 	if len(params) > 0 {
-		if lo.Contains([]string{"GET", "DELETE"}, method) { // url参数
+		if lo.Contains([]string{"GET", "DELETE"}, method) { // url 参数
 			urlParams := url.Values{}
 			for k, v := range params {
 				urlParams.Set(k, fmt.Sprint(v))
@@ -37,7 +37,7 @@ func RESTful(method, rawUrl string, params map[string]any, headers map[string]st
 			Url.RawQuery = urlParams.Encode()
 			rawUrl = Url.String()
 
-		} else { // entity参数
+		} else { // entity 参数
 			paramBytes, err := json.Marshal(params)
 			if err != nil {
 				zap.L().Error(err.Error())

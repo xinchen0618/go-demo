@@ -12,7 +12,7 @@ import (
 
 func main() {
 	app := &cli.App{
-		Commands: []*cli.Command{ // cli路由
+		Commands: []*cli.Command{ // cli 路由
 			// DEMO
 			{
 				Name:  "user",

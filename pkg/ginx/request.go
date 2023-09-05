@@ -1,6 +1,6 @@
-// Package ginx Gin增强函数
+// Package ginx Gin 增强函数
 //
-//	此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可.
+//	此包中出现 error 会向客户端输出4xx/500错误, 调用时捕获到 error 直接结束业务逻辑即可.
 package ginx
 
 import (
@@ -42,15 +42,15 @@ type PageItems struct {
 	Items        []map[string]any `json:"items"`         // 列表
 }
 
-// GetJSONBody 获取JSON参数
+// GetJSONBody 获取 JSON 参数
 //
 //	patterns 模式格式 ["paramKey:paramName:paramType:paramPattern"]
-//	  paramType: 类型. 详情见FilterParam()方法paramType参数.
+//	  paramType: 类型. 详情见 FilterParam() 方法 paramType 参数.
 //	  paramPattern: 传值模式. + 表示字段必传,值不可为空; * 表示字段选传,值可为空; ? 表示字段选传,值不可为空.
 func GetJSONBody(c *gin.Context, patterns []string) (map[string]any, error) {
 	// body
 	jsonBody := make(map[string]any)
-	_ = c.ShouldBindJSON(&jsonBody) // 这里的error不要处理, 因为空body会报error
+	_ = c.ShouldBindJSON(&jsonBody) // 这里的 error 不要处理, 因为空 body 会报 error
 	// 逐字段校验
 	result := make(map[string]any)
 	var err error
@@ -89,10 +89,10 @@ func GetJSONBody(c *gin.Context, patterns []string) (map[string]any, error) {
 	return result, nil
 }
 
-// GetQueries 获取Query参数
+// GetQueries 获取 Query 参数
 //
 //	patterns 模式格式 ["paramKey:paramName:paramType:defaultValue"]
-//	  paramType: 类型. 详情见FilterParam()方法paramType参数.
+//	  paramType: 类型. 详情见 FilterParam() 方法 paramType 参数.
 //	  defaultValue: 默认值. required 表示参数必填, "" 表示空字符串; 字符串不需要引号.
 func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
 	// 逐字段校验
@@ -133,9 +133,9 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
 //		+integer 正整型64位;
 //		!-integer 非负整型64位;
 //		string 字符串, 去首尾空格;
-//		float.%d 浮点数, 数字表示精度(没有后补零), 超过精度四舍五入, 点号同数字可省略, 表示无限制, 返回类型为float64;
+//		float.%d 浮点数, 数字表示精度(没有后补零), 超过精度四舍五入, 点号同数字可省略, 表示无限制, 返回类型为 float64;
 //		decimal.%d 精度小数, 数字表示精度(有后补零), 超过精度四舍五入, 点号同数字可省略, 默认为2位小数, 返回类型为字符串;
-//		[] 枚举, 支持数字float64与字符串string混合枚举;
+//		[] 枚举, 支持数字 float64 与字符串 string 混合枚举;
 //		array 数组;
 //		[]integer 整型64位数组;
 //		[]string 字符串数组;
@@ -201,7 +201,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		return valueStr, nil
 	}
 
-	// 浮点数, float.%d, 数字表示精度(没有后补零), 超过精度四舍五入, 点号同数字可省略, 表示无限制, 返回类型为float64
+	// 浮点数, float.%d, 数字表示精度(没有后补零), 超过精度四舍五入, 点号同数字可省略, 表示无限制, 返回类型为 float64
 	if lo.Substring(paramType, 0, 5) == "float" {
 		// 值
 		valueStr, err := FilterParam(c, paramName, paramValue, "string", allowEmpty)
@@ -255,7 +255,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		return strconv.FormatFloat(valueFloat.(float64), 'f', prec, 64), nil // 这里不会有精度问题, 精度在float递归时已经处理了
 	}
 
-	// 枚举, 支持数字float64与字符串string混合枚举
+	// 枚举, 支持数字 float64 与字符串 string 混合枚举
 	if paramType[0:1] == "[" && paramType[1:2] != "]" {
 		var enum []any
 		if err := json.Unmarshal([]byte(paramType), &enum); err != nil { // 候选值解析到切片
@@ -305,7 +305,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		return nil, errors.New("ParamInvalid")
 	}
 
-	// int64数组
+	// int64 数组
 	if paramType == "[]integer" {
 		valueArr, err := FilterParam(c, paramName, paramValue, "array", allowEmpty)
 		if err != nil {
@@ -322,7 +322,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		return intSlice, nil
 	}
 
-	// string数组
+	// string 数组
 	if paramType == "[]string" {
 		arrayValue, err := FilterParam(c, paramName, paramValue, "array", allowEmpty)
 		if err != nil {
@@ -364,7 +364,7 @@ func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
 	}
 	// 总记录数
 	var countSQL string
-	if pageQuery.GroupBy != "" { // GROUP BY存在总记录数计算方式会不同
+	if pageQuery.GroupBy != "" { // GROUP BY 存在总记录数计算方式会不同
 		where += " GROUP BY " + pageQuery.GroupBy
 		if pageQuery.Having != "" {
 			where += " HAVING " + pageQuery.Having

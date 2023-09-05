@@ -1,4 +1,4 @@
-// Package gox Golang增强函数
+// Package gox Golang 增强函数
 package gox
 
 import (
@@ -8,7 +8,7 @@ import (
 
 // RandInt64 生成区间随机数
 //
-//	双闭区间[min, max].
+//	双闭区间 [min, max].
 func RandInt64(min, max int64) int64 {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 

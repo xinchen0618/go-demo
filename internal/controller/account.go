@@ -1,4 +1,4 @@
-// Package controller API控制器
+// Package controller API 控制器
 package controller
 
 import (
@@ -16,7 +16,7 @@ import (
 	"github.com/spf13/cast"
 )
 
-// 用户相关控制器 DEMO 这里定义一个空结构体用于为大量的controller方法做分类
+// 用户相关控制器 DEMO 这里定义一个空结构体用于为大量的 controller 方法做分类
 type account struct{}
 
 // Account 这里仅需结构体零值
@@ -44,7 +44,7 @@ func (account) PostUserLogin(c *gin.Context) {
 		return
 	}
 
-	// JWT登录
+	// JWT 登录
 	token, err := service.Auth.JWTLogin(consts.UserJWT, user.UserID, user.UserName)
 	if err != nil {
 		ginx.InternalError(c, nil)
@@ -126,7 +126,7 @@ func (account) PostUsers(c *gin.Context) {
 		userCount = cast.ToInt(jsonBody["user_count"])
 	}
 
-	// 多线程写Demo
+	// 多线程写 Demo
 	ch := make(chan error, userCount)
 	wpsg := di.WorkerPoolSeparate(100).Group()
 	for i := 0; i < userCount; i++ {

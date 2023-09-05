@@ -16,7 +16,7 @@ var (
 	cacheRedisOnce sync.Once
 )
 
-// CacheRedis 缓存redis实例
+// CacheRedis 缓存 redis 实例
 //
 //	删除缓存数据不会引发业务错误
 func CacheRedis() *redis.Client {
@@ -37,7 +37,7 @@ var (
 	storageRedisOnce sync.Once
 )
 
-// StorageRedis 存储redis实例
+// StorageRedis 存储 redis 实例
 //
 //	删除存储数据会引发业务错误
 func StorageRedis() *redis.Client {
@@ -58,7 +58,7 @@ var (
 	jwtRedisOnce sync.Once
 )
 
-// JWTRedis JWT redis实例
+// JWTRedis JWT redis 实例
 func JWTRedis() *redis.Client {
 	jwtRedisOnce.Do(func() {
 		jwtRedis = redis.NewClient(&redis.Options{

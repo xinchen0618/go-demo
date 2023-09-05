@@ -1,4 +1,4 @@
-// Package gox Golang增强函数
+// Package gox Golang 增强函数
 package gox
 
 import (
@@ -10,14 +10,14 @@ import (
 	"go.uber.org/zap"
 )
 
-// MD5 字符串md5
+// MD5 字符串 md5
 func MD5(s string) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(s)))
 }
 
-// MD5x 非string数据md5
+// MD5x 非 string 数据 md5
 //
-//	数据会先json.Marshal再md5.
+//	数据会先 json.Marshal 再 md5.
 func MD5x(a any) (string, error) {
 	iBytes, err := json.Marshal(a)
 	if err != nil {

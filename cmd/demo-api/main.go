@@ -1,4 +1,4 @@
-// RESTful API入口
+// RESTful API 入口
 package main
 
 import (
@@ -17,14 +17,14 @@ import (
 )
 
 func main() {
-	// 实例化Gin
+	// 实例化 Gin
 	if lo.Contains([]string{"prod", "stage"}, config.GetRuntimeEnv()) {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	r := gin.Default()
 
 	r.Use(
-		middleware.Recovery(),                           // panic处理
+		middleware.Recovery(),                           // panic 处理
 		middleware.CORS(),                               // 跨域处理
 		middleware.QPSLimit(config.GetInt("qps_limit")), // 限流
 		middleware.Timeout(time.Duration(config.GetInt("timeout"))*time.Second), // 超时控制

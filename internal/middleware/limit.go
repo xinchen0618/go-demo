@@ -1,4 +1,4 @@
-// Package middleware Gin中间件
+// Package middleware Gin 中间件
 package middleware
 
 import (
@@ -17,7 +17,7 @@ import (
 	"github.com/vearne/gin-timeout"
 )
 
-// QPSLimit QPS限流
+// QPSLimit QPS 限流
 func QPSLimit(qps int) gin.HandlerFunc {
 	quantum := cast.ToInt64(qps)
 	bucket := ratelimit.NewBucketWithQuantum(time.Second, quantum, quantum)
@@ -36,7 +36,7 @@ func QPSLimit(qps int) gin.HandlerFunc {
 func SubmitLimit() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var uid string // md5(id+method+path)
-		// 优先取用户id作为唯一标识, 如果没有则取ip+agent作为唯一标识
+		// 优先取用户 id 作为唯一标识, 如果没有则取 ip+agent 作为唯一标识
 		if c.GetInt64("userID") > 0 {
 			uid = cast.ToString(c.GetInt64("userID"))
 		} else if c.GetInt64("adminID") > 0 {

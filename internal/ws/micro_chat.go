@@ -1,4 +1,4 @@
-// Package ws websocket服务
+// Package ws websocket 服务
 package ws
 
 import (

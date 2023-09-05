@@ -1,4 +1,4 @@
-// Package gox Golang增强函数
+// Package gox Golang 增强函数
 package gox
 
 import (
@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// PutCsv 创建CSV文件
+// PutCsv 创建 CSV 文件
 //
 //	文件不存在会创建, 文件存在会覆盖写入.
 func PutCsv(name string, data [][]string) error {
@@ -23,7 +23,7 @@ func PutCsv(name string, data [][]string) error {
 		}
 	}(f)
 
-	if _, err := f.WriteString("\xEF\xBB\xBF"); err != nil { // 写入UTF-8 BOM
+	if _, err := f.WriteString("\xEF\xBB\xBF"); err != nil { // 写入 UTF-8 BOM
 		zap.L().Error(err.Error())
 		return err
 	}

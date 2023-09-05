@@ -7,7 +7,7 @@ import (
 	"go-demo/pkg/dbx"
 )
 
-// 用户相关计划任务 DEMO 这里定义一个空结构体用于为大量的cron方法做分类
+// 用户相关计划任务 DEMO 这里定义一个空结构体用于为大量的 cron 方法做分类
 type user struct{}
 
 // User 这里仅需结构体零值

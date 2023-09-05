@@ -43,35 +43,35 @@
   - demo-cli/           命令行
   - demo-cron/          计划任务
   - demo-queue/         消息队列
-  - demo-websocket/      WebSocket
+  - demo-websocket/     WebSocket
 - config/               配置
   - consts/             常量定义
-    - redis_key.go      Redis key统一在此定义避免冲突
+    - redis_key.go      Redis key 统一在此定义避免冲突
   - di/                 服务注入
     - db.go             db服务
     - logger.go         日志服务
     - queue.go          消息队列服务
-    - redis.go          Redis服务
-    - worker_pool.go    Goroutine池服务
+    - redis.go          Redis 服务
+    - worker_pool.go    Goroutine 池服务
   - cfg.go              配置实现
   - common.go           公共配置
   - prod.go             生产环境配置
   - testing.go          测试环境配置
 - internal/             内部应用代码. 处理业务的代码
-  - action/             命令行action
+  - action/             命令行 action
   - cron/               计划任务  
-  - controller/         API控制器
-  - router/             API路由
-  - middleware/         API中间件  
+  - controller/         API 控制器
+  - router/             API 路由
+  - middleware/         API 中间件  
   - task/               消息队列任务 
   - service/            内部应用业务原子级服务. 需要公共使用的业务逻辑在这里实现
-  - ws/                 websocket业务
+  - ws/                 websocket 业务
 - pkg/                  外部应用可以使用的代码. 不依赖内部应用的代码
-  - dbx/                db增删改查操作函数
-  - ginx/               Gin增强函数. 此包中出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
-  - gox/                Golang增强函数
+  - dbx/                DB 增删改查操作函数
+  - ginx/               Gin 增强函数. 此包中出现 error 会向客户端输出4xx/500错误, 调用时捕获到 error 直接结束业务逻辑即可
+  - gox/                Golang 增强函数
   - queuex/             消息队列操作函数
-  - dbcache/            db增删改查操作函数并维护缓存
+  - dbcache/            DB 增删改查操作函数并维护缓存
   - xcache/             自定义缓存操作函数
 - go.mod                包管理  
 ```
@@ -99,23 +99,23 @@
 
 - 多环境配置
   
-  `common.go` 公共配置, `<RUNTIME_ENV>.go` 环境配置, 同键名环境配置覆盖公共配置. 
+  `common.go`公共配置, `<RUNTIME_ENV>.go`环境配置, 同键名环境配置覆盖公共配置. 
 
-  可以按分类将配置文件拆分为多个 `<RUNTIME_ENV>_<TYPE>.go`, 比如 `testing_db.go`, `testing_app.go`
+  可以按分类将配置文件拆分为多个`<RUNTIME_ENV>_<TYPE>.go`, 比如`testing_db.go`, `testing_app.go`
 
-  dev环境配置不参与版本控制.
+  dev 环境配置不参与版本控制.
 
 - 使用
 
   配置值支持整型/字符串/布尔/整型切片/字符串切片. 
 
-  获取配置值 `config.Get()`, `config.GetInt()`, `config.GetString()`, `config.GetBool()`, `config.GetIntSlice()`, `config.GetStringSlice()`
+  获取配置值`config.GetInt()`, `config.GetString()`, `config.GetBool()`, `config.GetIntSlice()`, `config.GetStringSlice()`
 
 ### 依赖注入
 
-DI的实现理念参考了 [Dependency Injection / Service Location](https://docs.phalcon.io/5.0/en/di#dependency-injection--service-location)
+DI 的实现理念参考了 [Dependency Injection / Service Location](https://docs.phalcon.io/5.0/en/di#dependency-injection--service-location)
 
-`config/di` 下每一个导出函数即为一个服务, 需要添加服务, 添加导出函数即可; 包中文件按服务类型分为了多个, 方便管理
+`config/di`下每一个导出函数即为一个服务, 需要添加服务, 添加导出函数即可; 包中文件按服务类型分为了多个, 方便管理
 
 仅日志服务为初始化时加载, 日志服务加载不成功程序不允许启动, 因为在生产环境程序的所有异常都需要通过日志来排查, 日志加载不成功开发者就失去了与生产环境程序的联系
 
@@ -125,24 +125,28 @@ DI的实现理念参考了 [Dependency Injection / Service Location](https://doc
 
 - 记录日志
 
-  `zap.L(),Error()`, `zap.L().Warn()`, `zap.L().Info()`, `zap.L().Debug()`或者`di.Logger().Error()`, `di.Logger().Warn()`, `di.Logger().Info()`, `di.Logger().Debug()`. 错误日志会记录栈信息.
+  `pkg`中使用`zap.L(),Error()`, `zap.L().Warn()`, `zap.L().Info()`, `zap.L().Debug()`
+
+  内部应用使用`di.Logger().Error()`, `di.Logger().Warn()`, `di.Logger().Info()`, `di.Logger().Debug()`
+
+  错误日志会记录栈信息
 
   日志文件路径通过`config/`中`error_log`项配置, 注意文件需要读写权限. 
 
-- SQL日志
+- SQL 日志
 
-  SQL日志文件路径通过`config/`中`sql_log`项配置, 缺省或为空时不记录日志, 注意文件需要读写权限.
+  SQL 日志文件路径通过`config/`中`sql_log`项配置, 缺省或为空时不记录日志, 注意文件需要读写权限.
 
 ### WorkerPool 
 
-使用WorkerPool(Goroutine池)旨在解决两个问题 
+使用 WorkerPool(Goroutine 池)旨在解决两个问题 
 
-- Goroutine使用资源上限 
-- 优雅处理Goroutine中panic
+- Goroutine 使用资源上限 
+- 优雅处理 Goroutine 中 panic
  
 #### 使用
 
-- 公共Goroutine池
+- 公共 Goroutine 池
 
   ```
   # go func
@@ -162,9 +166,9 @@ DI的实现理念参考了 [Dependency Injection / Service Location](https://doc
   wpg.Wait()
   ```
 
-- 独享Goroutine池
+- 独享 Goroutine 池
 
-  独享Goroutine池通常起到类似限流的作用  
+  独享 Goroutine 池通常起到类似限流的作用  
 
   ```
   # go func
@@ -189,13 +193,13 @@ DI的实现理念参考了 [Dependency Injection / Service Location](https://doc
 
 #### 规范
 
-遵循RESTful规范, 参考指南[Best Practices for Designing a Pragmatic RESTful API](https://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api)
+遵循 RESTful 规范, 参考指南 [Best Practices for Designing a Pragmatic RESTful API](https://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api)
 
 #### 流程
 
 `cmd/demo-api/main.go` -> `internal/router/` [-> `internal/middleware/`] -> `internal/controller/` [-> `internal/service/`]
 
-- `internal/router/` 路由, API版本在此控制.
+- `internal/router/` 路由, API 版本在此控制.
 - `internal/middleware/` 中间件, 可选
 - `internal/controller/` 业务处理
 - `internal/service/` 原子级服务, 可选, 业务应优先考虑是否可以封装为原子级操作以提高代码复用性. 比如, "添加用户"为一个原子级操作, "删除用户"也为一个原子级操作.
@@ -205,26 +209,26 @@ DI的实现理念参考了 [Dependency Injection / Service Location](https://doc
 - 登录流程
 
   - 校验账户信息
-  - 生成JWT Token
-  - 以 `jwt:<userType>:<userID>:<jwtSignature>`的格式记录入Redis白名单
-  - JWT Token返回给客户端
+  - 生成 JWT Token
+  - 以 `jwt:<userType>:<userID>:<jwtSignature>`的格式记录入 Redis 白名单
+  - JWT Token 返回给客户端
 
 - 校验登录
 
-  - 客户端请求时Header携带JWT Token `Authorization: Bearer <token>`
-  - 校验JWT Token
-  - 校验Redis白名单
+  - 客户端请求时 Header 携带 JWT Token `Authorization: Bearer <token>`
+  - 校验 JWT Token
+  - 校验 Redis 白名单
   
 - 退出登录
  
   - 校验登录
-  - 删除对应Redis白名单
+  - 删除对应 Redis 白名单
 
 #### 运行
 
-- 开发&测试环境使用gowatch实时热重载
+- 开发&测试环境使用 gowatch 实时热重载
 
-  注意, 是否配置了Go mod代理 `go env -w GOPROXY=https://goproxy.cn,direct`, 是否安装了gowatch `go install github.com/silenceper/gowatch@latest`, 是否配置了Go bin路径 `export PATH=$PATH:$HOME/go/bin`.
+  注意, 是否配置了 Go mod 代理`go env -w GOPROXY=https://goproxy.cn,direct`, 是否安装了 gowatch `go install github.com/silenceper/gowatch@latest`, 是否配置了 Go bin 路径`export PATH=$PATH:$HOME/go/bin`.
 
   ```
   cd cmd/demo-api
@@ -233,7 +237,7 @@ DI的实现理念参考了 [Dependency Injection / Service Location](https://doc
 
 - 预发布&生产环境执行编译好的程序
 
-  实际上会提前编译好, 在机器上直接部署可执行文件. 如果程序不需要使用C库或者嵌入C代码，那么`CGO_ENABLED=0`可以让编译更简单和快速, 如果程序里调用了cgo命令, 此参数必须设置为1, 否则编译时将出错.
+  实际上会提前编译好, 在机器上直接部署可执行文件. 如果程序不需要使用 C 库或者嵌入 C 代码，那么`CGO_ENABLED=0`可以让编译更简单和快速, 如果程序里调用了 cgo 命令, 此参数必须设置为1, 否则编译时将出错.
 
   ```
   # 启动
@@ -254,7 +258,7 @@ DI的实现理念参考了 [Dependency Injection / Service Location](https://doc
 
 `cmd/demo-cli/main.go` -> `internal/action/` [-> `internal/service/`]
 
-- `cmd/demo-cli/main.go` 定义CLI路由, 按业务维度分两级
+- `cmd/demo-cli/main.go` 定义 CLI 路由, 按业务维度分两级
 - `internal/action/` 执行逻辑
 
 #### 使用
@@ -267,7 +271,7 @@ RUNTIME_ENV=testing ./demo-cli <commond> <action> [ARG...]
 
 ### Cron
 
-Cron的停止并非优雅停止, 尤其要注意数据完整性的问题
+Cron 的停止并非优雅停止, 尤其要注意数据完整性的问题
 
 #### 流程
 
@@ -295,7 +299,7 @@ go build -ldflags="-s -w"
 
 #### 使用
 
-- 启动Worker
+- 启动 Worker
 
   ```
   cd cmd/demo-queue
@@ -303,13 +307,13 @@ go build -ldflags="-s -w"
   (RUNTIME_ENV=testing ./demo-queue &> /dev/nul &)
   ```
 
-- 优雅停止Worker
+- 优雅停止 Worker
 
   ```
   pkill -TERM -f "demo-queue"
   ```
 
-- 发送Job
+- 发送 Job
 
   消息队列按任务优先级分两个队列: 默认队列, 该队列分配了较多的系统资源, 任务一般发送至此队列; 低优先级队列, 该队列分配了较少的系统资源, 数据量大不紧急的任务发送至此队列
 
@@ -321,7 +325,7 @@ go build -ldflags="-s -w"
 
 #### 鉴权 
 
-与API鉴权保持一致, 使用的JWT. 客户端通过URL参数`client_id`, 值为`url_base64(userID:jwtSignature)`, 传入鉴权信息
+与 API 鉴权保持一致, 使用的JWT. 客户端通过URL参数`client_id`, 值为`url_base64(userID:jwtSignature)`, 传入鉴权信息
 
 #### 通信
 
@@ -348,13 +352,21 @@ go build -ldflags="-s -w"
 }
 ```
 
+## 消息推送
+
+服务端主动向客户端推送消息, 通过 Redis 订阅来实现, 服务端监听名为 wsMessageChannel 的 Redis 频道
+
+向频道发送消息的格式为 json 字符串 `{"user_id": int, "type": string, data: {}}`
+
+`user_id` 为 0 表示向所有用户推送消息, 否则为向指定用户推送消息
+
 ### MySQL
 
-`dbx` 提供以`map[string]any`类型操作和读取数据库的函数, 同时支持读取结果至`struct`或指定类型
+`dbx`提供以`map[string]any`类型操作和读取数据库的函数, 同时支持读取结果至`struct`或指定类型
 
 #### 数据类型映射
 
-- 读操作, 若不指定结果接收类型, MySQL整型(包括无符号)将统一映射为Golang `int64`, 浮点型统一映射为 `float64`, 其他类型统一映射为`string` 
+- 读操作, 若不指定结果接收类型, MySQL 整型(包括无符号)将统一映射为 Golang `int64`, 浮点型统一映射为 `float64`, 其他类型统一映射为`string` 
 
   ```
   MySQL => Golang 数据类型映射:
@@ -363,7 +375,7 @@ go build -ldflags="-s -w"
     varchar/char/longtext/text/mediumtext/tinytext/decimal/datetime/timestamp/date/time => string,
   ```
 
-- 写操作, Golang写MySQL对数据没有强类型要求
+- 写操作, Golang 写 MySQL 对数据没有强类型要求
 
 #### 操作函数
 
@@ -395,11 +407,11 @@ go build -ldflags="-s -w"
 
 #### 缓存
 
-- DB缓存
+- DB 缓存
 
   以资源对象(实体表一行记录为一个资源对象)为单位, 使用旁路缓存策略.
  
-  使用`dbcache.Get()`或`dbcache.Take()`方法获取DB记录, 在更新和删除DB记录时, 必须使用`dbcache.Update()`和`dbcache.Delete()`方法自动维护缓存, 或`dbcache.Expired()`手动清除缓存.
+  使用`dbcache.Get()`或`dbcache.Take()`方法获取 DB 记录, 在更新和删除DB记录时, 必须使用`dbcache.Update()`和`dbcache.Delete()`方法自动维护缓存, 或`dbcache.Expired()`手动清除缓存.
   
   变更表结构会导致缓存数据不正确, 更新表版本`dbcache:table:<table_name>:version`可过期与之相关的所有缓存数据.
 
@@ -412,4 +424,4 @@ go build -ldflags="-s -w"
 - 业务缓存
 
   - 自定义缓存, `xcache.GetOrSet()` 获取或设置自定义缓存
-  - API业务缓存, `xcache.GinCache()` 获取或设置API业务缓存, 出现error会向客户端输出4xx/500错误, 调用时捕获到error直接结束业务逻辑即可
+  - API 业务缓存, `xcache.GinCache()` 获取或设置 API 业务缓存, 出现 error 会向客户端输出4xx/500错误, 调用时捕获到 error 直接结束业务逻辑即可

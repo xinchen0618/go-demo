@@ -12,13 +12,13 @@ func init() {
 		// 错误日志路径
 		"error_log": "/var/log/golang_error.log",
 
-		// SQL日志
+		// SQL 日志
 		"sql_log": "/var/log/golang_sql.log",
 
-		// 公共Goroutine池大小
+		// 公共 Goroutine 池大小
 		"worker_pool": 409600,
 
-		// 限流QPS
+		// 限流 QPS
 		"qps_limit": 40000,
 
 		// 超时控制, 秒

@@ -18,8 +18,8 @@ var sg singleflight.Group
 
 // GetOrSet 获取或设置自定义缓存
 //
-//	缓存数据使用json编解码.
-//	返回的是json.Unmarshal的数据.
+//	缓存数据使用 json 编解码.
+//	返回的是 json.Unmarshal 的数据.
 func GetOrSet(cache *redis.Client, key string, ttl time.Duration, f func() (any, error)) (any, error) {
 	result, err, _ := sg.Do(key, func() (any, error) {
 		var resultCache string
@@ -41,7 +41,7 @@ func GetOrSet(cache *redis.Client, key string, ttl time.Duration, f func() (any,
 				return nil, err
 			}
 			resultCache = string(resultBytes)
-		default: // redis异常
+		default: // redis 异常
 			zap.L().Error(err.Error())
 			return nil, err
 		}
@@ -62,7 +62,7 @@ func GetOrSet(cache *redis.Client, key string, ttl time.Duration, f func() (any,
 // GinCache 获取或者设置业务缓存
 //
 //	发生错误会向客户端输出500错误.
-//	返回的是json.Unmarshal的数据.
+//	返回的是 json.Unmarshal 的数据.
 func GinCache(c *gin.Context, cache *redis.Client, key string, ttl time.Duration, f func() (any, error)) (any, error) {
 	result, err, _ := sg.Do(key, func() (any, error) {
 		var resultCache string

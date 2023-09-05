@@ -1,4 +1,4 @@
-// Package middleware Gin中间件
+// Package middleware Gin 中间件
 package middleware
 
 import (
@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Recovery 主Goroutine中panic处理
+// Recovery 主 Goroutine 中 panic 处理
 func Recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {

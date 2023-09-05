@@ -1,6 +1,6 @@
-// Package dbcache MySQL增删改查操作函数并维护缓存
+// Package dbcache MySQL 增删改查操作函数并维护缓存
 //
-//	这里数据使用的msgpack编码, 这种编码可以保留字段的类型.
+//	这里数据使用的 msgpack 编码, 这种编码可以保留字段的类型.
 package dbcache
 
 import (
@@ -30,7 +30,7 @@ const (
 
 var sg singleflight.Group
 
-// set 设置DB缓存
+// set 设置 DB 缓存
 func set(cache *redis.Client, db gorose.IOrm, table string, id any) (bool, error) {
 	primaryKey, err := tablePrimaryKey(cache, db, table)
 	if err != nil {
@@ -62,10 +62,10 @@ func set(cache *redis.Client, db gorose.IOrm, table string, id any) (bool, error
 	return true, nil
 }
 
-// Get 获取DB记录返回map并维护缓存
+// Get 获取DB记录返回 map 并维护缓存
 //
-//	这里使用msgpack编码缓存数据目的在于解码缓存保持数据类型不变.
-//	使用dbcache.Get()或dbcache.Take()方法获取DB记录, 在更新和删除DB记录时, 必须使用dbcache.Update()和dbcache.Delete()方法自动维护缓存, 或dbcache.Expired()手动清除缓存.
+//	这里使用 msgpack 编码缓存数据目的在于解码缓存保持数据类型不变.
+//	使用 dbcache.Get() 或 dbcache.Take() 方法获取 DB 记录, 在更新和删除 DB 记录时, 必须使用 dbcache.Update() 和 dbcache.Delete() 方法自动维护缓存, 或 dbcache.Expired() 手动清除缓存.
 func Get(cache *redis.Client, db gorose.IOrm, table string, id any) (map[string]any, error) {
 	version, err := tableVersion(cache, table)
 	if err != nil {
@@ -91,7 +91,7 @@ func Get(cache *redis.Client, db gorose.IOrm, table string, id any) (map[string]
 				zap.L().Error(err.Error())
 				return nil, err
 			}
-		default: // redis异常
+		default: // redis 异常
 			zap.L().Error(err.Error())
 			return nil, err
 		}
@@ -109,9 +109,9 @@ func Get(cache *redis.Client, db gorose.IOrm, table string, id any) (map[string]
 	return v.(map[string]any), nil
 }
 
-// Take 获取DB记录至struct并维护缓存
+// Take 获取 DB 记录至 struct 并维护缓存
 //
-//	使用dbcache.Get()或dbcache.Take()方法获取DB记录, 在更新和删除DB记录时, 必须使用dbcache.Update()和dbcache.Delete()方法自动维护缓存, 或dbcache.Expired()手动清除缓存.
+//	使用 dbcache.Get() 或 dbcache.Take() 方法获取 DB 记录, 在更新和删除 DB 记录时, 必须使用 dbcache.Update() 和 dbcache.Delete() 方法自动维护缓存, 或 dbcache.Expired() 手动清除缓存.
 //	p 为接收结果的指针.
 func Take(p any, cache *redis.Client, db gorose.IOrm, table string, id any) error {
 	data, err := Get(cache, db, table, id)
@@ -128,7 +128,7 @@ func Take(p any, cache *redis.Client, db gorose.IOrm, table string, id any) erro
 	return nil
 }
 
-// Update 更新DB记录并维护缓存
+// Update 更新 DB 记录并维护缓存
 func Update(cache *redis.Client, db gorose.IOrm, table string, data map[string]any, where string, params ...any) (affectedRows int64, err error) {
 	// 清除缓存
 	primaryKey, err := tablePrimaryKey(cache, db, table)
@@ -156,7 +156,7 @@ func Update(cache *redis.Client, db gorose.IOrm, table string, data map[string]a
 	return affectedRows, nil
 }
 
-// Delete 删除DB记录并维护缓存
+// Delete 删除 DB 记录并维护缓存
 func Delete(cache *redis.Client, db gorose.IOrm, table string, where string, params ...any) (affectedRows int64, err error) {
 	// 清除缓存
 	primaryKey, err := tablePrimaryKey(cache, db, table)
@@ -201,7 +201,7 @@ func Expired(cache *redis.Client, table string, ids ...any) error {
 
 	// 多线程执行
 	var wg sync.WaitGroup
-	ch := make(chan error, length) // size不可固定为0或1, 否则错误有多个时会造成死锁
+	ch := make(chan error, length) // size 不可固定为0或1, 否则错误有多个时会造成死锁
 	for _, id := range ids {
 		wg.Add(1)
 		id := cast.ToInt64(id)

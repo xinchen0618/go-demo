@@ -18,7 +18,7 @@ type user struct{}
 var User user
 
 func (user) AddUser(ctx context.Context, t *asynq.Task) error {
-	// 解析payload
+	// 解析 payload
 	var user struct {
 		UserName string `json:"user_name"`
 	}

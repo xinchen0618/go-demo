@@ -65,7 +65,7 @@ func (ws) Send(client *WSClient, msgType string, msgData map[string]any) error {
 	return nil
 }
 
-// Close 关闭client
+// Close 关闭 client
 func (ws) Close(client *WSClient) {
 	if client.IsClosed {
 		return

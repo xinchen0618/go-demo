@@ -1,4 +1,4 @@
-// Package dbx MySQL增删改查操作函数
+// Package dbx MySQL 增删改查操作函数
 //
 //	MySQL=>Golang数据类型映射:
 //		bigint/int/smallint/tinyint => int64,
@@ -19,7 +19,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// FetchAll 获取多行记录返回map
+// FetchAll 获取多行记录返回 map
 //
 //	params 不支持切片类型.
 func FetchAll(db gorose.IOrm, sql string, params ...any) ([]map[string]any, error) {
@@ -37,9 +37,9 @@ func FetchAll(db gorose.IOrm, sql string, params ...any) ([]map[string]any, erro
 	return result, nil
 }
 
-// TakeAll 获取多行记录至struct
+// TakeAll 获取多行记录至 struct
 //
-//	p 为接收结果的指针, json tag是必须的.
+//	p 为接收结果的指针, json tag 是必须的.
 func TakeAll(p any, db gorose.IOrm, sql string, params ...any) error {
 	items, err := FetchAll(db, sql, params...)
 	if err != nil {
@@ -52,9 +52,9 @@ func TakeAll(p any, db gorose.IOrm, sql string, params ...any) error {
 	return nil
 }
 
-// FetchOne 获取一行记录返回map
+// FetchOne 获取一行记录返回 map
 //
-//	查询时会自动添加限制LIMIT 1.
+//	查询时会自动添加限制 LIMIT 1.
 func FetchOne(db gorose.IOrm, sql string, params ...any) (map[string]any, error) {
 	sql = strings.TrimSpace(sql)
 	if strings.ToUpper(lo.Substring(sql, 0, 6)) == "SELECT" && strings.ToUpper(lo.Substring(sql, -7, math.MaxUint)) != "LIMIT 1" {
@@ -73,9 +73,9 @@ func FetchOne(db gorose.IOrm, sql string, params ...any) (map[string]any, error)
 	return rows[0], nil
 }
 
-// TakeOne 获取一行记录至struct
+// TakeOne 获取一行记录至 struct
 //
-//	p 为接收结果的指针, json tag是必须的.
+//	p 为接收结果的指针, json tag 是必须的.
 func TakeOne(p any, db gorose.IOrm, sql string, params ...any) error {
 	item, err := FetchOne(db, sql, params...)
 	if err != nil {
@@ -151,9 +151,9 @@ func TakeColumn(p any, db gorose.IOrm, sql string, params ...any) error {
 	return nil
 }
 
-// Slice2In Slice转IN条件
+// Slice2In Slice 转 IN 条件
 //
-//	Golang SQL驱动不支持IN(?), 使用fmt.Sprint("IN(%s)", Slice2In(s)).
+//	Golang SQL 驱动不支持 IN(?), 使用 fmt.Sprint("IN(%s)", Slice2In(s)).
 func Slice2In(s any) string {
 	stringSlice := cast.ToStringSlice(s)
 	cleaned := make([]string, 0)
