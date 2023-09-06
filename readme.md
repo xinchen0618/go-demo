@@ -1,6 +1,6 @@
-## Golang
+# Golang
 
-### 技术栈
+## 技术栈
 
 |     技术     |        名称         | 地址                                   |
 |:----------:|:-----------------:|--------------------------------------|
@@ -18,7 +18,7 @@
 |    json    |      go-json      | https://github.com/goccy/go-json     |
 | WebSocket  | Gorilla WebSocket | https://github.com/gorilla/websocket |
 
-### 规范
+## 规范
 
 - 代码管理策略
 
@@ -33,7 +33,7 @@
   - [Uber Go 语言编码规范](https://github.com/xxjwxc/uber_go_guide_cn)
   - [Google Style Guides](https://google.github.io/styleguide/go/)
 
-### 目录结构
+## 目录结构
 
 这里是完整的目录结构, 实际项目未使用的目录可以删除
 
@@ -76,7 +76,7 @@
 - go.mod                包管理  
 ```
 
-### 环境定义
+## 环境定义
 
 环境定义使用`DTAP`, 参考[Deployment environment](https://en.wikipedia.org/wiki/Deployment_environment)
 
@@ -87,7 +87,7 @@
 - `stage`     预发布环境
 - `prod`      生产环境
 
-### 配置
+## 配置
 
 - 需求
 
@@ -111,9 +111,9 @@
 
   获取配置值`config.GetInt()`, `config.GetString()`, `config.GetBool()`, `config.GetIntSlice()`, `config.GetStringSlice()`
 
-### 依赖注入
+## 依赖注入
 
-DI 的实现理念参考了 [Dependency Injection / Service Location](https://docs.phalcon.io/5.0/en/di#dependency-injection--service-location)
+DI 实现理念参考了 [Dependency Injection / Service Location](https://docs.phalcon.io/5.0/en/di#dependency-injection--service-location)
 
 `config/di`下每一个导出函数即为一个服务, 需要添加服务, 添加导出函数即可; 包中文件按服务类型分为了多个, 方便管理
 
@@ -121,7 +121,7 @@ DI 的实现理念参考了 [Dependency Injection / Service Location](https://do
 
 其他服务均为惰性加载, 即第一次使用时才加载
 
-### 日志
+## 日志
 
 - 记录日志
 
@@ -137,14 +137,14 @@ DI 的实现理念参考了 [Dependency Injection / Service Location](https://do
 
   SQL 日志文件路径通过`config/`中`sql_log`项配置, 缺省或为空时不记录日志, 注意文件需要读写权限.
 
-### WorkerPool 
+## WorkerPool 
 
 使用 WorkerPool(Goroutine 池)旨在解决两个问题 
 
 - Goroutine 使用资源上限 
 - 优雅处理 Goroutine 中 panic
  
-#### 使用
+### 使用
 
 - 公共 Goroutine 池
 
@@ -189,13 +189,13 @@ DI 的实现理念参考了 [Dependency Injection / Service Location](https://do
   wpsg.Wait()  
   ```
 
-### API
+## API
 
-#### 规范
+### 规范
 
 遵循 RESTful 规范, 参考指南 [Best Practices for Designing a Pragmatic RESTful API](https://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api)
 
-#### 流程
+### 流程
 
 `cmd/demo-api/main.go` -> `internal/router/` [-> `internal/middleware/`] -> `internal/controller/` [-> `internal/service/`]
 
@@ -204,7 +204,7 @@ DI 的实现理念参考了 [Dependency Injection / Service Location](https://do
 - `internal/controller/` 业务处理
 - `internal/service/` 原子级服务, 可选, 业务应优先考虑是否可以封装为原子级操作以提高代码复用性. 比如, "添加用户"为一个原子级操作, "删除用户"也为一个原子级操作.
   
-#### 登录
+### 登录
 
 - 登录流程
 
@@ -224,7 +224,7 @@ DI 的实现理念参考了 [Dependency Injection / Service Location](https://do
   - 校验登录
   - 删除对应 Redis 白名单
 
-#### 运行
+### 运行
 
 - 开发&测试环境使用 gowatch 实时热重载
 
@@ -252,16 +252,16 @@ DI 的实现理念参考了 [Dependency Injection / Service Location](https://do
   pkill -SIGINT -f "demo-api"
   ```
 
-### CLI
+## CLI
 
-#### 流程
+### 流程
 
 `cmd/demo-cli/main.go` -> `internal/action/` [-> `internal/service/`]
 
 - `cmd/demo-cli/main.go` 定义 CLI 路由, 按业务维度分两级
 - `internal/action/` 执行逻辑
 
-#### 使用
+### 使用
 
 ```
 cd cmd/demo-cli
@@ -269,18 +269,18 @@ go build -ldflags="-s -w"
 RUNTIME_ENV=testing ./demo-cli <commond> <action> [ARG...]
 ```
 
-### Cron
+## Cron
 
 Cron 的停止并非优雅停止, 尤其要注意数据完整性的问题
 
-#### 流程
+### 流程
 
 `cmd/demo-cron/main.go` -> `internal/cron/` [-> `internal/service/`]  
 
 - `cmd/demo-cron/main.go` 定义计划任务
 - `internal/cron/` 执行逻辑
 
-#### 启动
+### 启动
 
 ```
 cd cmd/demo-cron
@@ -288,16 +288,16 @@ go build -ldflags="-s -w"
 (RUNTIME_ENV=testing ./demo-cron &> /dev/nul &)
 ```
 
-### Queue
+## Queue
 
-#### 流程
+### 流程
 
 `cmd/demo-queue/main.go` -> `internal/task/` [-> `internal/service/`]
 
 - `cmd/demo-queue/main.go` 定义队列任务
 - `internal/task/` 执行逻辑
 
-#### 使用
+### 使用
 
 - 启动 Worker
 
@@ -319,15 +319,15 @@ go build -ldflags="-s -w"
 
   默认队列: 及时消息`queuex.Enqueue()`, 延时消息`queuex.EnqueueIn()`, 定时消息`queuex.EnqueueAt()`; 低优先级队列: 及时消息`queuex.LowEnqueue()`, 延时消息`queuex.LowEnqueueIn()`, 定时消息`queuex.LowEnqueueAt()`
 
-### WebSocket
+## WebSocket
 
 目前的`WebSocket`实现定性为`beta`版
 
-#### 鉴权 
+### 鉴权 
 
 与 API 鉴权保持一致, 使用的JWT. 客户端通过URL参数`client_id`, 值为`url_base64(userID:jwtSignature)`, 传入鉴权信息
 
-#### 通信
+### 通信
 
 客户端与服务端通信的消息格式为`{type: "", data: {}}`, `type`-消息类型, `data`-消息内容
   
@@ -352,7 +352,7 @@ go build -ldflags="-s -w"
 }
 ```
 
-## 消息推送
+### 消息推送
 
 服务端主动向客户端推送消息, 通过 Redis 订阅来实现, 服务端监听名为 wsMessageChannel 的 Redis 频道
 
@@ -360,11 +360,11 @@ go build -ldflags="-s -w"
 
 `user_id` 为 0 表示向所有用户推送消息, 否则为向指定用户推送消息
 
-### MySQL
+## MySQL
 
 `dbx`提供以`map[string]any`类型操作和读取数据库的函数, 同时支持读取结果至`struct`或指定类型
 
-#### 数据类型映射
+### 数据类型映射
 
 - 读操作, 若不指定结果接收类型, MySQL 整型(包括无符号)将统一映射为 Golang `int64`, 浮点型统一映射为 `float64`, 其他类型统一映射为`string` 
 
@@ -377,7 +377,7 @@ go build -ldflags="-s -w"
 
 - 写操作, Golang 写 MySQL 对数据没有强类型要求
 
-#### 操作函数
+### 操作函数
 
 - `FetchAll()` 获取多行记录返回`map`切片
 - `TakeAll()` 获取多行记录至`struct`切片
@@ -397,15 +397,15 @@ go build -ldflags="-s -w"
 - `Commit()` 手动提交事务
 - `Rollback()` 手动回滚事务
 
-### Redis
+## Redis
 
 `key`统一在`config/consts/redis_key.go`中定义.
 
-#### 规范
+### 规范
 
 [阿里云Redis开发规范](https://developer.aliyun.com/article/531067)
 
-#### 缓存
+### 缓存
 
 - DB 缓存
 
