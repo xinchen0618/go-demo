@@ -132,7 +132,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 			case "MicroChat:SendMessage": // DEMO
 				ws.MicroChat.SendMessage(client, submsg.Data)
 			default: // 未知路由
-				di.Logger().Error(fmt.Sprintf("ws 错误订阅消息 %s", msg.Payload))
+				di.Logger().Error(fmt.Sprintf("ws 错误订阅消息: %s", msg.Payload))
 			}
 		}
 	})

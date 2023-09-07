@@ -48,7 +48,7 @@
   - consts/             常量定义
     - redis_key.go      Redis key 统一在此定义避免冲突
   - di/                 服务注入
-    - db.go             db服务
+    - db.go             DB 服务
     - logger.go         日志服务
     - queue.go          消息队列服务
     - redis.go          Redis 服务
@@ -325,7 +325,7 @@ go build -ldflags="-s -w"
 
 ### 鉴权 
 
-与 API 鉴权保持一致, 使用的JWT. 客户端通过URL参数`client_id`, 值为`url_base64(userID:jwtSignature)`, 传入鉴权信息
+与 API 鉴权保持一致, 使用的JWT. 客户端通过 URL 参数`client_id`, 值为`url_base64(userID:jwtSignature)`, 传入鉴权信息
 
 ### 通信
 
