@@ -18,7 +18,7 @@ import (
 
 func main() {
 	// 实例化 Gin
-	if lo.Contains([]string{"prod", "stage"}, config.GetRuntimeEnv()) {
+	if lo.Contains([]string{"prod", "stage"}, config.RuntimeEnv()) {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	r := gin.Default()

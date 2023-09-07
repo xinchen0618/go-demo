@@ -11,8 +11,8 @@ import (
 // configure{"common": map[string]any, "<runtimeEnv>": map[string]any}
 var configure = map[string]map[string]any{}
 
-// GetRuntimeEnv 获取运行时环境
-func GetRuntimeEnv() string {
+// RuntimeEnv 获取运行时环境
+func RuntimeEnv() string {
 	runtimeEnv := os.Getenv("RUNTIME_ENV")
 	if runtimeEnv == "" { // 默认为生产环境
 		runtimeEnv = "prod"
@@ -22,7 +22,7 @@ func GetRuntimeEnv() string {
 }
 
 func get(key string) any {
-	runtimeEnv := GetRuntimeEnv()
+	runtimeEnv := RuntimeEnv()
 
 	if envConfigure, ok := configure[runtimeEnv]; ok { // 环境配置
 		if value, ok := envConfigure[key]; ok {
