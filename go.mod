@@ -1,6 +1,6 @@
 module go-demo
 
-go 1.20
+go 1.21
 
 require (
 	github.com/alitto/pond v1.8.3
@@ -11,7 +11,7 @@ require (
 	github.com/goccy/go-json v0.10.2
 	github.com/gohouse/gorose/v2 v2.1.12
 	github.com/golang-jwt/jwt/v5 v5.0.0
-	github.com/golang-module/carbon/v2 v2.2.6
+	github.com/golang-module/carbon/v2 v2.2.7
 	github.com/gorilla/websocket v1.5.0
 	github.com/hibiken/asynq v0.24.1
 	github.com/juju/ratelimit v1.0.2
@@ -26,7 +26,7 @@ require (
 )
 
 require (
-	github.com/bytedance/sonic v1.10.0 // indirect
+	github.com/bytedance/sonic v1.10.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.0 // indirect
@@ -36,7 +36,7 @@ require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.15.3 // indirect
+	github.com/go-playground/validator/v10 v10.15.4 // indirect
 	github.com/gohouse/golib v0.0.0-20210711163732-a5c22059eb75 // indirect
 	github.com/gohouse/t v0.0.0-20201007094014-630049a6bfe9 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect

@@ -80,7 +80,7 @@
 
 环境定义使用`DTAP`, 参考[Deployment environment](https://en.wikipedia.org/wiki/Deployment_environment)
 
-环境变量`RUNTIME_ENV`指定运行环境, 可以在系统中设置, 也可以在命令行中指定, 默认为生产环境. 
+环境变量`RUNTIME_ENV`指定运行环境, 可以在系统中设置, 也可以在命令行中指定, 默认为生产环境
 
 - `dev`       开发环境. 开发人员的个人环境
 - `testing`   测试环境
@@ -91,19 +91,19 @@
 
 - 为什么从项目中移除了`viper`
 
-  `viper`提供了修改配置的功能, 而且无法限制, 运行时配置被修改是不可接受的. 
+  `viper`提供了修改配置的功能, 而且无法限制, 运行时配置被修改是不可接受的
 
 - 多环境配置
   
-  `common.go`公共配置, `<RUNTIME_ENV>.go`环境配置, 环境配置为可选, 同键名环境配置覆盖公共配置. 
+  `common.go`公共配置, `<RUNTIME_ENV>.go`环境配置, 环境配置为可选, 同键名环境配置覆盖公共配置 
 
   可以按分类将配置文件拆分为多个`<RUNTIME_ENV>_<TYPE>.go`, 比如`testing_db.go`, `testing_app.go`
 
-  dev 环境配置不参与版本控制.
+  dev 环境配置不参与版本控制
 
 - 使用
 
-  配置值支持整型/字符串/布尔/整型切片/字符串切片. 
+  配置值支持整型/字符串/布尔/整型切片/字符串切片
 
   获取配置值`config.GetInt()`, `config.GetString()`, `config.GetBool()`, `config.GetIntSlice()`, `config.GetStringSlice()`
 
@@ -121,17 +121,17 @@ DI 实现理念参考了 [Dependency Injection / Service Location](https://docs.
 
 - 记录日志
 
-  `pkg`中使用`zap.L(),Error()`, `zap.L().Warn()`, `zap.L().Info()`, `zap.L().Debug()`
-
   内部应用使用`di.Logger().Error()`, `di.Logger().Warn()`, `di.Logger().Info()`, `di.Logger().Debug()`
+
+  其他, 使用`zap.L(),Error()`, `zap.L().Warn()`, `zap.L().Info()`, `zap.L().Debug()`
 
   错误日志会记录栈信息
 
-  日志文件路径通过`config/`中`error_log`项配置, 注意文件需要读写权限. 
+  日志文件路径通过`config/`中`error_log`项配置, 注意文件需要读写权限
 
 - SQL 日志
 
-  SQL 日志文件路径通过`config/`中`sql_log`项配置, 缺省或为空时不记录日志, 注意文件需要读写权限.
+  SQL 日志文件路径通过`config/`中`sql_log`项配置, 缺省或为空时不记录日志, 注意文件需要读写权限
 
 ## WorkerPool 
 
@@ -195,10 +195,10 @@ DI 实现理念参考了 [Dependency Injection / Service Location](https://docs.
 
 `cmd/demo-api/main.go` -> `internal/router/` [-> `internal/middleware/`] -> `internal/controller/` [-> `internal/service/`]
 
-- `internal/router/` 路由, API 版本在此控制.
+- `internal/router/` 路由, API 版本在此控制
 - `internal/middleware/` 中间件, 可选
 - `internal/controller/` 业务处理
-- `internal/service/` 原子级服务, 可选, 业务应优先考虑是否可以封装为原子级操作以提高代码复用性. 比如, "添加用户"为一个原子级操作, "删除用户"也为一个原子级操作.
+- `internal/service/` 原子级服务, 可选, 业务应优先考虑是否可以封装为原子级操作以提高代码复用性. 比如, "添加用户"为一个原子级操作, "删除用户"也为一个原子级操作
   
 ### 登录
 
@@ -224,7 +224,7 @@ DI 实现理念参考了 [Dependency Injection / Service Location](https://docs.
 
 - 开发&测试环境使用 gowatch 实时热重载
 
-  注意, 是否配置了 Go mod 代理`go env -w GOPROXY=https://goproxy.cn,direct`, 是否安装了 gowatch `go install github.com/silenceper/gowatch@latest`, 是否配置了 Go bin 路径`export PATH=$PATH:$HOME/go/bin`.
+  注意, 是否配置了 Go mod 代理`go env -w GOPROXY=https://goproxy.cn,direct`, 是否安装了 gowatch `go install github.com/silenceper/gowatch@latest`, 是否配置了 Go bin 路径`export PATH=$PATH:$HOME/go/bin`
 
   ```
   cd cmd/demo-api
@@ -233,7 +233,7 @@ DI 实现理念参考了 [Dependency Injection / Service Location](https://docs.
 
 - 预发布&生产环境执行编译好的程序
 
-  实际上会提前编译好, 在机器上直接部署可执行文件. 如果程序不需要使用 C 库或者嵌入 C 代码，那么`CGO_ENABLED=0`可以让编译更简单和快速, 如果程序里调用了 cgo 命令, 此参数必须设置为1, 否则编译时将出错.
+  实际上会提前编译好, 在机器上直接部署可执行文件. 如果程序不需要使用 C 库或者嵌入 C 代码，那么`CGO_ENABLED=0`可以让编译更简单和快速, 如果程序里调用了 cgo 命令, 此参数必须设置为1, 否则编译时将出错
 
   ```
   # 启动
@@ -313,7 +313,9 @@ go build -ldflags="-s -w"
 
   消息队列按任务优先级分两个队列: 默认队列, 该队列分配了较多的系统资源, 任务一般发送至此队列; 低优先级队列, 该队列分配了较少的系统资源, 数据量大不紧急的任务发送至此队列
 
-  默认队列: 及时消息`queuex.Enqueue()`, 延时消息`queuex.EnqueueIn()`, 定时消息`queuex.EnqueueAt()`; 低优先级队列: 及时消息`queuex.LowEnqueue()`, 延时消息`queuex.LowEnqueueIn()`, 定时消息`queuex.LowEnqueueAt()`
+  默认队列: 及时消息`queuex.Enqueue()`, 延时消息`queuex.EnqueueIn()`, 定时消息`queuex.EnqueueAt()`
+
+  低优先级队列: 及时消息`queuex.LowEnqueue()`, 延时消息`queuex.LowEnqueueIn()`, 定时消息`queuex.LowEnqueueAt()`
 
 ## WebSocket
 
@@ -395,7 +397,7 @@ go build -ldflags="-s -w"
 
 ## Redis
 
-`key`统一在`config/consts/redis_key.go`中定义.
+`key`统一在`config/consts/redis_key.go`中定义
 
 ### 规范
 
@@ -405,11 +407,11 @@ go build -ldflags="-s -w"
 
 - DB 缓存
 
-  以资源对象(实体表一行记录为一个资源对象)为单位, 使用旁路缓存策略.
+  以资源对象(实体表一行记录为一个资源对象)为单位, 使用旁路缓存策略
  
-  使用`dbcache.Get()`或`dbcache.Take()`方法获取 DB 记录, 在更新和删除 DB 记录时, 必须使用`dbcache.Update()`和`dbcache.Delete()`方法自动维护缓存, 或`dbcache.Expired()`手动清除缓存.
+  使用`dbcache.Get()`或`dbcache.Take()`方法获取 DB 记录, 在更新和删除 DB 记录时, 必须使用`dbcache.Update()`和`dbcache.Delete()`方法自动维护缓存, 或`dbcache.Expired()`手动清除缓存
   
-  变更表结构会导致缓存数据不正确, 更新表版本`dbcache:table:<table_name>:version`可过期与之相关的所有缓存数据.
+  变更表结构会导致缓存数据不正确, 更新表版本`dbcache:table:<table_name>:version`可过期与之相关的所有缓存数据
 
   - `dbcache.Get()` 获取 DB 记录返回`map`并维护缓存
   - `dbcache.Take()` 获取 DB 记录至`struct`并维护缓存

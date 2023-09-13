@@ -121,7 +121,7 @@ func Take(p any, cache *redis.Client, db gorose.IOrm, table string, id any) erro
 	if len(data) == 0 {
 		return nil
 	}
-	if err := gox.TypeCast(data, p); err != nil {
+	if err := gox.Cast(data, p); err != nil {
 		return err
 	}
 

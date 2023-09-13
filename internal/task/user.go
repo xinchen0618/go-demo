@@ -33,7 +33,7 @@ func (user) AddUser(ctx context.Context, t *asynq.Task) error {
 
 	// 业务处理
 	userData := map[string]any{}
-	if err := gox.TypeCast(user, &userData); err != nil {
+	if err := gox.Cast(user, &userData); err != nil {
 		return err
 	}
 	if _, err := service.User.CreateUser(userData); err != nil {

@@ -34,7 +34,7 @@ func (account) PostUserLogin(c *gin.Context) {
 		UserName string `json:"user_name"`
 		Password string `json:"password"`
 	}
-	sql := "SELECT user_id,user_name,password FROM t_users WHERE user_name=? LIMIT 1"
+	sql := "SELECT user_id,user_name,password FROM t_users WHERE user_name = ? LIMIT 1"
 	if err := dbx.TakeOne(&user, di.DemoDB(), sql, jsonBody["user_name"]); err != nil {
 		ginx.InternalError(c, nil)
 		return

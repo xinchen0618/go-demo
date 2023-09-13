@@ -45,7 +45,7 @@ func TakeAll(p any, db gorose.IOrm, sql string, params ...any) error {
 	if err != nil {
 		return err
 	}
-	if err := gox.TypeCast(items, p); err != nil {
+	if err := gox.Cast(items, p); err != nil {
 		return err
 	}
 
@@ -81,7 +81,7 @@ func TakeOne(p any, db gorose.IOrm, sql string, params ...any) error {
 	if err != nil {
 		return err
 	}
-	if err := gox.TypeCast(item, p); err != nil {
+	if err := gox.Cast(item, p); err != nil {
 		return err
 	}
 
@@ -111,7 +111,7 @@ func TakeValue(p any, db gorose.IOrm, sql string, params ...any) error {
 	if err != nil {
 		return err
 	}
-	if err := gox.TypeCast(value, p); err != nil {
+	if err := gox.Cast(value, p); err != nil {
 		return err
 	}
 
@@ -144,7 +144,7 @@ func TakeColumn(p any, db gorose.IOrm, sql string, params ...any) error {
 	if err != nil {
 		return err
 	}
-	if err := gox.TypeCast(values, p); err != nil {
+	if err := gox.Cast(values, p); err != nil {
 		return err
 	}
 
