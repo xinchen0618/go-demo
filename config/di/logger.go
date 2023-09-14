@@ -13,18 +13,24 @@ import (
 var logger *zap.Logger
 
 func init() { // 日志服务最为基础, 日志初始化失败, 程序不允许启动
+	// 创建输出位置
 	logFile, err := os.OpenFile(config.GetString("error_log"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o664)
 	if err != nil {
 		panic(err)
 	}
-	writeSyncer := zapcore.AddSync(logFile)
+	fileSyncer := zapcore.AddSync(logFile)      // 输出到文件
+	consoleSyncer := zapcore.AddSync(os.Stdout) // 输出到 console
+	// 创建编码器
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	encoder := zapcore.NewConsoleEncoder(encoderConfig)
-	zapCore := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(writeSyncer, zapcore.AddSync(os.Stdout)), zapcore.DebugLevel) // 输出到 console 和文件
-	logger = zap.New(zapCore, zap.AddStacktrace(zapcore.ErrorLevel))                                                              // 错误日志记录栈信息
-	zap.ReplaceGlobals(logger)                                                                                                    // 替换 zap 包中全局的 logger 实例，后续在其他包中只需使用 zap.L() 调用即可
+	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder // 彩色输出
+	encoder := zapcore.NewConsoleEncoder(encoderConfig)          // console 格式输出
+	// 创建 Core
+	zapCore := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(fileSyncer, consoleSyncer), zapcore.DebugLevel) // 允许记录所有级别日志
+	// 创建 Logger
+	logger = zap.New(zapCore, zap.AddStacktrace(zapcore.ErrorLevel)) // 错误日志记录栈信息
+	// 替换 zap 包中全局的 logger 实例, 后续在其他包中只需使用 zap.L() 调用即可
+	zap.ReplaceGlobals(logger)
 }
 
 // Logger 日志
