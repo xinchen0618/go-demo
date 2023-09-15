@@ -12,6 +12,7 @@ import (
 	"go-demo/config/consts"
 	"go-demo/config/di"
 	"go-demo/internal/service"
+	"go-demo/internal/types"
 	"go-demo/internal/ws"
 	"go-demo/pkg/gox"
 
@@ -28,7 +29,7 @@ var (
 
 func socketHandler(w http.ResponseWriter, r *http.Request) {
 	// 将 ws 连接信息和 user_id 记录到 WSClient 对象
-	client := &service.WSClient{Conn: nil, IsClosed: true}
+	client := &types.WSClient{Conn: nil, IsClosed: true}
 
 	// Upgrade our raw HTTP connection to a websocket based one
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -118,7 +119,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	gox.Go(func() {
 		for msg := range msgCh {
 			// 读取订阅消息并格式化
-			submsg := service.SubMsg{}
+			submsg := types.SubMsg{}
 			if err := json.Unmarshal([]byte(msg.Payload), &submsg); err != nil {
 				di.Logger().Error(err.Error())
 				continue
@@ -148,7 +149,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			break
 		}
-		msg := service.WSMsg{}
+		msg := types.WSMsg{}
 		if err := json.Unmarshal(message, &msg); err != nil {
 			_ = service.WS.Send(client, "ClientError", map[string]any{
 				"code":    "MessageError",
