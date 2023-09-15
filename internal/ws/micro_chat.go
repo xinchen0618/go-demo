@@ -3,6 +3,7 @@ package ws
 
 import (
 	"go-demo/internal/service"
+	"go-demo/internal/types"
 
 	"github.com/spf13/cast"
 )
@@ -11,7 +12,7 @@ type microChat struct{}
 
 var MicroChat microChat
 
-func (microChat) SendMessage(client *service.WSClient, data map[string]any) {
+func (microChat) SendMessage(client *types.WSClient, data map[string]any) {
 	content := cast.ToString(data["content"])
 	if content == "" {
 		return

@@ -8,39 +8,18 @@ import (
 	"fmt"
 
 	"go-demo/config/di"
+	"go-demo/internal/types"
 
 	"github.com/goccy/go-json"
 	"github.com/gorilla/websocket"
 )
-
-// WSClient 客户端信息
-//
-//	这个对象用于存放客户端的 ws 连接信息和用户信息
-type WSClient struct {
-	UserID   int64
-	Conn     *websocket.Conn
-	IsClosed bool
-}
-
-// WSMsg 客户端与服务端通信的消息格式
-type WSMsg struct {
-	Type string         `json:"type"`
-	Data map[string]any `json:"data"`
-}
-
-// SubMsg 服务端订阅 redis 频道的消息格式
-type SubMsg struct {
-	UserID int64          `json:"user_id"`
-	Type   string         `json:"type"`
-	Data   map[string]any `json:"data"`
-}
 
 type ws struct{}
 
 var WS ws
 
 // Send 发送消息
-func (ws) Send(client *WSClient, msgType string, msgData map[string]any) error {
+func (ws) Send(client *types.WSClient, msgType string, msgData map[string]any) error {
 	if client.IsClosed {
 		di.Logger().Error(fmt.Sprintf("%p client is closed", client))
 		return errors.New("client is closed")
@@ -49,7 +28,7 @@ func (ws) Send(client *WSClient, msgType string, msgData map[string]any) error {
 	if msgData == nil {
 		msgData = map[string]any{}
 	}
-	message, err := json.Marshal(WSMsg{
+	message, err := json.Marshal(types.WSMsg{
 		Type: msgType,
 		Data: msgData,
 	})
@@ -66,7 +45,7 @@ func (ws) Send(client *WSClient, msgType string, msgData map[string]any) error {
 }
 
 // Close 关闭 client
-func (ws) Close(client *WSClient) {
+func (ws) Close(client *types.WSClient) {
 	if client.IsClosed {
 		return
 	}

@@ -53,8 +53,7 @@ func (sqlLogger) EnableSlowLog() float64 {
 	return 0
 }
 
-/********************** 下面开始定义项目中的DB ********************/
-
+/*************************** 演示 DB ****************************/
 var (
 	demoDBEngine *gorose.Engin
 	demoDBOnce   gox.Once

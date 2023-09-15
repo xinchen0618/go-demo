@@ -23,8 +23,8 @@ func init() { // 日志服务最为基础, 日志初始化失败, 程序不允�
 	// 创建编码器
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder // 彩色输出
-	encoder := zapcore.NewConsoleEncoder(encoderConfig)          // console 格式输出
+	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder // 彩色输出. json 格式输出时不需要
+	encoder := zapcore.NewConsoleEncoder(encoderConfig)          // console 格式输出. json 格式输出为 NewJSONEncoder()
 	// 创建 Core
 	zapCore := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(fileSyncer, consoleSyncer), zapcore.DebugLevel) // 允许记录所有级别日志
 	// 创建 Logger
