@@ -45,8 +45,6 @@
   - demo-queue/         消息队列
   - demo-websocket/     WebSocket
 - config/               配置
-  - consts/             常量定义
-    - redis_key.go      Redis key 统一在此定义避免冲突
   - di/                 服务注入
     - db.go             DB 服务
     - logger.go         日志服务
@@ -66,6 +64,7 @@
   - task/               消息队列任务 
   - service/            内部应用业务原子级服务. 需要公共使用的业务逻辑在这里实现
   - ws/                 websocket 业务
+  - consts/             业务相关常量定义
   - types/              业务相关结构体定义
 - pkg/                  外部应用可以使用的代码. 不依赖内部应用的代码
   - dbx/                DB 增删改查操作函数
@@ -398,7 +397,7 @@ go build -ldflags="-s -w"
 
 ## Redis
 
-`key`统一在`config/consts/redis_key.go`中定义
+`key`统一在`internal/consts/redis_key.go`中定义, 避免冲突
 
 ### 规范
 

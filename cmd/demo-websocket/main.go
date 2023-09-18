@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"go-demo/config/consts"
 	"go-demo/config/di"
+	"go-demo/internal/consts"
 	"go-demo/internal/service"
 	"go-demo/internal/types"
 	"go-demo/internal/ws"

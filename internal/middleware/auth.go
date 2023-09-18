@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"go-demo/config"
-	"go-demo/config/consts"
 	"go-demo/config/di"
+	"go-demo/internal/consts"
 	"go-demo/pkg/ginx"
 
 	"github.com/gin-gonic/gin"

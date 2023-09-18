@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"go-demo/config"
-	"go-demo/config/consts"
 	"go-demo/config/di"
+	"go-demo/internal/consts"
 
 	"github.com/goccy/go-json"
 	"github.com/golang-jwt/jwt/v5"

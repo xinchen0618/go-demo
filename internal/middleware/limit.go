@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"go-demo/config/consts"
 	"go-demo/config/di"
+	"go-demo/internal/consts"
 	"go-demo/pkg/ginx"
 	"go-demo/pkg/gox"
 

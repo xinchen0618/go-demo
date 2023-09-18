@@ -2,7 +2,7 @@
 package router
 
 import (
-	"go-demo/config/consts"
+	"go-demo/internal/consts"
 	"go-demo/internal/controller"
 	"go-demo/internal/middleware"
 

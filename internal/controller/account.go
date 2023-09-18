@@ -4,8 +4,8 @@ package controller
 import (
 	"fmt"
 
-	"go-demo/config/consts"
 	"go-demo/config/di"
+	"go-demo/internal/consts"
 	"go-demo/internal/service"
 	"go-demo/pkg/dbcache"
 	"go-demo/pkg/dbx"
