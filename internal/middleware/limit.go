@@ -35,7 +35,7 @@ func QPSLimit(qps int) gin.HandlerFunc {
 //	主要用于防重.
 func SubmitLimit() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var uid string // md5(id+method+path)
+		uid := "" // md5(id+method+path)
 		// 优先取用户 id 作为唯一标识, 如果没有则取 ip+agent 作为唯一标识
 		if c.GetInt64("userID") > 0 {
 			uid = cast.ToString(c.GetInt64("userID"))

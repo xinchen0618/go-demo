@@ -206,7 +206,7 @@ DI 实现理念参考了 [Dependency Injection / Service Location](https://docs.
 
   - 校验账户信息
   - 生成 JWT Token
-  - 以 `jwt:<userType>:<userID>:<jwtSignature>`的格式记录入 Redis 白名单
+  - 以`jwt:<userType>:<userID>:<jwtSignature>`的格式记录入 Redis 白名单
   - JWT Token 返回给客户端
 
 - 校验登录
@@ -409,7 +409,7 @@ go build -ldflags="-s -w"
 
   以资源对象(实体表一行记录为一个资源对象)为单位, 使用旁路缓存策略
  
-  使用`dbcache.Get()`或`dbcache.Take()`方法获取 DB 记录, 在更新和删除 DB 记录时, 必须使用`dbcache.Update()`和`dbcache.Delete()`方法自动维护缓存, 或`dbcache.Expired()`手动清除缓存
+  使用`dbcache.Get()`或`dbcache.Take()`方法获取 DB 记录, 在更新和删除 DB 记录时, 需使用`dbcache.Update()`和`dbcache.Delete()`方法自动维护缓存, 或`dbcache.Expired()`手动清除缓存
   
   变更表结构会导致缓存数据不正确, 更新表版本`dbcache:table:<table_name>:version`可过期与之相关的所有缓存数据
 
