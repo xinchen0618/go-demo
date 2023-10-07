@@ -35,7 +35,7 @@
 
 ## 目录结构
 
-这里是完整的目录结构, 实际项目未使用的目录可以删除
+这里是完整的目录结构, 实际项目未使用的目录可以删除.
 
 ```
 - cmd/                  项目入口
@@ -80,7 +80,7 @@
 
 环境定义使用`DTAP`, 参考[Deployment environment](https://en.wikipedia.org/wiki/Deployment_environment)
 
-环境变量`RUNTIME_ENV`指定运行环境, 可以在系统中设置, 也可以在命令行中指定, 默认为生产环境
+环境变量`RUNTIME_ENV`指定运行环境, 可以在系统中设置, 也可以在命令行中指定, 默认为生产环境.
 
 - `dev`       开发环境. 开发人员的个人环境
 - `testing`   测试环境
@@ -91,19 +91,17 @@
 
 - 为什么从项目中移除了`viper`
 
-  `viper`提供了修改配置的功能, 而且无法限制, 运行时配置被修改是不可接受的
+  `viper`提供了修改配置的功能, 而且无法限制, 运行时配置被修改是不可接受的.
 
 - 多环境配置
   
-  `common.go`公共配置, `<RUNTIME_ENV>.go`环境配置, 环境配置为可选, 同键名环境配置覆盖公共配置 
+  `common.go`公共配置, `<RUNTIME_ENV>.go`环境配置, 环境配置为可选, 同键名环境配置覆盖公共配置.
 
   可以按分类将配置文件拆分为多个`<RUNTIME_ENV>_<TYPE>.go`, 比如`testing_db.go`, `testing_app.go`
 
-  dev 环境配置不参与版本控制
+  dev 环境配置不参与版本控制.
 
 - 使用
-
-  配置值支持整型/字符串/布尔/整型切片/字符串切片
 
   获取配置值`config.GetInt()`, `config.GetString()`, `config.GetBool()`, `config.GetIntSlice()`, `config.GetStringSlice()`
 
@@ -111,11 +109,11 @@
 
 DI 实现理念参考了 [Dependency Injection / Service Location](https://docs.phalcon.io/5.0/en/di#dependency-injection--service-location)
 
-`config/di`下每一个导出函数即为一个服务, 需要添加服务, 添加导出函数即可; 包中文件按服务类型分为了多个, 方便管理
+`config/di`下每一个导出函数即为一个服务, 需要添加服务, 添加导出函数即可; 包中文件按服务类型分为了多个, 方便管理.
 
-仅日志服务为初始化时加载, 日志服务加载不成功程序不允许启动, 因为在生产环境日志加载不成功开发者就失去了与生产环境程序的联系
+仅日志服务为初始化时加载, 日志服务加载不成功程序不允许启动, 因为在生产环境日志加载不成功开发者就失去了与生产环境程序的联系.
 
-其他服务均为惰性加载, 即第一次使用时才加载
+其他服务均为惰性加载, 即第一次使用时才加载.
 
 ## 日志
 
@@ -125,20 +123,20 @@ DI 实现理念参考了 [Dependency Injection / Service Location](https://docs.
 
   其他, 使用`zap.L(),Error()`, `zap.L().Warn()`, `zap.L().Info()`, `zap.L().Debug()`
 
-  错误日志会记录栈信息
+  错误日志会记录栈信息.
 
-  日志文件路径通过`config/`中`error_log`项配置, 注意文件需要读写权限
+  日志文件路径通过`config/`中`error_log`项配置, 注意文件需要读写权限.
 
 - SQL 日志
 
-  SQL 日志文件路径通过`config/`中`sql_log`项配置, 缺省或为空时不记录日志, 注意文件需要读写权限
+  SQL 日志文件路径通过`config/`中`sql_log`项配置, 缺省或为空时不记录日志, 注意文件需要读写权限.
 
 ## WorkerPool 
 
-使用 WorkerPool(Goroutine 池)旨在解决两个问题 
+使用 WorkerPool(Goroutine 池)旨在解决两个问题:
 
-- Goroutine 使用资源上限 
-- 优雅处理 Goroutine 中 panic
+- Goroutine 使用资源上限
+- 优雅处理 Goroutine 中`panic`
  
 ### 使用
 
@@ -233,7 +231,7 @@ DI 实现理念参考了 [Dependency Injection / Service Location](https://docs.
 
 - 预发布&生产环境执行编译好的程序
 
-  实际上会提前编译好, 在机器上直接部署可执行文件. 如果程序不需要使用 C 库或者嵌入 C 代码，那么`CGO_ENABLED=0`可以让编译更简单和快速, 如果程序里调用了 cgo 命令, 此参数必须设置为1, 否则编译时将出错
+  实际上会提前编译好, 在机器上直接部署可执行文件. 如果程序不需要使用 C 库或者嵌入 C 代码，那么`CGO_ENABLED=0`可以让编译更简单和快速, 如果程序里调用了 cgo 命令, 此参数必须设置为1, 否则编译时将出错.
 
   ```
   # 启动
@@ -267,7 +265,7 @@ RUNTIME_ENV=testing ./demo-cli <commond> <action> [ARG...]
 
 ## Cron
 
-Cron 的停止并非优雅停止, 尤其要注意数据完整性的问题
+Cron 的停止并非优雅停止, 尤其要注意数据完整性的问题.
 
 ### 流程
 
@@ -311,7 +309,7 @@ go build -ldflags="-s -w"
 
 - 发送 Job
 
-  消息队列按任务优先级分两个队列: 默认队列, 该队列分配了较多的系统资源, 任务一般发送至此队列; 低优先级队列, 该队列分配了较少的系统资源, 数据量大不紧急的任务发送至此队列
+  消息队列按任务优先级分两个队列: 默认队列, 该队列分配了较多的系统资源, 任务一般发送至此队列; 低优先级队列, 该队列分配了较少的系统资源, 数据量大不紧急的任务发送至此队列.
 
   默认队列: 及时消息`queuex.Enqueue()`, 延时消息`queuex.EnqueueIn()`, 定时消息`queuex.EnqueueAt()`
 
@@ -319,15 +317,13 @@ go build -ldflags="-s -w"
 
 ## WebSocket
 
-目前的`WebSocket`实现定性为`beta`版
-
 ### 鉴权 
 
-与 API 鉴权保持一致, 使用的JWT. 客户端通过 URL 参数`client_id`, 值为`url_base64(userID:jwtSignature)`, 传入鉴权信息
+与 API 鉴权保持一致, 使用的JWT. 客户端通过 URL 参数`client_id`, 值为`url_base64(userID:jwtSignature)`, 传入鉴权信息.
 
 ### 通信
 
-客户端与服务端通信的消息格式为`{type: "", data: {}}`, `type`-消息类型, `data`-消息内容
+客户端与服务端通信的消息格式为`{type: "", data: {}}`, `type`-消息类型, `data`-消息内容.
   
 比如, 客户端发送消息
 ```
@@ -352,15 +348,15 @@ go build -ldflags="-s -w"
 
 ### 消息推送
 
-服务端主动向客户端推送消息, 通过 Redis 订阅来实现, 服务端监听名为 wsMessageChannel 的 Redis 频道
+服务端主动向客户端推送消息, 通过 Redis 订阅来实现, 服务端监听名为`wsMessageChannel`的 Redis 频道.
 
 向频道发送消息的格式为 json 字符串 `{"user_id": int, "type": string, data: {}}`
 
-`user_id` 为 0 表示向所有用户推送消息, 否则为向指定用户推送消息
+`user_id` 为 0 表示向所有用户推送消息, 否则为向指定用户推送消息.
 
 ## MySQL
 
-`dbx`提供以`map[string]any`类型操作和读取数据库的函数, 同时支持读取结果至`struct`或指定类型
+`dbx`提供以`map[string]any`类型操作和读取数据库的函数, 同时支持读取结果至`struct`或指定类型.
 
 ### 数据类型映射
 
@@ -397,7 +393,7 @@ go build -ldflags="-s -w"
 
 ## Redis
 
-`key`统一在`internal/consts/redis_key.go`中定义, 避免冲突
+`key`统一在`internal/consts/redis_key.go`中定义, 避免冲突.
 
 ### 规范
 
@@ -407,11 +403,11 @@ go build -ldflags="-s -w"
 
 - DB 缓存
 
-  以资源对象(实体表一行记录为一个资源对象)为单位, 使用旁路缓存策略
+  以资源对象(实体表一行记录为一个资源对象)为单位, 使用旁路缓存策略.
  
-  使用`dbcache.Get()`或`dbcache.Take()`方法获取 DB 记录, 在更新和删除 DB 记录时, 需使用`dbcache.Update()`和`dbcache.Delete()`方法自动维护缓存, 或`dbcache.Expired()`手动清除缓存
+  使用`dbcache.Get()`或`dbcache.Take()`方法获取 DB 记录, 在更新和删除 DB 记录时, 需使用`dbcache.Update()`和`dbcache.Delete()`方法自动维护缓存, 或`dbcache.Expired()`手动清除缓存.
   
-  变更表结构会导致缓存数据不正确, 更新表版本`dbcache:table:<table_name>:version`可过期与之相关的所有缓存数据
+  变更表结构会导致缓存数据不正确, 更新表版本`dbcache:table:<table_name>:version`可过期与之相关的所有缓存数据.
 
   - `dbcache.Get()` 获取 DB 记录返回`map`并维护缓存
   - `dbcache.Take()` 获取 DB 记录至`struct`并维护缓存
@@ -422,4 +418,4 @@ go build -ldflags="-s -w"
 - 业务缓存
 
   - 自定义缓存, `xcache.GetOrSet()` 获取或设置自定义缓存
-  - API 业务缓存, `xcache.GinCache()` 获取或设置 API 业务缓存, 出现 error 会向客户端输出4xx/500错误, 调用时捕获到 error 直接结束业务逻辑即可
+  - API 业务缓存, `xcache.GinCache()` 获取或设置 API 业务缓存, 出现`error`会向客户端输出4xx/500错误, 调用时捕获到`error`直接结束业务逻辑即可
