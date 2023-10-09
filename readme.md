@@ -78,7 +78,7 @@
 
 ## 环境定义
 
-环境定义使用`DTAP`, 参考[Deployment environment](https://en.wikipedia.org/wiki/Deployment_environment)
+环境定义使用`DTAP`, 参考 [Deployment environment](https://en.wikipedia.org/wiki/Deployment_environment)
 
 环境变量`RUNTIME_ENV`指定运行环境, 可以在系统中设置, 也可以在命令行中指定, 默认为生产环境.
 
@@ -91,7 +91,7 @@
 
 - 为什么从项目中移除了`viper`
 
-  `viper`提供了修改配置的功能, 而且无法限制, 运行时配置被修改是不可接受的.
+  `viper`提供了运行时修改配置的功能, 而且无法限制, 这个是不可接受的.
 
 - 多环境配置
   
@@ -107,7 +107,7 @@
 
 ## 依赖注入
 
-DI 实现理念参考了 [Dependency Injection / Service Location](https://docs.phalcon.io/5.0/en/di#dependency-injection--service-location)
+DI 实现参考 [Dependency Injection / Service Location](https://docs.phalcon.io/5.0/en/di#dependency-injection--service-location)
 
 `config/di`下每一个导出函数即为一个服务, 需要添加服务, 添加导出函数即可; 包中文件按服务类型分为了多个, 方便管理.
 

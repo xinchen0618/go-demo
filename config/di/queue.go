@@ -19,7 +19,10 @@ var (
 func QueueClient() *asynq.Client {
 	queueClientOnce.Do(func() {
 		queueClient = asynq.NewClient(asynq.RedisClientOpt{
-			Addr:     fmt.Sprintf("%s:%d", config.GetString("redis_host"), config.GetInt("redis_port")),
+			Addr: fmt.Sprintf("%s:%d",
+				config.GetString("redis_host"),
+				config.GetInt("redis_port"),
+			),
 			DB:       config.GetInt("redis_index_queue"),
 			Password: config.GetString("redis_auth"),
 		})
@@ -38,7 +41,10 @@ func QueueServer() *asynq.Server {
 	queueServerOnce.Do(func() {
 		queueServer = asynq.NewServer(
 			asynq.RedisClientOpt{
-				Addr:     fmt.Sprintf("%s:%d", config.GetString("redis_host"), config.GetInt("redis_port")),
+				Addr: fmt.Sprintf("%s:%d",
+					config.GetString("redis_host"),
+					config.GetInt("redis_port"),
+				),
 				DB:       config.GetInt("redis_index_queue"),
 				Password: config.GetString("redis_auth"),
 			},
