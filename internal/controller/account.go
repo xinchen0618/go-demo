@@ -78,7 +78,7 @@ func (account) GetUsers(c *gin.Context) {
 	userName := queries["user_name"].(string)
 	if userName != "" {
 		where += " AND user_name LIKE ?"
-		bindParams = append(bindParams, fmt.Sprintf("%%%s%%", gox.AddSlashes(userName)))
+		bindParams = append(bindParams, "%"+userName+"%")
 	}
 
 	pageItems, err := ginx.GetPageItems(c, ginx.PageQuery{
