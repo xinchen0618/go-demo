@@ -48,6 +48,8 @@ func newGormLogger() logger.Interface {
 	return gormLogger
 }
 
+/**************** DEMO DB *************************************************/
+
 var (
 	demoDB     *gorm.DB
 	demoDBOnce gox.Once
