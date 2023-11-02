@@ -64,11 +64,9 @@
   - types/              业务相关结构体定义
   - model/              表 Model
 - pkg/                  外部应用可以使用的代码. 不依赖内部应用的代码
-  - dbx/                DB 增删改查操作函数
   - ginx/               Gin 增强函数. 此包中出现 error 会向客户端输出4xx/500错误, 调用时捕获到 error 直接结束业务逻辑即可
   - gox/                Golang 增强函数
   - queuex/             消息队列操作函数
-  - dbcache/            DB 增删改查操作函数并维护缓存
   - xcache/             自定义缓存操作函数
 - go.mod                包管理  
 ```
