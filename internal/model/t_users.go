@@ -11,7 +11,7 @@ type TUsers struct {
 	Password  string    `gorm:"column:password" json:"password"`          // 密码哈希
 	Position  float64   `gorm:"column:position" json:"position"`          // 位置
 	Money     float64   `gorm:"column:money" json:"money"`                // 金额
-	IsVip     bool      `gorm:"column:is_vip" json:"is_vip"`              // 已否为VIP, 1-是,0-否
+	IsVip     int64     `gorm:"column:is_vip" json:"is_vip"`              // 已否为VIP, 1-是,0-否
 	UUID      string    `gorm:"column:uuid" json:"uuid"`                  // UUID
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt time.Time `gorm:"column:updated_at" json:"updated_at"`
