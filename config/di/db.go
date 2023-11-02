@@ -57,7 +57,6 @@ var (
 
 func DemoDB() *gorm.DB {
 	_ = demoDBOnce.Do(func() error {
-		newLogger := newGormLogger()
 		dsn := fmt.Sprintf(
 			"%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local",
 			config.GetString("mysql_username"),
@@ -69,7 +68,7 @@ func DemoDB() *gorm.DB {
 		)
 		var err error
 		demoDB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-			Logger: newLogger,
+			Logger: newGormLogger(),
 		})
 		if err != nil {
 			Logger().Error(err.Error())
