@@ -1,68 +1,63 @@
-// Package di 服务注入
 package di
 
 import (
 	"fmt"
+	"log"
 	"os"
-	"time"
 
 	"go-demo/config"
 	"go-demo/pkg/gox"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/gohouse/gorose/v2"
-	"github.com/golang-module/carbon/v2"
-	"go.uber.org/zap"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-/********************** sql log middleware ********************/
-// 这里重新实现 sql log, 是为了可以配置 sql log 的位置
-type sqlLogger struct{}
-
-func (sqlLogger) Sql(sqlStr string, runtime time.Duration) {
-	f, err := os.OpenFile(config.GetString("sql_log"), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0o644)
-	if err != nil {
-		zap.L().Error(err.Error())
-	}
-	defer func(f *os.File) {
-		if err := f.Close(); err != nil {
-			zap.L().Error(err.Error())
-		}
-	}(f)
-
-	if _, err := fmt.Fprintf(f, "[SQL] [%s] %s --- %s\n", carbon.Now().ToDateTimeString(), runtime.String(), sqlStr); err != nil {
-		zap.L().Error(err.Error())
-	}
-}
-
-func (sqlLogger) Slow(sqlStr string, runtime time.Duration) {
-}
-
-func (sqlLogger) Error(msg string) {
-}
-
-func (sqlLogger) EnableSqlLog() bool {
-	return true
-}
-
-func (sqlLogger) EnableErrorLog() bool {
-	return false
-}
-
-func (sqlLogger) EnableSlowLog() float64 {
-	return 0
-}
-
-/*************************** 演示 DB ****************************/
+/****************** GORM 日志定义 ***********************************/
 var (
-	demoDBEngine *gorose.Engin
-	demoDBOnce   gox.Once
+	gormLogger      logger.Interface
+	gormLoggerOnece gox.Once
 )
 
-// DemoDB DEMO MySQL
-func DemoDB() gorose.IOrm {
+func newGormLogger() logger.Interface {
+	_ = gormLoggerOnece.Do(func() error {
+		sqlLog := config.GetString("sql_log")
+		if sqlLog == "" {
+			gormLogger = logger.Default.LogMode(logger.Silent)
+		}
+
+		file, err := os.OpenFile(config.GetString("sql_log"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o666)
+		if err != nil {
+			Logger().Error(err.Error())
+			return err
+		}
+
+		gormLogger = logger.New(
+			log.New(file, "\r\n", log.LstdFlags),
+			logger.Config{
+				LogLevel:                  logger.Info,
+				IgnoreRecordNotFoundError: true,
+				ParameterizedQueries:      false,
+				Colorful:                  false,
+			},
+		)
+
+		return nil
+	})
+
+	return gormLogger
+}
+
+var (
+	demoDB     *gorm.DB
+	demoDBOnce gox.Once
+)
+
+func DemoDB() *gorm.DB {
 	_ = demoDBOnce.Do(func() error {
-		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s",
+		newLogger := newGormLogger()
+		dsn := fmt.Sprintf(
+			"%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local",
 			config.GetString("mysql_username"),
 			config.GetString("mysql_password"),
 			config.GetString("mysql_host"),
@@ -71,23 +66,25 @@ func DemoDB() gorose.IOrm {
 			config.GetString("mysql_charset"),
 		)
 		var err error
-		demoDBEngine, err = gorose.Open(&gorose.Config{
-			Driver:          "mysql",
-			Dsn:             dsn,
-			SetMaxOpenConns: config.GetInt("mysql_max_open_conns"),
-			SetMaxIdleConns: config.GetInt("mysql_max_idle_conns"),
+		demoDB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+			Logger: newLogger,
 		})
 		if err != nil {
 			Logger().Error(err.Error())
 			return err
 		}
 
-		if config.GetString("sql_log") != "" {
-			demoDBEngine.SetLogger(sqlLogger{})
+		// 连接池
+		sqlDB, err := demoDB.DB()
+		if err != nil {
+			Logger().Error(err.Error())
+			return err
 		}
+		sqlDB.SetMaxIdleConns(config.GetInt("mysql_max_idle_conns"))
+		sqlDB.SetMaxOpenConns(config.GetInt("mysql_max_open_conns"))
 
 		return nil
 	})
 
-	return demoDBEngine.NewOrm()
+	return demoDB
 }

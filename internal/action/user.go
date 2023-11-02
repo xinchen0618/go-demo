@@ -4,9 +4,12 @@ package action
 import (
 	"fmt"
 
-	"go-demo/internal/service"
+	"go.uber.org/zap"
 
 	"github.com/urfave/cli/v2"
+
+	"go-demo/config/di"
+	"go-demo/internal/model"
 )
 
 // 用户相关命令行 DEMO 这里定义一个空结构体用于为大量的 action 方法做分类
@@ -23,11 +26,8 @@ func (user) AddUser(c *cli.Context) error {
 		return nil
 	}
 
-	userData := map[string]any{
-		"user_name": userName,
-	}
-	_, err := service.User.CreateUser(userData)
-	if err != nil {
+	if err := di.DemoDB().Model(&model.TUsers{}).Create(map[string]any{"user_name": userName}).Error; err != nil {
+		zap.L().Error(err.Error())
 		return err
 	}
 	fmt.Println("处理完毕")

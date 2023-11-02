@@ -6,13 +6,13 @@ import (
 
 	"go-demo/config/di"
 	"go-demo/internal/consts"
+	"go-demo/internal/model"
 	"go-demo/internal/service"
-	"go-demo/pkg/dbcache"
-	"go-demo/pkg/dbx"
 	"go-demo/pkg/ginx"
 	"go-demo/pkg/gox"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-module/carbon/v2"
 	"github.com/spf13/cast"
 )
 
@@ -29,14 +29,13 @@ func (account) PostUserLogin(c *gin.Context) {
 	}
 
 	// 校验密码
-	var user struct {
+	user := struct {
 		UserID   int64  `json:"user_id"`
 		UserName string `json:"user_name"`
 		Password string `json:"password"`
-	}
-	sql := "SELECT user_id,user_name,password FROM t_users WHERE user_name = ? LIMIT 1"
-	if err := dbx.TakeOne(&user, di.DemoDB(), sql, jsonBody["user_name"]); err != nil {
-		ginx.InternalError(c, nil)
+	}{}
+	if err := di.DemoDB().Model(&model.TUsers{}).Where("user_name = ?", jsonBody["user_name"]).Limit(1).Find(&user).Error; err != nil {
+		ginx.InternalError(c, err)
 		return
 	}
 	if user.UserID == 0 || !gox.PasswordVerify(jsonBody["password"].(string), user.Password) {
@@ -72,7 +71,7 @@ func (account) GetUsers(c *gin.Context) {
 		return
 	}
 
-	where := "1"
+	where := "1 = 1"
 	bindParams := make([]any, 0)
 
 	userName := queries["user_name"].(string)
@@ -81,10 +80,14 @@ func (account) GetUsers(c *gin.Context) {
 		bindParams = append(bindParams, "%"+userName+"%")
 	}
 
-	pageItems, err := ginx.GetPageItems(c, ginx.PageQuery{
+	items := make([]struct {
+		UserID    int64  `json:"user_id"`
+		UserName  string `json:"user_name"`
+		CreatedAt string `json:"created_at"`
+	}, 0)
+	paging, err := ginx.Paginate(c, &items, ginx.PageQuery{
 		DB:         di.DemoDB(),
-		Select:     "user_id,user_name,created_at",
-		From:       "t_users",
+		Model:      &model.TUsers{},
 		Where:      where,
 		BindParams: bindParams,
 		OrderBy:    "user_id DESC",
@@ -93,7 +96,7 @@ func (account) GetUsers(c *gin.Context) {
 		return
 	}
 
-	ginx.Success(c, 200, pageItems)
+	ginx.PageSuccess(c, items, paging)
 }
 
 func (account) GetUsersByID(c *gin.Context) {
@@ -102,12 +105,12 @@ func (account) GetUsersByID(c *gin.Context) {
 		return
 	}
 
-	user, err := dbcache.Get(di.CacheRedis(), di.DemoDB(), "t_users", userID)
-	if err != nil {
+	user := model.TUsers{}
+	if err := di.DemoDB().Where("user_id = ?", userID).Find(&user).Error; err != nil {
 		ginx.InternalError(c, nil)
 		return
 	}
-	if len(user) == 0 {
+	if user.UserID == 0 {
 		ginx.Error(c, 404, "UserNotFound", "用户不存在")
 		return
 	}
@@ -131,11 +134,11 @@ func (account) PostUsers(c *gin.Context) {
 	wpsg := di.WorkerPoolSeparate(100).Group()
 	for i := 0; i < userCount; i++ {
 		wpsg.Submit(func() {
-			userData := map[string]any{
-				"user_name": fmt.Sprintf("U%d", gox.RandInt64(111111111, 999999999)),
-				"password":  gox.PasswordHash("111111"),
+			user := model.TUsers{
+				UserName: fmt.Sprintf("U%d%d", carbon.Now().Timestamp(), gox.RandInt64(1111, 9999)),
+				Password: gox.PasswordHash("111111"),
 			}
-			if _, err := service.User.CreateUser(userData); err != nil {
+			if err := di.DemoDB().Create(&user).Error; err != nil {
 				ch <- err
 			}
 		})
@@ -162,24 +165,27 @@ func (account) PutUsersByID(c *gin.Context) {
 		return
 	}
 
-	user, err := dbcache.Get(di.CacheRedis(), di.DemoDB(), "t_users", userID)
-	if err != nil {
+	user := struct {
+		UserID int64
+	}{}
+	if err := di.DemoDB().Model(&model.TUsers{}).Where("user_id = ?", userID).Find(&user).Error; err != nil {
 		ginx.InternalError(c, nil)
 		return
 	}
-	if len(user) == 0 {
+	if user.UserID == 0 {
 		ginx.Error(c, 404, "UserNotFound", "用户不存在")
 		return
 	}
 
 	if _, ok := jsonBody["user_name"]; ok {
-		sql := "SELECT user_id FROM t_users WHERE user_name = ? AND user_id != ?"
-		userConflict, err := dbx.FetchOne(di.DemoDB(), sql, jsonBody["user_name"], userID)
-		if err != nil {
+		conflictUser := struct {
+			UserID int64
+		}{}
+		if err := di.DemoDB().Model(&model.TUsers{}).Where("user_name = ? AND user_id != ?", jsonBody["user_name"], userID).Find(&conflictUser).Error; err != nil {
 			ginx.InternalError(c, nil)
 			return
 		}
-		if len(userConflict) > 0 {
+		if conflictUser.UserID > 0 {
 			ginx.Error(c, 400, "UserConflict", "用户名已存在")
 			return
 		}
@@ -188,7 +194,7 @@ func (account) PutUsersByID(c *gin.Context) {
 		jsonBody["password"] = gox.PasswordHash(password)
 	}
 
-	if _, err := dbcache.Update(di.CacheRedis(), di.DemoDB(), "t_users", jsonBody, "user_id = ?", userID); err != nil {
+	if err := di.DemoDB().Model(&model.TUsers{}).Where("user_id = ?", userID).Updates(jsonBody).Error; err != nil {
 		ginx.InternalError(c, nil)
 		return
 	}

@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var logger *zap.Logger
+var zapLogger *zap.Logger
 
 func init() { // 日志服务最为基础, 日志初始化失败, 程序不允许启动
 	// 创建输出位置
@@ -28,12 +28,12 @@ func init() { // 日志服务最为基础, 日志初始化失败, 程序不允�
 	// 创建 Core
 	zapCore := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(fileSyncer, consoleSyncer), zapcore.DebugLevel) // 允许记录所有级别日志
 	// 创建 Logger
-	logger = zap.New(zapCore, zap.AddStacktrace(zapcore.ErrorLevel)) // 错误日志记录栈信息
-	// 替换 zap 包中全局的 logger 实例, 后续在其他包中只需使用 zap.L() 调用即可
-	zap.ReplaceGlobals(logger)
+	zapLogger = zap.New(zapCore, zap.AddStacktrace(zapcore.ErrorLevel)) // 错误日志记录栈信息
+	// 替换 zap 包中全局的 zapLogger 实例, 后续在其他包中只需使用 zap.L() 调用即可
+	zap.ReplaceGlobals(zapLogger)
 }
 
 // Logger 日志
 func Logger() *zap.Logger {
-	return logger
+	return zapLogger
 }

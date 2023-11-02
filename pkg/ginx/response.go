@@ -18,6 +18,26 @@ func Success(c *gin.Context, httpCode int, body any) {
 	c.JSON(httpCode, body)
 }
 
+// PageSuccess 输出分页结果
+//
+//	items 列表数据
+func PageSuccess(c *gin.Context, items any, paging Paging) {
+	body := struct {
+		Page         int64 `json:"page"`          // 页码
+		PerPage      int64 `json:"per_page"`      // 页大小
+		TotalPages   int64 `json:"total_pages"`   // 总页数
+		TotalResults int64 `json:"total_results"` // 总记录数
+		Items        any   `json:"items"`         // 列表
+	}{
+		paging.Page,
+		paging.PerPage,
+		paging.TotalPages,
+		paging.TotalResults,
+		items,
+	}
+	c.JSON(200, body)
+}
+
 // Error 输出失败信息
 func Error(c *gin.Context, httpCode int, code, message string) {
 	c.AbortWithStatusJSON(httpCode, gin.H{"code": code, "message": message})

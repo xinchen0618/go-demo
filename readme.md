@@ -5,7 +5,7 @@
 |     技术     |        名称         | 地址                                   |
 |:----------:|:-----------------:|--------------------------------------|
 |    API     |        Gin        | https://github.com/gin-gonic/gin     |
-|   MySQL    |      GoRose       | https://github.com/gohouse/gorose    |
+|   MySQL    |       GORM        | https://github.com/go-gorm/gorm      |
 |   Redis    |     go-redis      | https://github.com/go-redis/redis    |
 |     登录     |      jwt-go       | https://github.com/golang-jwt/jwt    |
 |     日志     |        zap        | https://github.com/uber-go/zap       |
@@ -19,10 +19,6 @@
 | WebSocket  | Gorilla WebSocket | https://github.com/gorilla/websocket |
 
 ## 规范
-
-- 代码管理策略
-
-  - [为什么Google上十亿行代码都放在同一个仓库里](https://cacm.acm.org/magazines/2016/7/204032-why-google-stores-billions-of-lines-of-code-in-a-single-repository/fulltext)
 
 - 项目布局
   
@@ -66,6 +62,7 @@
   - ws/                 websocket 业务
   - consts/             业务相关常量定义
   - types/              业务相关结构体定义
+  - model/              表 Model
 - pkg/                  外部应用可以使用的代码. 不依赖内部应用的代码
   - dbx/                DB 增删改查操作函数
   - ginx/               Gin 增强函数. 此包中出现 error 会向客户端输出4xx/500错误, 调用时捕获到 error 直接结束业务逻辑即可
@@ -354,42 +351,6 @@ go build -ldflags="-s -w"
 
 `user_id` 为 0 表示向所有用户推送消息, 否则为向指定用户推送消息.
 
-## MySQL
-
-`dbx`提供以`map[string]any`类型操作和读取数据库的函数, 同时支持读取结果至`struct`或指定类型.
-
-### 数据类型映射
-
-- 读操作, 若不指定结果接收类型, MySQL 整型(包括无符号)将统一映射为 Golang `int64`, 浮点型统一映射为 `float64`, 其他类型统一映射为`string` 
-
-  ```
-  MySQL => Golang 数据类型映射:
-    bigint/int/smallint/tinyint => int64,
-    float/double => float64,
-    varchar/char/longtext/text/mediumtext/tinytext/decimal/datetime/timestamp/date/time => string,
-  ```
-
-- 写操作, Golang 写 MySQL 对数据没有强类型要求
-
-### 操作函数
-
-- `FetchAll()` 获取多行记录返回`map`切片
-- `TakeAll()` 获取多行记录至`struct`切片
-- `FetchOne()` 获取一行记录返回`map`
-- `TakeOne()` 获取一行记录至`struct`
-- `FetchValue()` 获取一个值返回`any`
-- `TakeValue()` 获取一个值至指定类型
-- `FetchColumn()` 获取一列值返回`any`切片
-- `TakeColumn()` 获取一列值至指定类型切片
-- `Slice2In()` `slice`转`IN`条件
-- `Insert()` 新增记录
-- `InsertBatch()` 批量新增记录
-- `Update()` 更新记录
-- `Delete()` 删除记录
-- `Execute()` 执行原生 SQL
-- `Begin()` 手动开始事务
-- `Commit()` 手动提交事务
-- `Rollback()` 手动回滚事务
 
 ## Redis
 
@@ -400,20 +361,6 @@ go build -ldflags="-s -w"
 [阿里云Redis开发规范](https://developer.aliyun.com/article/531067)
 
 ### 缓存
-
-- DB 缓存
-
-  以资源对象(实体表一行记录为一个资源对象)为单位, 使用旁路缓存策略.
- 
-  使用`dbcache.Get()`或`dbcache.Take()`方法获取 DB 记录, 在更新和删除 DB 记录时, 需使用`dbcache.Update()`和`dbcache.Delete()`方法自动维护缓存, 或`dbcache.Expired()`手动清除缓存.
-  
-  变更表结构会导致缓存数据不正确, 更新表版本`dbcache:table:<table_name>:version`可过期与之相关的所有缓存数据.
-
-  - `dbcache.Get()` 获取 DB 记录返回`map`并维护缓存
-  - `dbcache.Take()` 获取 DB 记录至`struct`并维护缓存
-  - `dbcache.Update()` 更新 DB 记录并维护缓存
-  - `dbcache.Delete()` 删除 DB 记录并维护缓存
-  - `dbcache.Expired()` 过期缓存
 
 - 业务缓存
 

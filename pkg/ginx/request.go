@@ -11,36 +11,14 @@ import (
 	"strconv"
 	"strings"
 
-	"go-demo/pkg/dbx"
 	"go-demo/pkg/gox"
 
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
-	"github.com/gohouse/gorose/v2"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
+	"gorm.io/gorm"
 )
-
-// PageQuery 分页参数
-type PageQuery struct {
-	DB         gorose.IOrm
-	Select     string
-	From       string
-	Where      string
-	BindParams []any
-	GroupBy    string
-	Having     string
-	OrderBy    string
-}
-
-// PageItems 分页结果
-type PageItems struct {
-	Page         int64            `json:"page"`          // 页码
-	PerPage      int64            `json:"per_page"`      // 页大小
-	TotalPages   int64            `json:"total_pages"`   // 总页数
-	TotalResults int64            `json:"total_results"` // 总记录数
-	Items        []map[string]any `json:"items"`         // 列表
-}
 
 // GetJSONBody 获取 JSON 参数
 //
@@ -73,7 +51,7 @@ func GetJSONBody(c *gin.Context, patterns []string) (map[string]any, error) {
 		paramValue, ok := jsonBody[patternAtoms[0]]
 		if !ok || paramValue == nil {
 			if required {
-				Error(c, 400, "ParamEmpty", fmt.Sprintf("%s不得为空", patternAtoms[1]))
+				Error(c, 400, "ParamEmpty", patternAtoms[1]+"不得为空")
 				return nil, errors.New("ParamEmpty")
 			} else {
 				continue
@@ -110,7 +88,7 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
 		paramValue := c.Query(patternAtoms[0])
 		if paramValue == "" {
 			if patternAtoms[3] == "required" { // 必填
-				Error(c, 400, "ParamEmpty", fmt.Sprintf("%s不得为空", patternAtoms[1]))
+				Error(c, 400, "ParamEmpty", patternAtoms[1]+"不得为空")
 				return nil, errors.New("ParamEmpty")
 			} else {
 				paramValue = patternAtoms[3]
@@ -153,7 +131,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		}
 		valueInt, err := strconv.ParseInt(cast.ToString(valueStr), 10, 64) // 解决前导0被识别为8进制的问题
 		if err != nil {
-			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
+			Error(c, 400, "ParamInvalid", paramName+"不正确")
 			return nil, errors.New("ParamInvalid")
 		}
 		return valueInt, nil
@@ -166,7 +144,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 			return nil, err
 		}
 		if valueInt.(int64) <= 0 {
-			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
+			Error(c, 400, "ParamInvalid", paramName+"不正确")
 			return nil, errors.New("ParamInvalid")
 		}
 		return valueInt, nil
@@ -179,7 +157,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 			return nil, err
 		}
 		if valueInt.(int64) < 0 {
-			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
+			Error(c, 400, "ParamInvalid", paramName+"不正确")
 			return nil, errors.New("ParamInvalid")
 		}
 		return valueInt, nil
@@ -189,12 +167,12 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 	if paramType == "string" {
 		valueStr, err := cast.ToStringE(paramValue)
 		if err != nil {
-			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
+			Error(c, 400, "ParamInvalid", paramName+"不正确")
 			return nil, errors.New("ParamInvalid")
 		}
 		valueStr = strings.TrimSpace(valueStr)
 		if valueStr == "" && !allowEmpty {
-			Error(c, 400, "ParamEmpty", fmt.Sprintf("%s不得为空", paramName))
+			Error(c, 400, "ParamEmpty", paramName+"不得为空")
 			return nil, errors.New("ParamEmpty")
 		}
 
@@ -215,7 +193,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		// float
 		valueFloat, err := cast.ToFloat64E(valueStr)
 		if err != nil {
-			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
+			Error(c, 400, "ParamInvalid", paramName+"不正确")
 			return nil, errors.New("ParamInvalid")
 		}
 		// 精度
@@ -224,7 +202,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		if precStr != "" {
 			prec, err = cast.ToIntE(precStr)
 			if err != nil {
-				Error(c, 400, "ParamTypeError", fmt.Sprintf("数据类型错误: %s", paramName))
+				Error(c, 400, "ParamTypeError", "数据类型错误: "+paramName)
 				return nil, errors.New("ParamTypeError")
 			}
 		}
@@ -243,7 +221,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 			var err error
 			prec, err = cast.ToIntE(precStr)
 			if err != nil {
-				Error(c, 400, "ParamTypeError", fmt.Sprintf("数据类型错误: %s", paramName))
+				Error(c, 400, "ParamTypeError", "数据类型错误: "+paramName)
 				return nil, errors.New("ParamTypeError")
 			}
 		}
@@ -259,7 +237,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 	if paramType[0:1] == "[" && paramType[1:2] != "]" {
 		var enum []any
 		if err := json.Unmarshal([]byte(paramType), &enum); err != nil { // 候选值解析到切片
-			Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
+			Error(c, 400, "ParamInvalid", paramName+"不正确")
 			return nil, errors.New("ParamInvalid")
 		}
 		for _, value := range enum { // 用户输入与候选值逐个比较
@@ -277,18 +255,18 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 			} else if valueType == "string" {
 				valueFloat, err := cast.ToFloat64E(paramValue)
 				if err != nil {
-					Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
+					Error(c, 400, "ParamInvalid", paramName+"不正确")
 					return nil, errors.New("ParamInvalid")
 				}
 				if valueFloat == value {
 					return valueFloat, nil
 				}
 			} else {
-				Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
+				Error(c, 400, "ParamInvalid", paramName+"不正确")
 				return nil, errors.New("ParamInvalid")
 			}
 		}
-		Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
+		Error(c, 400, "ParamInvalid", paramName+"不正确")
 		return nil, errors.New("ParamInvalid")
 	}
 
@@ -296,12 +274,12 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 	if paramType == "array" {
 		if valueType == "[]interface {}" {
 			if !allowEmpty && len(paramValue.([]any)) == 0 {
-				Error(c, 400, "ParamEmpty", fmt.Sprintf("%s不得为空", paramName))
+				Error(c, 400, "ParamEmpty", paramName+"不得为空")
 				return nil, errors.New("ParamEmpty")
 			}
 			return paramValue, nil
 		}
-		Error(c, 400, "ParamInvalid", fmt.Sprintf("%s不正确", paramName))
+		Error(c, 400, "ParamInvalid", paramName+"不正确")
 		return nil, errors.New("ParamInvalid")
 	}
 
@@ -339,74 +317,66 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		return stringSlice, nil
 	}
 
-	Error(c, 400, "ParamTypeUndefined", fmt.Sprintf("未知数据类型: %s", paramName))
+	Error(c, 400, "ParamTypeUndefined", "未知数据类型: %s"+paramName)
 	return nil, errors.New("ParamTypeUndefined")
 }
 
-// GetPageItems 获取分页数据
-func GetPageItems(c *gin.Context, pageQuery PageQuery) (PageItems, error) {
+// PageQuery 分页参数
+type PageQuery struct {
+	DB         *gorm.DB
+	Model      any // 表 model 指针
+	Where      string
+	BindParams []any
+	OrderBy    string
+}
+
+// Paging 分页结果
+type Paging struct {
+	Page         int64 `json:"page"`          // 页码
+	PerPage      int64 `json:"per_page"`      // 页大小
+	TotalPages   int64 `json:"total_pages"`   // 总页数
+	TotalResults int64 `json:"total_results"` // 总记录数
+}
+
+// Paginate 获取分页数据
+func Paginate(c *gin.Context, items any, pageQuery PageQuery) (Paging, error) {
 	// 页码
 	queries, err := GetQueries(c, []string{"page:页码:+integer:1", "per_page:页大小:+integer:12"})
 	if err != nil {
-		return PageItems{}, err
+		return Paging{}, err
 	}
 	page := queries["page"].(int64)
 	perPage := queries["per_page"].(int64)
-	// 绑定参数
-	bindParams := make([]any, 0)
-	if pageQuery.BindParams != nil {
-		bindParams = pageQuery.BindParams
-	}
-	// WHERE
-	where := pageQuery.Where
-	if where == "" {
-		where = "1"
-	}
 	// 总记录数
-	var countSQL string
-	if pageQuery.GroupBy != "" { // GROUP BY 存在总记录数计算方式会不同
-		where += " GROUP BY " + pageQuery.GroupBy
-		if pageQuery.Having != "" {
-			where += " HAVING " + pageQuery.Having
-		}
-		countSQL = fmt.Sprintf("SELECT COUNT(*) FROM (SELECT %s FROM %s WHERE %s) AS t", pageQuery.Select, pageQuery.From, where)
-	} else {
-		countSQL = fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE %s", pageQuery.From, where)
+	var totalResults int64 // 计算总记录数
+	if err := pageQuery.DB.Model(pageQuery.Model).Where(pageQuery.Where, pageQuery.BindParams...).Count(&totalResults).Error; err != nil {
+		InternalError(c, err)
+		return Paging{}, errors.New("InternalError")
 	}
-	countValue, err := dbx.FetchValue(pageQuery.DB, countSQL, bindParams...) // 计算总记录数
-	if err != nil {
-		InternalError(c, nil)
-		return PageItems{}, errors.New("InternalError")
-	}
-	totalResults := cast.ToInt64(countValue)
 	if totalResults == 0 { // 没有数据
-		result := PageItems{
+		result := Paging{
 			Page:         page,
 			PerPage:      perPage,
 			TotalPages:   0,
 			TotalResults: 0,
-			Items:        []map[string]any{},
 		}
 		return result, nil
 	}
 	// items
-	sql := fmt.Sprintf("SELECT %s FROM %s WHERE %s", pageQuery.Select, pageQuery.From, where)
+	tx := pageQuery.DB.Model(pageQuery.Model).Where(pageQuery.Where, pageQuery.BindParams...)
 	if pageQuery.OrderBy != "" {
-		sql += fmt.Sprintf(" ORDER BY %s", pageQuery.OrderBy)
+		tx.Order(pageQuery.OrderBy)
 	}
 	offset := (page - 1) * perPage
-	sql += fmt.Sprintf(" LIMIT %d, %d", offset, perPage)
-	items, err := dbx.FetchAll(pageQuery.DB, sql, bindParams...)
-	if err != nil {
-		InternalError(c, nil)
-		return PageItems{}, errors.New("InternalError")
+	if err := tx.Offset(int(offset)).Limit(int(perPage)).Find(items).Error; err != nil {
+		InternalError(c, err)
+		return Paging{}, errors.New("InternalError")
 	}
-	result := PageItems{
+	result := Paging{
 		Page:         page,
 		PerPage:      perPage,
 		TotalPages:   int64(math.Ceil(float64(totalResults) / float64(perPage))),
 		TotalResults: totalResults,
-		Items:        items,
 	}
 	return result, nil
 }

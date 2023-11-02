@@ -5,11 +5,13 @@ import (
 	"context"
 	"fmt"
 
-	"go-demo/internal/service"
+	"go-demo/config/di"
+	"go-demo/internal/model"
 	"go-demo/pkg/gox"
 	"go-demo/pkg/queuex"
 
 	"github.com/hibiken/asynq"
+	"go.uber.org/zap"
 )
 
 // 用户相关消息队列 DEMO
@@ -36,7 +38,8 @@ func (user) AddUser(ctx context.Context, t *asynq.Task) error {
 	if err := gox.Cast(user, &userData); err != nil {
 		return err
 	}
-	if _, err := service.User.CreateUser(userData); err != nil {
+	if err := di.DemoDB().Model(&model.TUsers{}).Create(userData).Error; err != nil {
+		zap.L().Error(err.Error())
 		return err
 	}
 
