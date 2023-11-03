@@ -42,7 +42,7 @@ func newGormLogger() logger.Interface {
 			logger.Config{
 				LogLevel:                  logger.LogLevel(logLevel),
 				IgnoreRecordNotFoundError: true,
-				ParameterizedQueries:      false,
+				ParameterizedQueries:      false, // Raw() 方法无效
 				Colorful:                  colorful,
 			},
 		)
