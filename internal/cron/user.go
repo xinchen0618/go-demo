@@ -2,8 +2,6 @@
 package cron
 
 import (
-	"go.uber.org/zap"
-
 	"go-demo/config/di"
 	"go-demo/internal/model"
 )
@@ -22,7 +20,5 @@ func (user) DeleteUsers(userCount int) {
 	if err := di.DemoDB().Model(&model.TUsers{}).Select("user_id").Limit(userCount).Find(&userIDs).Error; err != nil {
 		return
 	}
-	if err := di.DemoDB().Where("user_id IN ?", userIDs).Delete(&model.TUsers{}).Error; err != nil {
-		zap.L().Error(err.Error())
-	}
+	di.DemoDB().Where("user_id IN ?", userIDs).Delete(&model.TUsers{})
 }

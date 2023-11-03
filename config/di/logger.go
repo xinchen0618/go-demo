@@ -14,7 +14,7 @@ var zapLogger *zap.Logger
 
 func init() { // 日志服务最为基础, 日志初始化失败, 程序不允许启动
 	// 创建输出位置
-	logFile, err := os.OpenFile(config.GetString("error_log"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o664)
+	logFile, err := os.OpenFile(config.GetString("app_log"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o664)
 	if err != nil {
 		panic(err)
 	}
@@ -22,9 +22,11 @@ func init() { // 日志服务最为基础, 日志初始化失败, 程序不允�
 	consoleSyncer := zapcore.AddSync(os.Stdout) // 输出到 console
 	// 创建编码器
 	encoderConfig := zap.NewProductionEncoderConfig()
-	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder // 彩色输出. json 格式输出时不需要
-	encoder := zapcore.NewConsoleEncoder(encoderConfig)          // console 格式输出. json 格式输出为 NewJSONEncoder()
+	encoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("\r\n2006-01-02 15:04:05") // 自定义时间格式, 并在两行记录间加一行空行
+	if config.GetBool("colorful_log") {
+		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder // 彩色输出. json 格式输出时不需要
+	}
+	encoder := zapcore.NewConsoleEncoder(encoderConfig) // console 格式输出. json 格式输出为 NewJSONEncoder()
 	// 创建 Core
 	zapCore := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(fileSyncer, consoleSyncer), zapcore.DebugLevel) // 允许记录所有级别日志
 	// 创建 Logger

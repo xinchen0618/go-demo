@@ -11,11 +11,12 @@ func init() {
 	for k, v := range map[string]any{
 		/************ 配置 START ****************/
 
-		// 错误日志路径
-		"error_log": "/var/log/golang_error.log",
-
-		// SQL 日志
-		"sql_log": "/var/log/golang_sql.log",
+		// 日志路径
+		"app_log": "/var/log/golang_app.log",
+		// 彩色输出日志
+		"colorful_log": true,
+		// SQL 日志级别, 生产通常使用 Error, 开发使用 Info
+		"sql_log_level": 4, // 1-Silent,2-Error,3-Warn,4-Info
 
 		// 公共 Goroutine 池大小
 		"worker_pool": 409600,

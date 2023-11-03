@@ -11,7 +11,6 @@ import (
 	"go-demo/pkg/queuex"
 
 	"github.com/hibiken/asynq"
-	"go.uber.org/zap"
 )
 
 // 用户相关消息队列 DEMO
@@ -39,7 +38,6 @@ func (user) AddUser(ctx context.Context, t *asynq.Task) error {
 		return err
 	}
 	if err := di.DemoDB().Model(&model.TUsers{}).Create(userData).Error; err != nil {
-		zap.L().Error(err.Error())
 		return err
 	}
 

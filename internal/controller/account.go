@@ -35,7 +35,7 @@ func (account) PostUserLogin(c *gin.Context) {
 		Password string `json:"password"`
 	}{}
 	if err := di.DemoDB().Model(&model.TUsers{}).Where("user_name = ?", jsonBody["user_name"]).Limit(1).Find(&user).Error; err != nil {
-		ginx.InternalError(c, err)
+		ginx.InternalError(c, nil)
 		return
 	}
 	if user.UserID == 0 || !gox.PasswordVerify(jsonBody["password"].(string), user.Password) {

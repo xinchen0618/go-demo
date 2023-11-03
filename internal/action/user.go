@@ -4,8 +4,6 @@ package action
 import (
 	"fmt"
 
-	"go.uber.org/zap"
-
 	"github.com/urfave/cli/v2"
 
 	"go-demo/config/di"
@@ -27,7 +25,6 @@ func (user) AddUser(c *cli.Context) error {
 	}
 
 	if err := di.DemoDB().Model(&model.TUsers{}).Create(map[string]any{"user_name": userName}).Error; err != nil {
-		zap.L().Error(err.Error())
 		return err
 	}
 	fmt.Println("处理完毕")
