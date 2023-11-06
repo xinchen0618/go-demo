@@ -350,7 +350,7 @@ func Paginate(c *gin.Context, items any, pageQuery PageQuery) (Paging, error) {
 	// 总记录数
 	var totalResults int64 // 计算总记录数
 	if err := pageQuery.DB.Model(pageQuery.Model).Where(pageQuery.Where, pageQuery.BindParams...).Count(&totalResults).Error; err != nil {
-		InternalError(c, err)
+		InternalError(c, nil)
 		return Paging{}, errors.New("InternalError")
 	}
 	if totalResults == 0 { // 没有数据
@@ -369,7 +369,7 @@ func Paginate(c *gin.Context, items any, pageQuery PageQuery) (Paging, error) {
 	}
 	offset := (page - 1) * perPage
 	if err := tx.Offset(int(offset)).Limit(int(perPage)).Find(items).Error; err != nil {
-		InternalError(c, err)
+		InternalError(c, nil)
 		return Paging{}, errors.New("InternalError")
 	}
 	result := Paging{
