@@ -9,12 +9,12 @@ is_foreign_key : false # Whether to mark foreign key or not
 is_gui : false # Whether to operate on gui
 is_table_name : true # Whether to out GetTableName/column function
 is_null_to_point : false # database is 'DEFAULT NULL' then set element type as point
-is_web_tag: true
-is_web_tag_pk_hidden: false
+is_web_tag: true # json tag
+is_web_tag_pk_hidden: false  # json tag 隐藏主键
+web_tag_type: 1 # json tag 0: Small Camel-Case 1: _
 table_prefix: "" #table prefix
-table_names: "" # Specified table generation, multiple tables with , separated
 is_column_name: true # Whether to generate column names
-is_out_file_by_table_name: false # Whether to generate multiple models based on table names
+is_out_file_by_table_name: true # Whether to generate multiple models based on table names
 db_info :
     host : "127.0.0.1"
     port : 3306
@@ -22,5 +22,5 @@ db_info :
     password : "cx654321"
     database : "test"
     type: 0 # database type (0:mysql , 1:sqlite , 2:mssql)
+table_names: "" # Specified table generation, multiple tables with , separated
 out_file_name: "" # Custom build file name
-web_tag_type: 1 # json tag 0: Small Camel-Case 1: _
