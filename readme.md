@@ -114,15 +114,19 @@ DI 实现参考 [Dependency Injection / Service Location](https://docs.phalcon.i
 
 日志文件路径通过`config/`中`app_log`项配置, 注意文件需要读写权限.
 
-- 记录日志
+- ERROR 日志
 
-  内部应用使用`di.Logger().Error()`, `di.Logger().Warn()`, `di.Logger().Info()`, `di.Logger().Debug()`
+  日志文件路径通过`config/`中`error_log`项配置, 注意文件需要读写权限.
 
-  其他, 使用`zap.L(),Error()`, `zap.L().Warn()`, `zap.L().Info()`, `zap.L().Debug()`
+  内部应用使用`di.Logger().Error()`, `di.Logger().Warn()`, `di.Logger().Info()`, `di.Logger().Debug()`记录.
 
-  错误日志会记录栈信息.
+  其他, 使用`zap.L(),Error()`, `zap.L().Warn()`, `zap.L().Info()`, `zap.L().Debug()`记录.
+
+  `Error()`日志会记录栈信息.
 
 - SQL 日志
+
+  日志文件路径通过`config/`中`sql_log`项配置, 注意文件需要读写权限.
 
   `config/`中`sql_log_level`配置 SQL 日志级别, 默认为`Error`.
 

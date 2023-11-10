@@ -11,10 +11,15 @@ func init() {
 	for k, v := range map[string]any{
 		/************ 配置 START ****************/
 
-		// 日志路径
-		"app_log": "/var/log/golang_app.log",
-		// 彩色输出日志
-		"log_colorful": true,
+		// ERROR 日志路径
+		"error_log": "/var/log/golang_app.log",
+		// 彩色输出 ERROR 日志
+		"error_log_colorful": true,
+
+		// SQL 日志
+		"sql_log": "/var/log/golang_app.log",
+		// 彩色输出 SQL 日志
+		"sql_log_colorful": true,
 		// SQL 日志级别, 通常生产使用 Error, 开发使用 Info
 		"sql_log_level": 4, // 1-Silent,2-Error,3-Warn,4-Info
 
