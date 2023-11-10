@@ -35,7 +35,7 @@ func newGormLogger() logger.Interface {
 		if logLevel == 0 {
 			logLevel = 2 // 默认记录级别为 Error
 		}
-		colorful := config.GetBool("colorful_log")
+		colorful := config.GetBool("log_colorful")
 
 		gormLogger = logger.New(
 			log.New(file, "\r\n", log.LstdFlags),

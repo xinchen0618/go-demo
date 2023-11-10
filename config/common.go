@@ -14,8 +14,8 @@ func init() {
 		// 日志路径
 		"app_log": "/var/log/golang_app.log",
 		// 彩色输出日志
-		"colorful_log": true,
-		// SQL 日志级别, 生产通常使用 Error, 开发使用 Info
+		"log_colorful": true,
+		// SQL 日志级别, 通常生产使用 Error, 开发使用 Info
 		"sql_log_level": 4, // 1-Silent,2-Error,3-Warn,4-Info
 
 		// 公共 Goroutine 池大小
