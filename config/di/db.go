@@ -21,12 +21,12 @@ var (
 
 func newGormLogger() logger.Interface {
 	_ = gormLoggerOnce.Do(func() error {
-		sqlLog := config.GetString("app_log")
-		if sqlLog == "" {
+		appLog := config.GetString("app_log")
+		if appLog == "" {
 			gormLogger = logger.Default.LogMode(logger.Silent) // 未设定日志路径不记录
 			return nil
 		}
-		file, err := os.OpenFile(sqlLog, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o666)
+		file, err := os.OpenFile(appLog, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o666)
 		if err != nil {
 			Logger().Error(err.Error())
 			return err
