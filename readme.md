@@ -116,7 +116,7 @@ DI 实现参考 [Dependency Injection / Service Location](https://docs.phalcon.i
 
 - ERROR 日志
 
-  日志文件路径通过`config/`中`error_log`项配置, 注意文件需要读写权限.
+  ERROR 日志会打印到 console, 配置了日志文件路径会同时记录到文件, 日志文件路径通过`config/`中`error_log`项配置, 注意文件需要读写权限.
 
   内部应用使用`di.Logger().Error()`, `di.Logger().Warn()`, `di.Logger().Info()`, `di.Logger().Debug()`记录.
 
