@@ -21,15 +21,15 @@ var (
 
 func newGormLogger() logger.Interface {
 	_ = gormLoggerOnce.Do(func() error {
+		file := os.Stdout // 没有配置日志文件输出到 console
 		sqlLog := config.GetString("sql_log")
-		if sqlLog == "" {
-			gormLogger = logger.Default.LogMode(logger.Silent) // 未设定日志路径不记录
-			return nil
-		}
-		file, err := os.OpenFile(sqlLog, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o666)
-		if err != nil {
-			Logger().Error(err.Error())
-			return err
+		if sqlLog != "" {
+			var err error
+			file, err = os.OpenFile(sqlLog, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o666)
+			if err != nil {
+				Logger().Error(err.Error())
+				return err
+			}
 		}
 		logLevel := logger.Info // Silent,Error,Warn,Info
 		switch config.GetString("sql_log_level") {
@@ -42,15 +42,12 @@ func newGormLogger() logger.Interface {
 		case "Info":
 			logLevel = logger.Info
 		}
-		if logLevel == 0 {
-			logLevel = 2 // 默认记录级别为 Error
-		}
 		colorful := config.GetBool("sql_log_colorful")
 
 		gormLogger = logger.New(
 			log.New(file, "\r\n", log.LstdFlags),
 			logger.Config{
-				LogLevel:                  logger.LogLevel(logLevel),
+				LogLevel:                  logLevel,
 				IgnoreRecordNotFoundError: true,
 				ParameterizedQueries:      false, // Raw() 方法无效
 				Colorful:                  colorful,

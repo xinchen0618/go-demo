@@ -126,7 +126,7 @@ DI 实现参考 [Dependency Injection / Service Location](https://docs.phalcon.i
 
 - SQL 日志
 
-  日志文件路径通过`config/`中`sql_log`项配置, 注意文件需要读写权限.
+  没有配置日志文件路径才会打印到 console, 日志文件路径通过`config/`中`sql_log`项配置, 注意文件需要读写权限.
 
   `config/`中`sql_log_level`配置 SQL 日志级别, 默认为`Error`.
 
