@@ -34,7 +34,18 @@ func init() { // 日志服务最为基础, 日志初始化失败, 程序不允�
 	}
 	encoder := zapcore.NewConsoleEncoder(encoderConfig) // console 格式输出. json 格式输出为 NewJSONEncoder()
 	// 创建 Core
-	zapCore := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(syncers...), zapcore.DebugLevel) // 允许记录所有级别日志
+	logLevel := zapcore.DebugLevel
+	switch config.GetString("error_log_level") {
+	case "Debug":
+		logLevel = zapcore.DebugLevel
+	case "Info":
+		logLevel = zapcore.InfoLevel
+	case "Warn":
+		logLevel = zapcore.WarnLevel
+	case "Error":
+		logLevel = zapcore.ErrorLevel
+	}
+	zapCore := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(syncers...), logLevel) // 允许记录所有级别日志
 	// 创建 Logger
 	zapLogger = zap.New(zapCore, zap.AddStacktrace(zapcore.ErrorLevel)) // 错误日志记录栈信息
 	// 替换 zap 包中全局的 zapLogger 实例, 后续在其他包中只需使用 zap.L() 调用即可

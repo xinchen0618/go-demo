@@ -15,6 +15,8 @@ func init() {
 		"error_log": "/var/log/golang_app.log",
 		// 彩色输出 ERROR 日志
 		"error_log_colorful": true,
+		// ERROR 日志级别
+		"error_log_level": "Debug", // Debug,Info,Warn,Error
 
 		// SQL 日志
 		"sql_log": "/var/log/golang_app.log",
