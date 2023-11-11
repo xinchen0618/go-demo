@@ -20,11 +20,11 @@ func init() {
 		// JWT 密钥, JWT 配套有白名单功能不必担心秘钥泄露的问题
 		"jwt_secret": "btRZ5QHXX9VjfYhfGGHdCTcWiwQ6WFJXq9ZCwdqZwzk2ZfhceM9K3V5UGKsYLd9m",
 
-		"error_log_colorful": false,
 		"error_log_level":    "Error",
+		"error_log_colorful": false,
 
+		"sql_log_level":    "Error",
 		"sql_log_colorful": false,
-		"sql_log_level":    2, // 1-Silent,2-Error,3-Warn,4-Info
 
 		/************ 配置 END ****************/
 	} {

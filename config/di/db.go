@@ -31,7 +31,17 @@ func newGormLogger() logger.Interface {
 			Logger().Error(err.Error())
 			return err
 		}
-		logLevel := config.GetInt("sql_log_level") // 1-Silent,2-Error,3-Warn,4-Info
+		logLevel := logger.Info // Silent,Error,Warn,Info
+		switch config.GetString("sql_log_level") {
+		case "Silent":
+			logLevel = logger.Silent
+		case "Error":
+			logLevel = logger.Error
+		case "Warn":
+			logLevel = logger.Warn
+		case "Info":
+			logLevel = logger.Info
+		}
 		if logLevel == 0 {
 			logLevel = 2 // 默认记录级别为 Error
 		}
