@@ -156,7 +156,7 @@ func (account) PutUsersByID(c *gin.Context) {
 		return
 	}
 
-	jsonBody, err := ginx.GetJSONBody(c, []string{"user_name:用户名:string:?", "password:密码:string:?"})
+	jsonBody, err := ginx.GetJSONBody(c, []string{"user_name:用户名:string:?", "password:密码:string:?", "is_vip:VIP身份:[0,1]:?"})
 	if err != nil {
 		return
 	}

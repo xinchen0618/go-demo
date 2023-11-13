@@ -113,13 +113,11 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
 //		string 字符串, 去首尾空格;
 //		float.%d 浮点数, 数字表示精度(没有后补零), 超过精度四舍五入, 点号同数字可省略, 表示无限制, 返回类型为 float64;
 //		decimal.%d 精度小数, 数字表示精度(有后补零), 超过精度四舍五入, 点号同数字可省略, 默认为2位小数, 返回类型为字符串;
-//		[] 枚举, 支持数字 float64 与字符串 string 混合枚举;
+//		[] 枚举, 支持数字 float64 与字符串 string 混合枚举, string 需要引号;
 //		array 数组;
 //		[]integer 整型64位数组;
 //		[]string 字符串数组;
 func FilterParam(c *gin.Context, paramName string, paramValue any, paramType string, allowEmpty bool) (any, error) {
-	valueType := reflect.TypeOf(paramValue).String() // 用户输入值类型
-
 	// 整型64位
 	if paramType == "integer" {
 		valueStr, err := FilterParam(c, paramName, paramValue, "string", allowEmpty) // 先统一转字符串再转整型, 这样小数就不允许输入了
@@ -235,7 +233,8 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 
 	// 枚举, 支持数字 float64 与字符串 string 混合枚举
 	if paramType[0:1] == "[" && paramType[1:2] != "]" {
-		var enum []any
+		valueType := reflect.TypeOf(paramValue).String() // 用户输入值类型
+		enum := make([]any, 0)
 		if err := json.Unmarshal([]byte(paramType), &enum); err != nil { // 候选值解析到切片
 			Error(c, 400, "ParamInvalid", paramName+"不正确")
 			return nil, errors.New("ParamInvalid")
@@ -272,6 +271,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 
 	// 数组
 	if paramType == "array" {
+		valueType := reflect.TypeOf(paramValue).String() // 用户输入值类型
 		if valueType == "[]interface {}" {
 			if !allowEmpty && len(paramValue.([]any)) == 0 {
 				Error(c, 400, "ParamEmpty", paramName+"不得为空")
