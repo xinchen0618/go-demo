@@ -54,19 +54,19 @@ func WideCopy(o any, p any) error {
 			pm[k], err = cast.ToFloat64E(om[k])
 			if err != nil {
 				zap.L().Error(err.Error())
-				return fmt.Errorf("value cast error: %s, %w"+k, err)
+				return fmt.Errorf("value cast error: %s, %w", k, err)
 			}
 		case string:
 			pm[k], err = cast.ToStringE(om[k])
 			if err != nil {
 				zap.L().Error(err.Error())
-				return fmt.Errorf("value cast error: %s, %w"+k, err)
+				return fmt.Errorf("value cast error: %s, %w", k, err)
 			}
 		case bool:
 			pm[k], err = cast.ToBoolE(om[k])
 			if err != nil {
 				zap.L().Error(err.Error())
-				return fmt.Errorf("value cast error: %s, %w"+k, err)
+				return fmt.Errorf("value cast error: %s, %w", k, err)
 			}
 		default:
 			return errors.New("unsupported value type: " + k)
