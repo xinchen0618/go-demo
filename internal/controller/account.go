@@ -131,9 +131,9 @@ func (account) PostUsers(c *gin.Context) {
 
 	// 多线程写 Demo
 	ch := make(chan error, userCount)
-	wpsg := di.WorkerPoolSeparate(100).Group()
+	psg := di.PoolSeparate(100).Group()
 	for i := 0; i < userCount; i++ {
-		wpsg.Submit(func() {
+		psg.Submit(func() {
 			user := model.TUsers{
 				UserName: fmt.Sprintf("U%d%d", carbon.Now().Timestamp(), gox.RandInt64(1111, 9999)),
 				Password: gox.PasswordHash("111111"),
@@ -143,7 +143,7 @@ func (account) PostUsers(c *gin.Context) {
 			}
 		})
 	}
-	wpsg.Wait()
+	psg.Wait()
 	close(ch)
 	okCount := userCount - len(ch)
 

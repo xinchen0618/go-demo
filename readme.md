@@ -2,21 +2,21 @@
 
 ## 技术栈
 
-|     技术     |        名称         | 地址                                   |
-|:----------:|:-----------------:|--------------------------------------|
-|    API     |        Gin        | https://github.com/gin-gonic/gin     |
-|   MySQL    |       GORM        | https://github.com/go-gorm/gorm      |
-|   Redis    |     go-redis      | https://github.com/go-redis/redis    |
-|     登录     |      jwt-go       | https://github.com/golang-jwt/jwt    |
-|     日志     |        zap        | https://github.com/uber-go/zap       |
-|    优雅停止    |      endless      | https://github.com/fvbock/endless    |
-|    命令行     |    urfave/cli     | https://github.com/urfave/cli        |
-|    计划任务    |      gocron       | https://github.com/go-co-op/gocron   |
-| WorkerPool |       pond        | https://github.com/alitto/pond       |
-|    消息队列    |       Asynq       | https://github.com/hibiken/asynq     |
-|    类型转换    |       cast        | https://github.com/spf13/cast        |
-|    json    |      go-json      | https://github.com/goccy/go-json     |
-| WebSocket  | Gorilla WebSocket | https://github.com/gorilla/websocket |
+|        技术        |        名称         | 地址                                   |
+|:----------------:|:-----------------:|--------------------------------------|
+|       API        |        Gin        | https://github.com/gin-gonic/gin     |
+|      MySQL       |       GORM        | https://github.com/go-gorm/gorm      |
+|      Redis       |     go-redis      | https://github.com/go-redis/redis    |
+|        登录        |      jwt-go       | https://github.com/golang-jwt/jwt    |
+|        日志        |        zap        | https://github.com/uber-go/zap       |
+|       优雅停止       |      endless      | https://github.com/fvbock/endless    |
+|       命令行        |    urfave/cli     | https://github.com/urfave/cli        |
+|       计划任务       |      gocron       | https://github.com/go-co-op/gocron   |
+|   Goroutine 池    |       pond        | https://github.com/alitto/pond       |
+|       消息队列       |       Asynq       | https://github.com/hibiken/asynq     |
+|       类型转换       |       cast        | https://github.com/spf13/cast        |
+|       json       |      go-json      | https://github.com/goccy/go-json     |
+|    WebSocket     | Gorilla WebSocket | https://github.com/gorilla/websocket |
 
 ## 规范
 
@@ -46,7 +46,7 @@
     - logger.go         日志服务
     - queue.go          消息队列服务
     - redis.go          Redis 服务
-    - worker_pool.go    Goroutine 池服务
+    - pool.go           Goroutine 池服务
   - cfg.go              配置实现
   - common.go           公共配置
   - prod.go             生产环境配置
@@ -130,9 +130,9 @@ DI 实现参考 [Dependency Injection / Service Location](https://docs.phalcon.i
 
   `config/`中`sql_log_level`配置 SQL 日志级别, 默认为`Error`.
 
-## WorkerPool 
+## Goroutine 池 
 
-使用 WorkerPool(Goroutine 池)旨在解决两个问题:
+使用 Goroutine 池旨在解决两个问题:
 
 - Goroutine 使用资源上限
 - 优雅处理 Goroutine 中`panic`
@@ -144,19 +144,19 @@ DI 实现参考 [Dependency Injection / Service Location](https://docs.phalcon.i
   ```
   # go func
   for i := 0; i < 10; i++ {
-    di.WorkerPool().Submit(func () {
+    di.Pool().Submit(func () {
       // do something
     })
   }
   
   # Wait Group
-  wpg := di.WorkerPool().Group()
+  pg := di.Pool().Group()
   for i := 0; i < 10; i++ {
-    wpg.Submit(func () {
+    pg.Submit(func () {
       // do something
     })
   }
-  wpg.Wait()
+  pg.Wait()
   ```
 
 - 独享 Goroutine 池
@@ -165,21 +165,21 @@ DI 实现参考 [Dependency Injection / Service Location](https://docs.phalcon.i
 
   ```
   # go func
-  wps := di.WorkerPoolSeparate(100)
+  ps := di.PoolSeparate(100)
   for i := 0; i < 10000; i++ {
-    wps.Submit(func () {
+    ps.Submit(func () {
       // do something
     })
   }
   
   # Wait Group
-  wpsg := di.WorkerPoolSeparate(100).Group()
+  psg := di.PoolSeparate(100).Group()
   for i := 0; i < 10000; i++ {
-    wpsg.Submit(func () {
+    psg.Submit(func () {
       // do something
     })
   }
-  wpsg.Wait()  
+  psg.Wait()  
   ```
 
 ## API

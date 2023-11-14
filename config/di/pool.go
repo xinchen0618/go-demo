@@ -16,8 +16,8 @@ var (
 	wpOnce     sync.Once
 )
 
-// WorkerPool 公共 Goroutine 池
-func WorkerPool() *pond.WorkerPool {
+// Pool 公共 Goroutine 池
+func Pool() *pond.WorkerPool {
 	wpOnce.Do(func() {
 		workerPool = pond.New(config.GetInt("worker_pool"), 0, pond.PanicHandler(func(a any) {
 			zap.L().Error(fmt.Sprint(a))
@@ -27,10 +27,10 @@ func WorkerPool() *pond.WorkerPool {
 	return workerPool
 }
 
-// WorkerPoolSeparate 独享 Goroutine 池
+// PoolSeparate 独享 Goroutine 池
 //
 //	一次请求提交大量数据, 使用独享 Goroutine 池起限流作用.
-func WorkerPoolSeparate(maxWorkers int) *pond.WorkerPool {
+func PoolSeparate(maxWorkers int) *pond.WorkerPool {
 	return pond.New(maxWorkers, 0, pond.PanicHandler(func(a any) {
 		zap.L().Error(fmt.Sprint(a))
 	}))
