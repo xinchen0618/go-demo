@@ -10,7 +10,6 @@ import (
 
 	gormcache "github.com/asjdf/gorm-cache/cache"
 	gormcacheconfig "github.com/asjdf/gorm-cache/config"
-	gormcachestorage "github.com/asjdf/gorm-cache/storage"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -92,11 +91,11 @@ func DemoDB() *gorm.DB {
 
 		// 缓存
 		cache, err := gormcache.NewGorm2Cache(&gormcacheconfig.CacheConfig{
-			CacheLevel:           gormcacheconfig.CacheLevelAll,
-			CacheStorage:         gormcachestorage.NewRedis(&gormcachestorage.RedisStoreConfig{Client: CacheRedis()}),
-			InvalidateWhenUpdate: true,            // when you create/update/delete objects, invalidate cache
-			CacheTTL:             6 * 3600 * 1000, // ms
-			CacheMaxItemCnt:      20,              // if length of objects retrieved one single time, exceeds this number, then don't cache
+			CacheLevel: gormcacheconfig.CacheLevelOff, // 缓存有 key 冲突的 BUG, 这里仅使用它的 singleflight
+			// CacheStorage:         gormcachestorage.NewRedis(&gormcachestorage.RedisStoreConfig{Client: CacheRedis()}),
+			// InvalidateWhenUpdate: true,            // when you create/update/delete objects, invalidate cache
+			// CacheTTL:             6 * 3600 * 1000, // ms
+			// CacheMaxItemCnt:      1,               // if length of objects retrieved one single time, exceeds this number, then don't cache
 		})
 		if err != nil {
 			Logger().Error(err.Error())
