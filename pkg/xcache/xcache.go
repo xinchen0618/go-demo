@@ -18,6 +18,8 @@ var sg singleflight.Group
 
 // GetOrSet 获取或设置自定义缓存
 //
+//	缓存使用 JSON 编码.
+//
 //	p 为接收缓存数据的指针.
 //	f() 返回的 any 为需要缓存的数据, 返回 error 时数据不缓存.
 //
@@ -64,6 +66,7 @@ func GetOrSet(p any, cache *redis.Client, key string, ttl time.Duration, f func(
 
 // GinCache 获取或者设置 Gin 缓存
 //
+//	缓存使用 JSON 编码.
 //	函数中出现 error 会向客户端输出错误. f() 中可调用 c.
 //
 //	p 为接收缓存数据的指针.
