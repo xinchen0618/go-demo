@@ -24,17 +24,18 @@ var sg singleflight.Group
 //	函数返回 error 表示取数据失败.
 func GetOrSet(p any, cache *redis.Client, key string, ttl time.Duration, f func() (any, error)) error {
 	if _, err, _ := sg.Do(key, func() (any, error) {
+		var resultBytes []byte
 		// 取数据
-		var resultCache string
 		resultCache, err := cache.Get(context.Background(), key).Result()
 		switch err {
 		case nil: // 正常拿到缓存
+			resultBytes = []byte(resultCache)
 		case redis.Nil: // 缓存不存在
 			result, err := f()
 			if err != nil {
 				return nil, err
 			}
-			resultBytes, err := json.Marshal(result)
+			resultBytes, err = json.Marshal(result)
 			if err != nil {
 				zap.L().Error(err.Error())
 				return nil, err
@@ -43,14 +44,13 @@ func GetOrSet(p any, cache *redis.Client, key string, ttl time.Duration, f func(
 				zap.L().Error(err.Error())
 				return nil, err
 			}
-			resultCache = string(resultBytes)
 		default: // redis 异常
 			zap.L().Error(err.Error())
 			return nil, err
 		}
 
 		// 返回数据
-		if err := json.Unmarshal([]byte(resultCache), &p); err != nil {
+		if err := json.Unmarshal(resultBytes, &p); err != nil {
 			zap.L().Error(err.Error())
 			return nil, err
 		}
@@ -72,16 +72,18 @@ func GetOrSet(p any, cache *redis.Client, key string, ttl time.Duration, f func(
 //	函数返回 error 表示取数据失败.
 func GinCache(p any, c *gin.Context, cache *redis.Client, key string, ttl time.Duration, f func() (any, error)) error {
 	if _, err, _ := sg.Do(key, func() (any, error) {
-		var resultCache string
+		var resultBytes []byte
+		// 取数据
 		resultCache, err := cache.Get(context.Background(), key).Result()
 		switch err {
 		case nil: // 正常拿到缓存
+			resultBytes = []byte(resultCache)
 		case redis.Nil: // 缓存不存在
 			result, err := f()
 			if err != nil {
 				return nil, err
 			}
-			resultBytes, err := json.Marshal(result)
+			resultBytes, err = json.Marshal(result)
 			if err != nil {
 				ginx.InternalError(c, err)
 				return nil, err
@@ -90,13 +92,12 @@ func GinCache(p any, c *gin.Context, cache *redis.Client, key string, ttl time.D
 				ginx.InternalError(c, err)
 				return nil, err
 			}
-			resultCache = string(resultBytes)
 		default: // redis异常
 			ginx.InternalError(c, err)
 			return nil, err
 		}
 
-		if err := json.Unmarshal([]byte(resultCache), &p); err != nil {
+		if err := json.Unmarshal(resultBytes, &p); err != nil {
 			ginx.InternalError(c, err)
 			return nil, err
 		}
