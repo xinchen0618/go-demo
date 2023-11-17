@@ -2,21 +2,22 @@
 
 ## 技术栈
 
-|        技术        |        名称         | 地址                                   |
-|:----------------:|:-----------------:|--------------------------------------|
-|       API        |        Gin        | https://github.com/gin-gonic/gin     |
-|      MySQL       |       GORM        | https://github.com/go-gorm/gorm      |
-|      Redis       |     go-redis      | https://github.com/go-redis/redis    |
-|        登录        |      jwt-go       | https://github.com/golang-jwt/jwt    |
-|        日志        |        zap        | https://github.com/uber-go/zap       |
-|       优雅停止       |      endless      | https://github.com/fvbock/endless    |
-|       命令行        |    urfave/cli     | https://github.com/urfave/cli        |
-|       计划任务       |      gocron       | https://github.com/go-co-op/gocron   |
-|   Goroutine 池    |       pond        | https://github.com/alitto/pond       |
-|       消息队列       |       Asynq       | https://github.com/hibiken/asynq     |
-|       类型转换       |       cast        | https://github.com/spf13/cast        |
-|       json       |      go-json      | https://github.com/goccy/go-json     |
-|    WebSocket     | Gorilla WebSocket | https://github.com/gorilla/websocket |
+|     技术      |        名称         | 地址                                   |
+|:-----------:|:-----------------:|--------------------------------------|
+|     API     |        Gin        | https://github.com/gin-gonic/gin     |
+|    MySQL    |       GORM        | https://github.com/go-gorm/gorm      |
+|    Redis    |     go-redis      | https://github.com/go-redis/redis    |
+|     缓存      |  go-redis/cache   | https://github.com/go-redis/cache    |
+|     登录      |      jwt-go       | https://github.com/golang-jwt/jwt    |
+|     日志      |        zap        | https://github.com/uber-go/zap       |
+|    优雅停止     |      endless      | https://github.com/fvbock/endless    |
+|     命令行     |    urfave/cli     | https://github.com/urfave/cli        |
+|    计划任务     |      gocron       | https://github.com/go-co-op/gocron   |
+| Goroutine 池 |       pond        | https://github.com/alitto/pond       |
+|    消息队列     |       Asynq       | https://github.com/hibiken/asynq     |
+|    类型转换     |       cast        | https://github.com/spf13/cast        |
+|    json     |      go-json      | https://github.com/goccy/go-json     |
+|  WebSocket  | Gorilla WebSocket | https://github.com/gorilla/websocket |
 
 ## 规范
 
@@ -46,6 +47,7 @@
     - logger.go         日志服务
     - queue.go          消息队列服务
     - redis.go          Redis 服务
+    - cache.go          缓存服务
     - pool.go           Goroutine 池服务
   - cfg.go              配置实现
   - common.go           公共配置
@@ -67,7 +69,6 @@
   - ginx/               Gin 增强函数. 此包中出现 error 会向客户端输出4xx/500错误, 调用时捕获到 error 直接结束业务逻辑即可
   - gox/                Golang 增强函数
   - queuex/             消息队列操作函数
-  - xcache/             自定义缓存操作函数
 - go.mod                包管理  
 ```
 
@@ -361,10 +362,3 @@ go build -ldflags="-s -w"
 ### 规范
 
 [阿里云Redis开发规范](https://developer.aliyun.com/article/531067)
-
-### 缓存
-
-- 业务缓存
-
-  - 自定义缓存, `xcache.GetOrSet()` 获取或设置自定义缓存
-  - API 业务缓存, `xcache.GinCache()` 获取或设置 API 业务缓存, 出现`error`会向客户端输出4xx/500错误, 调用时捕获到`error`直接结束业务逻辑即可
