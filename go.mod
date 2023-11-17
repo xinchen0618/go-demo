@@ -20,7 +20,7 @@ require (
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/vearne/gin-timeout v0.1.7
 	go.uber.org/zap v1.26.0
-	golang.org/x/sync v0.4.0
+	golang.org/x/sync v0.5.0
 	gorm.io/driver/mysql v1.5.2
 	gorm.io/gorm v1.25.5
 )
