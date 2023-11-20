@@ -21,7 +21,7 @@ type GetOrSetReq struct {
 	GinCtx *gin.Context // 选填， 用于 Gin 向客户端输出 4xx/500 错误, 调用时捕获到`error`直接结束业务逻辑即可
 	Cache  *redis.Client
 	Key    string
-	Ttl    time.Duration
+	Ttl    time.Duration       // 默认 1 小时
 	Do     func() (any, error) // 返回的 any 为需要缓存的数据, 返回 error 时数据不缓存.
 }
 
@@ -51,7 +51,11 @@ func GetOrSet(req GetOrSetReq) error {
 				}
 				return nil, err
 			}
-			if err := req.Cache.Set(context.Background(), req.Key, resultBytes, req.Ttl).Err(); err != nil {
+			ttl := req.Ttl
+			if ttl == 0 {
+				ttl = time.Hour
+			}
+			if err := req.Cache.Set(context.Background(), req.Key, resultBytes, ttl).Err(); err != nil {
 				zap.L().Error(err.Error())
 				if req.GinCtx != nil {
 					ginx.InternalError(req.GinCtx, nil)
