@@ -18,7 +18,7 @@ var sg singleflight.Group
 
 type GetOrSetReq struct {
 	Result any          // 接收缓存数据的指针
-	GinCtx *gin.Context // 选填， 用于向客户端输出4xx/500错误, 调用时捕获到`error`直接结束业务逻辑即可
+	GinCtx *gin.Context // 选填， 用于 Gin 向客户端输出 4xx/500 错误, 调用时捕获到`error`直接结束业务逻辑即可
 	Cache  *redis.Client
 	Key    string
 	Ttl    time.Duration
