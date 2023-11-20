@@ -364,7 +364,4 @@ go build -ldflags="-s -w"
 
 ### 缓存
 
-- 业务缓存
-
-  - 自定义缓存, `xcache.GetOrSet()` 获取或设置自定义缓存
-  - API 业务缓存, `xcache.GinCache()` 获取或设置 API 业务缓存, 出现`error`会向客户端输出4xx/500错误, 调用时捕获到`error`直接结束业务逻辑即可
+- 自定义缓存, `xcache.GetOrSet()` 获取或设置自定义缓存
