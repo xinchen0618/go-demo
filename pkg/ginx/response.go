@@ -1,6 +1,6 @@
 // Package ginx Gin 增强函数
 //
-//	此包中出现 error 会向客户端输出4xx/500错误, 调用时捕获到 error 直接结束业务逻辑即可.
+//	此包中出现 error 会向客户端输出 4xx/500 错误, 调用时捕获到 error 直接结束业务逻辑即可.
 package ginx
 
 import (

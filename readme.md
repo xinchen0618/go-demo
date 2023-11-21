@@ -353,7 +353,6 @@ go build -ldflags="-s -w"
 
 `user_id` 为 0 表示向所有用户推送消息, 否则为向指定用户推送消息.
 
-
 ## Redis
 
 `key`统一在`internal/consts/redis_key.go`中定义, 避免冲突.
