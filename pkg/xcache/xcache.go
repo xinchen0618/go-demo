@@ -31,19 +31,18 @@ type GetOrSetReq struct {
 //
 //	函数返回 error 表示取数据失败.
 func GetOrSet(req GetOrSetReq) error {
-	if _, err, _ := sg.Do(req.Key, func() (any, error) {
-		var resultBytes []byte
+	result, err, _ := sg.Do(req.Key, func() (any, error) {
 		// 取数据
 		resultCache, err := req.Cache.Get(context.Background(), req.Key).Result()
 		switch err {
 		case nil: // 正常拿到缓存
-			resultBytes = []byte(resultCache)
+			return []byte(resultCache), nil
 		case redis.Nil: // 缓存不存在
 			result, err := req.Do()
 			if err != nil {
 				return nil, err
 			}
-			resultBytes, err = json.Marshal(result)
+			resultBytes, err := json.Marshal(result)
 			if err != nil {
 				zap.L().Error(err.Error())
 				if req.GinCtx != nil {
@@ -62,6 +61,7 @@ func GetOrSet(req GetOrSetReq) error {
 				}
 				return nil, err
 			}
+			return resultBytes, nil
 		default: // redis 异常
 			zap.L().Error(err.Error())
 			if req.GinCtx != nil {
@@ -69,19 +69,19 @@ func GetOrSet(req GetOrSetReq) error {
 			}
 			return nil, err
 		}
-
-		// 返回数据
-		if err := json.Unmarshal(resultBytes, req.Result); err != nil {
-			zap.L().Error(err.Error())
-			if req.GinCtx != nil {
-				ginx.InternalError(req.GinCtx, nil)
-			}
-			return nil, err
-		}
-
-		return nil, nil
-	}); err != nil {
+	})
+	if err != nil {
 		return err
 	}
+
+	// 返回数据
+	if err := json.Unmarshal(result.([]byte), req.Result); err != nil {
+		zap.L().Error(err.Error())
+		if req.GinCtx != nil {
+			ginx.InternalError(req.GinCtx, nil)
+		}
+		return err
+	}
+
 	return nil
 }
