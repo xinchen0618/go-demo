@@ -17,7 +17,7 @@ import (
 var sg singleflight.Group
 
 type GetOrSetReq struct {
-	Result any          // 接收缓存数据的指针
+	Value  any          // 接收缓存数据的指针
 	GinCtx *gin.Context // 选填， 用于 Gin 向客户端输出 4xx/500 错误, 调用时捕获到 error 直接结束业务逻辑即可
 	Cache  *redis.Client
 	Key    string
@@ -31,18 +31,18 @@ type GetOrSetReq struct {
 //
 //	函数返回 error 表示取数据失败.
 func GetOrSet(req GetOrSetReq) error {
-	result, err, _ := sg.Do(req.Key, func() (any, error) {
+	value, err, _ := sg.Do(req.Key, func() (any, error) {
 		// 取数据
-		resultCache, err := req.Cache.Get(context.Background(), req.Key).Result()
+		valueCache, err := req.Cache.Get(context.Background(), req.Key).Result()
 		switch err {
 		case nil: // 正常拿到缓存
-			return []byte(resultCache), nil
+			return []byte(valueCache), nil
 		case redis.Nil: // 缓存不存在
-			result, err := req.Do()
+			value, err := req.Do()
 			if err != nil {
 				return nil, err
 			}
-			resultBytes, err := json.Marshal(result)
+			valueBytes, err := json.Marshal(value)
 			if err != nil {
 				zap.L().Error(err.Error())
 				if req.GinCtx != nil {
@@ -54,14 +54,14 @@ func GetOrSet(req GetOrSetReq) error {
 			if ttl == 0 {
 				ttl = time.Hour
 			}
-			if err := req.Cache.Set(context.Background(), req.Key, resultBytes, ttl).Err(); err != nil {
+			if err := req.Cache.Set(context.Background(), req.Key, valueBytes, ttl).Err(); err != nil {
 				zap.L().Error(err.Error())
 				if req.GinCtx != nil {
 					ginx.InternalError(req.GinCtx, nil)
 				}
 				return nil, err
 			}
-			return resultBytes, nil
+			return valueBytes, nil
 		default: // redis 异常
 			zap.L().Error(err.Error())
 			if req.GinCtx != nil {
@@ -75,7 +75,7 @@ func GetOrSet(req GetOrSetReq) error {
 	}
 
 	// 返回数据
-	if err := json.Unmarshal(result.([]byte), req.Result); err != nil {
+	if err := json.Unmarshal(value.([]byte), req.Value); err != nil {
 		zap.L().Error(err.Error())
 		if req.GinCtx != nil {
 			ginx.InternalError(req.GinCtx, nil)
