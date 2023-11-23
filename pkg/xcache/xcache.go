@@ -1,4 +1,5 @@
 // Package xcache 自定义缓存操作函数
+// 缓存使用 JSON 编码.
 package xcache
 
 import (
@@ -16,7 +17,7 @@ import (
 
 var sg singleflight.Group
 
-type GetOrSetReq struct {
+type OnceReq struct {
 	Value  any          // 接收缓存数据的指针
 	GinCtx *gin.Context // 选填， 用于 Gin 向客户端输出 4xx/500 错误, 调用时捕获到 error 直接结束业务逻辑即可
 	Cache  *redis.Client
@@ -25,12 +26,10 @@ type GetOrSetReq struct {
 	Do     func() (any, error) // 返回的 any 为需要缓存的数据, 返回 error 时数据不缓存.
 }
 
-// GetOrSet 获取或设置自定义缓存
-//
-//	缓存使用 JSON 编码.
+// Once 获取或设置缓存
 //
 //	函数返回 error 表示取数据失败.
-func GetOrSet(req GetOrSetReq) error {
+func Once(req OnceReq) error {
 	value, err, _ := sg.Do(req.Key, func() (any, error) {
 		// 取数据
 		valueCache, err := req.Cache.Get(context.Background(), req.Key).Result()
@@ -83,5 +82,82 @@ func GetOrSet(req GetOrSetReq) error {
 		return err
 	}
 
+	return nil
+}
+
+type GetReq struct {
+	GinCtx *gin.Context // 选填， 用于 Gin 向客户端输出 4xx/500 错误, 调用时捕获到 error 直接结束业务逻辑即可
+	Cache  *redis.Client
+	Key    string
+	Value  any // 接收结构的指针
+}
+
+// Get 从缓存中获取数据
+func Get(req GetReq) error {
+	valueCache, err := req.Cache.Get(context.Background(), req.Key).Result()
+	switch err {
+	case nil: // 正常拿到缓存
+		if err := json.Unmarshal([]byte(valueCache), req.Value); err != nil {
+			zap.L().Error(err.Error())
+			if req.GinCtx != nil {
+				ginx.InternalError(req.GinCtx, nil)
+			}
+			return err
+		}
+		return nil
+	case redis.Nil: // 缓存不存在
+		return nil
+	default:
+		zap.L().Error(err.Error())
+		if req.GinCtx != nil {
+			ginx.InternalError(req.GinCtx, nil)
+		}
+		return err
+	}
+}
+
+type SetReq struct {
+	GinCtx *gin.Context // 选填， 用于 Gin 向客户端输出 4xx/500 错误, 调用时捕获到 error 直接结束业务逻辑即可
+	Cache  *redis.Client
+	Key    string
+	Value  any // 需要缓存的数据
+	Ttl    time.Duration
+}
+
+// Set 设置缓存
+func Set(req SetReq) error {
+	value, err := json.Marshal(req.Value)
+	if err != nil {
+		zap.L().Error(err.Error())
+		if req.GinCtx != nil {
+			ginx.InternalError(req.GinCtx, nil)
+		}
+		return err
+	}
+	if err := req.Cache.Set(context.Background(), req.Key, value, req.Ttl).Err(); err != nil {
+		zap.L().Error(err.Error())
+		if req.GinCtx != nil {
+			ginx.InternalError(req.GinCtx, nil)
+		}
+		return err
+	}
+	return nil
+}
+
+type DelReq struct {
+	GinCtx *gin.Context // 选填， 用于 Gin 向客户端输出 4xx/500 错误, 调用时捕获到 error 直接结束业务逻辑即可
+	Cache  *redis.Client
+	Key    string
+}
+
+// Del 删除缓存
+func Del(req DelReq) error {
+	if err := req.Cache.Del(context.Background(), req.Key).Err(); err != nil {
+		zap.L().Error(err.Error())
+		if req.GinCtx != nil {
+			ginx.InternalError(req.GinCtx, nil)
+		}
+		return err
+	}
 	return nil
 }
