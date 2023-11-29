@@ -82,7 +82,8 @@ func DemoDB() *gorm.DB {
 		)
 		var err error
 		demoDB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-			Logger: newGormLogger(),
+			SkipDefaultTransaction: true,
+			Logger:                 newGormLogger(),
 		})
 		if err != nil {
 			Logger().Error(err.Error())
