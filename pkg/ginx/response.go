@@ -45,7 +45,7 @@ func Error(c *gin.Context, httpCode int, code, message string) {
 
 // InternalError 输出500错误
 //
-//	err 为 nil 时表示无需记录, 项目中定义的方法错误会就近记录, 无需重复记录.
+//	err 记录错误日志, nil 表示无需记录, 项目中定义的方法错误会就近记录, 无需重复记录.
 func InternalError(c *gin.Context, err error) {
 	if err != nil {
 		zap.L().Error(err.Error())

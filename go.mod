@@ -9,13 +9,13 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-co-op/gocron v1.36.0
 	github.com/goccy/go-json v0.10.2
-	github.com/golang-jwt/jwt/v5 v5.1.0
-	github.com/golang-module/carbon/v2 v2.2.13
+	github.com/golang-jwt/jwt/v5 v5.2.0
+	github.com/golang-module/carbon/v2 v2.2.14
 	github.com/gorilla/websocket v1.5.1
 	github.com/hibiken/asynq v0.24.1
 	github.com/juju/ratelimit v1.0.2
 	github.com/redis/go-redis/v9 v9.3.0
-	github.com/samber/lo v1.38.1
+	github.com/samber/lo v1.39.0
 	github.com/spf13/cast v1.6.0
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/vearne/gin-timeout v0.1.7
@@ -56,7 +56,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
-	github.com/ugorji/go/codec v1.2.11 // indirect
+	github.com/ugorji/go/codec v1.2.12 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
