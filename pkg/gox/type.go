@@ -37,13 +37,11 @@ func Copy(o any, p any) error {
 func WideCopy(o any, p any) error {
 	om := map[string]any{}
 	if err := Copy(o, &om); err != nil {
-		zap.L().Error(err.Error())
 		return err
 	}
 
 	pm := map[string]any{}
 	if err := Copy(p, &pm); err != nil {
-		zap.L().Error(err.Error())
 		return err
 	}
 
@@ -69,6 +67,7 @@ func WideCopy(o any, p any) error {
 				return fmt.Errorf("value cast error: %s, %w", k, err)
 			}
 		default:
+			zap.L().Error("unsupported value type: " + k)
 			return errors.New("unsupported value type: " + k)
 		}
 	}
