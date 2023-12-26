@@ -4,6 +4,7 @@ package xcache
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"go-demo/pkg/ginx"
@@ -33,10 +34,10 @@ func Once(req OnceReq) error {
 	value, err, _ := sg.Do(req.Key, func() (any, error) {
 		// 取数据
 		valueCache, err := req.Cache.Get(context.Background(), req.Key).Result()
-		switch err {
-		case nil: // 正常拿到缓存
+		switch {
+		case err == nil: // 正常拿到缓存
 			return []byte(valueCache), nil
-		case redis.Nil: // 缓存不存在
+		case errors.Is(err, redis.Nil): // 缓存不存在
 			value, err := req.Do()
 			if err != nil {
 				return nil, err
@@ -95,8 +96,8 @@ type GetReq struct {
 // Get 从缓存中获取数据
 func Get(req GetReq) error {
 	valueCache, err := req.Cache.Get(context.Background(), req.Key).Result()
-	switch err {
-	case nil: // 正常拿到缓存
+	switch {
+	case err == nil: // 正常拿到缓存
 		if err := json.Unmarshal([]byte(valueCache), req.Value); err != nil {
 			zap.L().Error(err.Error())
 			if req.GinCtx != nil {
@@ -105,7 +106,7 @@ func Get(req GetReq) error {
 			return err
 		}
 		return nil
-	case redis.Nil: // 缓存不存在
+	case errors.Is(err, redis.Nil): // 缓存不存在
 		return nil
 	default:
 		zap.L().Error(err.Error())

@@ -4,10 +4,10 @@ package action
 import (
 	"fmt"
 
-	"github.com/urfave/cli/v2"
-
 	"go-demo/config/di"
 	"go-demo/internal/model"
+
+	"github.com/urfave/cli/v2"
 )
 
 // 用户相关命令行 DEMO 这里定义一个空结构体用于为大量的 action 方法做分类

@@ -8,10 +8,10 @@ import (
 	"go.uber.org/zap"
 )
 
-// PutCsv 创建 CSV 文件
+// PutCSV 创建 CSV 文件
 //
 //	文件不存在会创建, 文件存在会覆盖写入.
-func PutCsv(name string, data [][]string) error {
+func PutCSV(name string, data [][]string) error {
 	f, err := os.Create(name) // 创建文件
 	if err != nil {
 		zap.L().Error(err.Error())
