@@ -20,10 +20,10 @@ var sg singleflight.Group
 
 type OnceReq struct {
 	Value  any          // 接收缓存数据的指针
-	GinCtx *gin.Context // 选填， 用于 Gin 向客户端输出 4xx/500 错误, 调用时捕获到 error 直接结束业务逻辑即可
+	GinCtx *gin.Context // 选填，用于 Gin 向客户端输出 4xx/500 错误, 调用时捕获到 error 直接结束业务逻辑即可
 	Cache  *redis.Client
 	Key    string
-	Ttl    time.Duration       // 默认 1 小时
+	TTL    time.Duration       // 默认 1 小时
 	Do     func() (any, error) // 返回的 any 为需要缓存的数据, 返回 error 时数据不缓存.
 }
 
@@ -50,7 +50,7 @@ func Once(req OnceReq) error {
 				}
 				return nil, err
 			}
-			ttl := req.Ttl
+			ttl := req.TTL
 			if ttl == 0 {
 				ttl = time.Hour
 			}
@@ -87,7 +87,7 @@ func Once(req OnceReq) error {
 }
 
 type GetReq struct {
-	GinCtx *gin.Context // 选填， 用于 Gin 向客户端输出 4xx/500 错误, 调用时捕获到 error 直接结束业务逻辑即可
+	GinCtx *gin.Context // 选填，用于 Gin 向客户端输出 4xx/500 错误, 调用时捕获到 error 直接结束业务逻辑即可
 	Cache  *redis.Client
 	Key    string
 	Value  any // 接收结构的指针
@@ -118,11 +118,11 @@ func Get(req GetReq) error {
 }
 
 type SetReq struct {
-	GinCtx *gin.Context // 选填， 用于 Gin 向客户端输出 4xx/500 错误, 调用时捕获到 error 直接结束业务逻辑即可
+	GinCtx *gin.Context // 选填，用于 Gin 向客户端输出 4xx/500 错误, 调用时捕获到 error 直接结束业务逻辑即可
 	Cache  *redis.Client
 	Key    string
 	Value  any // 需要缓存的数据
-	Ttl    time.Duration
+	TTL    time.Duration
 }
 
 // Set 设置缓存
@@ -135,7 +135,7 @@ func Set(req SetReq) error {
 		}
 		return err
 	}
-	if err := req.Cache.Set(context.Background(), req.Key, value, req.Ttl).Err(); err != nil {
+	if err := req.Cache.Set(context.Background(), req.Key, value, req.TTL).Err(); err != nil {
 		zap.L().Error(err.Error())
 		if req.GinCtx != nil {
 			ginx.InternalError(req.GinCtx, nil)
