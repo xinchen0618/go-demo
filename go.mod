@@ -10,14 +10,14 @@ require (
 	github.com/go-co-op/gocron v1.37.0
 	github.com/goccy/go-json v0.10.2
 	github.com/golang-jwt/jwt/v5 v5.2.0
-	github.com/golang-module/carbon/v2 v2.3.0
+	github.com/golang-module/carbon/v2 v2.3.1
 	github.com/gorilla/websocket v1.5.1
 	github.com/hibiken/asynq v0.24.1
 	github.com/juju/ratelimit v1.0.2
 	github.com/redis/go-redis/v9 v9.3.1
 	github.com/samber/lo v1.39.0
 	github.com/spf13/cast v1.6.0
-	github.com/urfave/cli/v2 v2.26.0
+	github.com/urfave/cli/v2 v2.27.0
 	github.com/vearne/gin-timeout v0.1.7
 	go.uber.org/zap v1.26.0
 	golang.org/x/sync v0.5.0

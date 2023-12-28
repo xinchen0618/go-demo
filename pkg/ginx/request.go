@@ -324,7 +324,10 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 // PageQuery 分页参数
 type PageQuery struct {
 	DB         *gorm.DB
-	Model      any // 表 model 指针
+	Model      any    // 表 model 指针
+	Table      string // 表名, 与 Model 二选一
+	Select     string // 查询字段, 配合 Table 使用, Model 会智能选择字段
+	Joins      string
 	Where      string
 	BindParams []any
 	OrderBy    string
@@ -347,9 +350,27 @@ func Paginate(c *gin.Context, items any, pageQuery PageQuery) (Paging, error) {
 	}
 	page := queries["page"].(int64)
 	perPage := queries["per_page"].(int64)
+
+	tx := pageQuery.DB
+	if pageQuery.Model != nil {
+		tx = tx.Model(pageQuery.Model)
+	}
+	if pageQuery.Table != "" {
+		tx = tx.Table(pageQuery.Table)
+	}
+	if pageQuery.Joins != "" {
+		tx = tx.Joins(pageQuery.Joins)
+	}
+	if pageQuery.Select != "" {
+		tx = tx.Select(pageQuery.Select)
+	}
+	if pageQuery.Where != "" {
+		tx = tx.Where(pageQuery.Where, pageQuery.BindParams...)
+	}
+
 	// 总记录数
 	var totalResults int64 // 计算总记录数
-	if err := pageQuery.DB.Model(pageQuery.Model).Where(pageQuery.Where, pageQuery.BindParams...).Count(&totalResults).Error; err != nil {
+	if err := tx.Count(&totalResults).Error; err != nil {
 		InternalError(c, nil)
 		return Paging{}, errors.New("InternalError")
 	}
@@ -363,7 +384,6 @@ func Paginate(c *gin.Context, items any, pageQuery PageQuery) (Paging, error) {
 		return result, nil
 	}
 	// items
-	tx := pageQuery.DB.Model(pageQuery.Model).Where(pageQuery.Where, pageQuery.BindParams...)
 	if pageQuery.OrderBy != "" {
 		tx.Order(pageQuery.OrderBy)
 	}
