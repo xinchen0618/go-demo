@@ -367,6 +367,7 @@ func Paginate(c *gin.Context, items any, pageQuery PageQuery) (Paging, error) {
 	if pageQuery.Where != "" {
 		tx = tx.Where(pageQuery.Where, pageQuery.BindParams...)
 	}
+	tx = tx.Session(&gorm.Session{})
 
 	// 总记录数
 	var totalResults int64 // 计算总记录数
@@ -383,9 +384,10 @@ func Paginate(c *gin.Context, items any, pageQuery PageQuery) (Paging, error) {
 		}
 		return result, nil
 	}
+
 	// items
 	if pageQuery.OrderBy != "" {
-		tx.Order(pageQuery.OrderBy)
+		tx = tx.Order(pageQuery.OrderBy)
 	}
 	offset := (page - 1) * perPage
 	if err := tx.Offset(int(offset)).Limit(int(perPage)).Find(items).Error; err != nil {
