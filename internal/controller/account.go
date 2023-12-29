@@ -3,6 +3,7 @@ package controller
 
 import (
 	"fmt"
+	"strings"
 
 	"go-demo/config/di"
 	"go-demo/internal/consts"
@@ -71,12 +72,12 @@ func (account) GetUsers(c *gin.Context) {
 		return
 	}
 
-	where := "1 = 1"
+	where := make([]string, 0)
 	bindParams := make([]any, 0)
 
 	userName := queries["user_name"].(string)
 	if userName != "" {
-		where += " AND user_name LIKE ?"
+		where = append(where, "user_name LIKE ?")
 		bindParams = append(bindParams, "%"+userName+"%")
 	}
 
@@ -88,7 +89,7 @@ func (account) GetUsers(c *gin.Context) {
 	paging, err := ginx.Paginate(c, &items, ginx.PageQuery{
 		DB:         di.DemoDB(),
 		Model:      &model.TUsers{},
-		Where:      where,
+		Where:      strings.Join(where, " AND "),
 		BindParams: bindParams,
 		OrderBy:    "user_id DESC",
 	})

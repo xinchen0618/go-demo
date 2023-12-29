@@ -326,7 +326,7 @@ type PageQuery struct {
 	DB         *gorm.DB
 	Model      any    // 表 model 指针
 	Table      string // 表名, 与 Model 二选一
-	Select     string // 查询字段, 配合 Table 使用, Model 会智能选择字段
+	Select     string // 表字段, 配合 Table 使用, Model 会智能选择表字段无需此字段
 	Joins      string
 	Where      string
 	BindParams []any
