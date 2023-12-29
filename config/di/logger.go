@@ -14,9 +14,9 @@ var zapLogger *zap.Logger
 
 func init() { // 日志服务最为基础, 日志初始化失败, 程序不允许启动
 	// 创建输出位置
-	syncers := make([]zapcore.WriteSyncer, 0)   // NewMultiWriteSyncer() 可以添加多个 syncer, 逗号分隔
-	consoleSyncer := zapcore.AddSync(os.Stdout) // 输出到 console
-	syncers = append(syncers, consoleSyncer)
+	syncers := make([]zapcore.WriteSyncer, 0) // NewMultiWriteSyncer() 可以添加多个 syncer, 逗号分隔
+	// consoleSyncer := zapcore.AddSync(os.Stdout) // 输出到 console
+	// syncers = append(syncers, consoleSyncer)
 	errorLog := config.GetString("error_log")
 	if errorLog != "" {
 		logFile, err := os.OpenFile(errorLog, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o664)
