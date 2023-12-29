@@ -114,6 +114,8 @@ DI 实现参考 [Dependency Injection / Service Location](https://docs.phalcon.i
 
 日志文件路径通过`config/`中`error_log`项配置, 注意文件需要读写权限.
 
+日志编码格式有两种`Console`和`JSON`, 通过`config/`中`error_log_encoder`项配置.
+
 内部应用使用`di.Logger().Error()`, `di.Logger().Warn()`, `di.Logger().Info()`, `di.Logger().Debug()`记录,
 
 其他, 使用`zap.L(),Error()`, `zap.L().Warn()`, `zap.L().Info()`, `zap.L().Debug()`记录.

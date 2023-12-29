@@ -14,11 +14,13 @@ func init() {
 		// ERROR 日志路径
 		"error_log": "/var/log/golang_app.log",
 		// ERROR 日志级别
-		"error_log_level": "Debug", // Debug,Info,Warn,Error
+		"error_log_level": "Debug", // Debug, Info, Warn, Error
+		// 日志编码格式
+		"error_log_encoder": "Console", // Console, JSON
 		// 彩色输出 ERROR 日志
-		"error_log_colorful": true,
+		"error_log_colorful": true, // Console 格式有效
 		// SQL 日志级别
-		"sql_log_level": "Info", // Silent,Error,Warn,Info
+		"sql_log_level": "Info", // Silent, Error, Warn, Info
 
 		// 公共 Goroutine 池大小
 		"worker_pool": 409600,
