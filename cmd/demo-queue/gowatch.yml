@@ -1,3 +1,0 @@
-watch_paths:
-  - "../.."
-output: "./tmp/demo-queue"

@@ -219,13 +219,13 @@ DI 实现参考 [Dependency Injection / Service Location](https://docs.phalcon.i
 
 ### 运行
 
-- 开发&测试环境使用 gowatch 实时热重载
+- 开发&测试环境使用 air 实时热重载
 
-  注意, 是否配置了 Go mod 代理`go env -w GOPROXY=https://goproxy.cn,direct`, 是否安装了 gowatch `go install github.com/silenceper/gowatch@latest`, 是否配置了 Go bin 路径`export PATH=$PATH:$HOME/go/bin`
+  注意, 是否配置了 Go mod 代理`go env -w GOPROXY=https://goproxy.cn,direct`, 是否安装了 air `go install github.com/cosmtrek/air@latest`, 是否配置了 Go bin 路径`export PATH=$PATH:$HOME/go/bin`
 
   ```
   cd cmd/demo-api
-  RUNTIME_ENV=testing gowatch
+  RUNTIME_ENV=testing air
   ```
 
 - 预发布&生产环境执行编译好的程序
