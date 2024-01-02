@@ -20,8 +20,9 @@ func init() {
 		// JWT 密钥, JWT 配套有白名单功能不必担心秘钥泄露的问题
 		"jwt_secret": "btRZ5QHXX9VjfYhfGGHdCTcWiwQ6WFJXq9ZCwdqZwzk2ZfhceM9K3V5UGKsYLd9m",
 
-		"error_log_level":    "Error",
-		"error_log_colorful": false,
+		// 日志
+		"error_log_level":   "Error",
+		"error_log_encoder": "JSON",
 
 		/************ 配置 END ****************/
 	} {
