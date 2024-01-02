@@ -22,7 +22,6 @@ func init() {
 
 		"error_log_level":    "Error",
 		"error_log_colorful": false,
-		"sql_log_level":      "Error",
 
 		/************ 配置 END ****************/
 	} {

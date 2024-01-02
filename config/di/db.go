@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"go-demo/config"
+	"go-demo/pkg/gormx"
 	"go-demo/pkg/gox"
 
 	gormcache "github.com/asjdf/gorm-cache/cache"
@@ -11,7 +12,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"moul.io/zapgorm2"
 )
 
 /**************** DEMO DB *************************************************/
@@ -24,20 +24,19 @@ var (
 func DemoDB() *gorm.DB {
 	_ = demoDBOnce.Do(func() error {
 		// 日志
-		zapLogger := zapgorm2.New(Logger())
-		zapLogger.IgnoreRecordNotFoundError = true
-		zapLogger.SlowThreshold = 0
-		switch config.GetString("sql_log_level") {
-		case "Info":
-			zapLogger.LogLevel = logger.Info
-		case "Warn":
-			zapLogger.LogLevel = logger.Warn
-		case "Error":
-			zapLogger.LogLevel = logger.Error
-		case "Silent":
-			zapLogger.LogLevel = logger.Silent
+		loggerConfig := logger.Config{
+			SlowThreshold:             0,
+			IgnoreRecordNotFoundError: true,
+			LogLevel:                  logger.Info,
 		}
-		zapLogger.SetAsDefault()
+		switch config.GetString("error_log_level") {
+		case "Info":
+			loggerConfig.LogLevel = logger.Info
+		case "Warn":
+			loggerConfig.LogLevel = logger.Warn
+		case "Error":
+			loggerConfig.LogLevel = logger.Error
+		}
 		// 连接
 		dsn := fmt.Sprintf(
 			"%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local",
@@ -51,7 +50,7 @@ func DemoDB() *gorm.DB {
 		var err error
 		demoDB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 			SkipDefaultTransaction: true,
-			Logger:                 zapLogger,
+			Logger:                 gormx.NewLogger(loggerConfig),
 		})
 		if err != nil {
 			Logger().Error(err.Error())

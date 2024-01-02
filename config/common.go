@@ -19,8 +19,6 @@ func init() {
 		"error_log_encoder": "Console", // Console, JSON
 		// 彩色输出 ERROR 日志
 		"error_log_colorful": true, // Console 格式有效
-		// SQL 日志级别
-		"sql_log_level": "Info", // Silent, Error, Warn, Info
 
 		// 公共 Goroutine 池大小
 		"worker_pool": 409600,

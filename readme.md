@@ -122,7 +122,7 @@ DI 实现参考 [Dependency Injection / Service Location](https://docs.phalcon.i
 
 `Error()`日志会记录栈信息.
 
-SQL 日志会记录到 zap, 正常运行的 SQL 为`Debug`级别.
+SQL 日志会记录到 zap.
 
 ## Goroutine 池 
 
