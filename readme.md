@@ -354,7 +354,3 @@ go build -ldflags="-s -w"
 ### 规范
 
 [阿里云Redis开发规范](https://developer.aliyun.com/article/531067)
-
-### 缓存
-
-- 自定义缓存, `xcache.GetOrSet()` 获取或设置自定义缓存
