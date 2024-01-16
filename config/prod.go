@@ -21,8 +21,7 @@ func init() {
 		"jwt_secret": "btRZ5QHXX9VjfYhfGGHdCTcWiwQ6WFJXq9ZCwdqZwzk2ZfhceM9K3V5UGKsYLd9m",
 
 		// 日志
-		"error_log_level":   "Error",
-		"error_log_encoder": "JSON",
+		"error_log_level": "Error",
 
 		/************ 配置 END ****************/
 	} {
