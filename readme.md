@@ -98,7 +98,7 @@
 
 - 使用
 
-  获取配置值`config.GetInt()`, `config.GetString()`, `config.GetBool()`, `config.GetIntSlice()`, `config.GetStringSlice()`
+  获取配置值`config.GetInt()`, `config.GetString()`, `config.GetBool()`, `config.GetIntSlice()`, `config.GetStringSlice()`, `config.GetStringMapString()`
 
 ## 依赖注入
 

@@ -77,3 +77,11 @@ func GetIntSlice(key string) []int {
 	}
 	return value
 }
+
+func GetStringMapString(key string) map[string]string {
+	value, err := cast.ToStringMapStringE(get(key))
+	if err != nil {
+		zap.L().Error(err.Error())
+	}
+	return value
+}
