@@ -29,8 +29,8 @@ var Auth auth
 //	返回字符串为 JWT token.
 func (auth) JWTLogin(userType string, id int64, userName string) (string, error) {
 	// JWT登录
-	loginTtl := 30 * 24 * time.Hour  // 登录有效时长
-	claims := &jwt.RegisteredClaims{ // **这样赋值并不符合 JWT 定义中的声明, 如此处理仅是为了方便**
+	loginTtl := 30 * 24 * time.Hour // 登录有效时长
+	claims := &jwt.RegisteredClaims{
 		Issuer:    userType, // 角色
 		Subject:   userName, // 用户名
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(loginTtl)),
