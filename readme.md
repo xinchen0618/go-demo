@@ -197,7 +197,7 @@ SQL 日志会记录到 zap.
 
   - 校验账户信息
   - 生成 JWT Token
-  - 以`jwt:<userType>:<userID>:<jwtSignature>`的格式记录入 Redis 白名单
+  - 以`<userType>:<userID>:jwt:<md5(jwtToken)>`的格式记录入 Redis 白名单
   - JWT Token 返回给客户端
 
 - 校验登录
@@ -312,7 +312,7 @@ go build -ldflags="-s -w"
 
 ### 鉴权 
 
-与 API 鉴权保持一致, 使用的JWT. 客户端通过 URL 参数`client_id`, 值为`url_base64(userID:jwtSignature)`, 传入鉴权信息.
+与 API 鉴权保持一致, 使用的JWT. 客户端通过 URL 参数`client_id`, 值为`url_base64(userID:md5(jwtToken))`, 传入鉴权信息.
 
 ### 通信
 

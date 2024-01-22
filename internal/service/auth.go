@@ -6,12 +6,12 @@ package service
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"go-demo/config"
 	"go-demo/config/di"
 	"go-demo/internal/consts"
+	"go-demo/pkg/gox"
 
 	"github.com/goccy/go-json"
 	"github.com/golang-jwt/jwt/v5"
@@ -30,7 +30,7 @@ var Auth auth
 func (auth) JWTLogin(userType string, id int64, userName string) (string, error) {
 	// JWT登录
 	loginTtl := 30 * 24 * time.Hour  // 登录有效时长
-	claims := &jwt.RegisteredClaims{ // **这样赋值并不符合JWT定义中的声明, 如此处理仅是为了方便**
+	claims := &jwt.RegisteredClaims{ // **这样赋值并不符合 JWT 定义中的声明, 如此处理仅是为了方便**
 		Issuer:    userType, // 角色
 		Subject:   userName, // 用户名
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(loginTtl)),
@@ -44,13 +44,12 @@ func (auth) JWTLogin(userType string, id int64, userName string) (string, error)
 		return "", err
 	}
 	// redis 登录白名单
-	tokenAtoms := strings.Split(tokenString, ".")
 	payload, err := json.Marshal(claims)
 	if err != nil {
 		di.Logger().Error(err.Error())
 		return "", err
 	}
-	key := fmt.Sprintf(consts.JWTLogin, userType, claims.ID, tokenAtoms[2])
+	key := fmt.Sprintf(consts.JWTLogin, userType, claims.ID, gox.MD5(tokenString))
 	if err := di.JWTRedis().Set(context.Background(), key, payload, loginTtl).Err(); err != nil {
 		di.Logger().Error(err.Error())
 		return "", err
@@ -64,8 +63,7 @@ func (auth) JWTLogin(userType string, id int64, userName string) (string, error)
 //	从 redis 白名单删除.
 //	userType 为 JWT 登录用户类型, 集中在 consts/auth.go 中定义. token 为 JWT token. id 为用户 id.
 func (auth) JWTLogout(userType, token string, id int64) error {
-	tokenAtoms := strings.Split(token, ".")
-	key := fmt.Sprintf(consts.JWTLogin, userType, id, tokenAtoms[2])
+	key := fmt.Sprintf(consts.JWTLogin, userType, id, gox.MD5(token))
 	if err := di.JWTRedis().Del(context.Background(), key).Err(); err != nil {
 		di.Logger().Error(err.Error())
 		return err

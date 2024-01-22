@@ -5,12 +5,12 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"strings"
 
 	"go-demo/config"
 	"go-demo/config/di"
 	"go-demo/internal/consts"
 	"go-demo/pkg/ginx"
+	"go-demo/pkg/gox"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -38,8 +38,7 @@ func JWTParse(userType string) gin.HandlerFunc {
 			return
 		}
 		// 白名单校验
-		tokenAtoms := strings.Split(tokenString, ".")
-		key := fmt.Sprintf(consts.JWTLogin, userType, claims["jti"], tokenAtoms[2])
+		key := fmt.Sprintf(consts.JWTLogin, userType, claims["jti"], gox.MD5(tokenString))
 		if n, err := di.JWTRedis().Exists(context.Background(), key).Result(); err != nil {
 			di.Logger().Error(err.Error())
 			c.Next()

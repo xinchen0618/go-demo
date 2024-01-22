@@ -43,7 +43,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	defer service.WS.Close(client)
 
 	// 鉴权, jwt redis 白名单
-	clientID := r.URL.Query().Get("client_id") // url_base64(userID:jwtSignature)
+	clientID := r.URL.Query().Get("client_id") // url_base64(userID:md5(jwtToken))
 	clientIDDecoded, err := base64.RawURLEncoding.DecodeString(clientID)
 	if err != nil {
 		_ = service.WS.Send(client, "ClientError", map[string]any{
