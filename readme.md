@@ -112,7 +112,7 @@ DI 实现参考 [Dependency Injection / Service Location](https://docs.phalcon.i
 
 ## 日志
 
-日志文件路径通过`config/`中`error_log`项配置, 注意文件需要读写权限.
+日志文件路径通过`config/`中`error_log`项配置, 注意文件需要读写权限, 未配置文件路径日志将输出到控制台.
 
 日志编码格式有两种`Console`和`JSON`, 通过`config/`中`error_log_encoder`项配置.
 

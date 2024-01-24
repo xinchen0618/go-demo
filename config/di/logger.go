@@ -16,13 +16,16 @@ func init() { // 日志服务最为基础, 日志初始化失败, 程序不允�
 	// 创建输出位置
 	syncers := make([]zapcore.WriteSyncer, 0) // NewMultiWriteSyncer() 可以添加多个 syncer, 逗号分隔
 	errorLog := config.GetString("error_log")
-	if errorLog != "" {
+	if errorLog != "" { // 输出到文件
 		logFile, err := os.OpenFile(errorLog, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o664)
 		if err != nil {
 			panic(err)
 		}
-		fileSyncer := zapcore.AddSync(logFile) // 输出到文件
+		fileSyncer := zapcore.AddSync(logFile)
 		syncers = append(syncers, fileSyncer)
+	} else { // 输出到控制台
+		consoleSyncer := zapcore.AddSync(os.Stdout)
+		syncers = append(syncers, consoleSyncer)
 	}
 	// 创建编码器
 	var encoder zapcore.Encoder
