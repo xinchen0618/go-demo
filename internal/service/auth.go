@@ -29,11 +29,11 @@ var Auth auth
 //	返回字符串为 JWT token.
 func (auth) JWTLogin(userType string, id int64, userName string) (string, error) {
 	// JWT登录
-	loginTtl := 30 * 24 * time.Hour // 登录有效时长
+	loginTTL := 30 * 24 * time.Hour // 登录有效时长
 	claims := &jwt.RegisteredClaims{
 		Issuer:    userType, // 角色
 		Subject:   userName, // 用户名
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(loginTtl)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(loginTTL)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 		ID:        cast.ToString(id), // ID
 	}
@@ -50,7 +50,7 @@ func (auth) JWTLogin(userType string, id int64, userName string) (string, error)
 		return "", err
 	}
 	key := fmt.Sprintf(consts.JWTLogin, userType, claims.ID, gox.MD5(tokenString))
-	if err := di.JWTRedis().Set(context.Background(), key, payload, loginTtl).Err(); err != nil {
+	if err := di.JWTRedis().Set(context.Background(), key, payload, loginTTL).Err(); err != nil {
 		di.Logger().Error(err.Error())
 		return "", err
 	}
