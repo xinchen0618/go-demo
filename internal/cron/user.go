@@ -17,7 +17,7 @@ var User user
 //	userCount 为需要删除的数量.
 func (user) DeleteUsers(userCount int) {
 	userIDs := make([]int64, 0)
-	if err := di.DemoDB().Model(&model.TUsers{}).Select("user_id").Limit(userCount).Find(&userIDs).Error; err != nil {
+	if err := di.DemoDB().Model(&model.TUsers{}).Select("user_id").Order("user_id").Limit(userCount).Find(&userIDs).Error; err != nil {
 		return
 	}
 	di.DemoDB().Where("user_id IN ?", userIDs).Delete(&model.TUsers{})

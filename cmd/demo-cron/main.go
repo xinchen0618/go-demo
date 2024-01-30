@@ -6,23 +6,41 @@ import (
 
 	"go-demo/config/di"
 	"go-demo/internal/cron"
+	"go-demo/pkg/gox"
 
-	"github.com/go-co-op/gocron"
+	"github.com/go-co-op/gocron/v2"
 )
 
 func main() {
-	loc, err := time.LoadLocation("Asia/Shanghai")
+	// create a scheduler
+	s, err := gocron.NewScheduler()
 	if err != nil {
 		di.Logger().Error(err.Error())
 		return
 	}
-	s := gocron.NewScheduler(loc)
+	defer gox.Go(func() {
+		// when you're done, shut it down
+		if err := s.Shutdown(); err != nil {
+			di.Logger().Error(err.Error())
+		}
+	})
 
-	// 计划任务路由 DEMO
-	if _, err = s.Cron("* * * * *").Do(cron.User.DeleteUsers, 10); err != nil {
+	// add a job to the scheduler
+	if _, err := s.NewJob(
+		gocron.DurationJob(
+			10*time.Second,
+		),
+		gocron.NewTask(
+			cron.User.DeleteUsers,
+			10,
+		),
+	); err != nil {
 		di.Logger().Error(err.Error())
 	}
 
-	// starts the scheduler and blocks current execution path
-	s.StartBlocking()
+	// start the scheduler
+	s.Start()
+
+	// block until you are ready to shut down
+	select {}
 }
