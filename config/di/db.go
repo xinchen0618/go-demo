@@ -15,7 +15,6 @@ import (
 )
 
 /**************** DEMO DB *************************************************/
-
 var (
 	demoDB     *gorm.DB
 	demoDBOnce gox.Once

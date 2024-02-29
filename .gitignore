@@ -1,5 +1,5 @@
 .idea
 .vscode
 **/tmp/
-config/dev.go
-config/dev_*.go
+config/local.go
+config/local_*.go

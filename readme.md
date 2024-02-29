@@ -77,7 +77,7 @@
 
 环境变量`RUNTIME_ENV`指定运行环境, 可以在系统中设置, 也可以在命令行中指定, 默认为生产环境.
 
-- `dev`       开发环境. 开发人员的个人环境
+- `dev`       开发环境
 - `testing`   测试环境
 - `stage`     预发布环境
 - `prod`      生产环境
@@ -93,8 +93,6 @@
   `common.go`公共配置, `<RUNTIME_ENV>.go`环境配置, 环境配置为可选, 同键名环境配置覆盖公共配置.
 
   可以按分类将配置文件拆分为多个`<RUNTIME_ENV>_<TYPE>.go`, 比如`testing_db.go`, `testing_app.go`
-
-  dev 环境配置不参与版本控制.
 
 - 使用
 

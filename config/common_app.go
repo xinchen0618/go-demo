@@ -29,25 +29,6 @@ func init() {
 		// 超时控制, 秒
 		"timeout": 30,
 
-		// DB DEMO
-		"mysql_host":           "127.0.0.1",
-		"mysql_port":           3306,
-		"mysql_username":       "root",
-		"mysql_password":       "cx654321",
-		"mysql_dbname":         "test",
-		"mysql_charset":        "utf8mb4",
-		"mysql_max_open_conns": 140,
-		"mysql_max_idle_conns": 30,
-
-		// Redis DEMO
-		"redis_host":          "127.0.0.1",
-		"redis_port":          6379,
-		"redis_auth":          "",
-		"redis_index_cache":   0, // 缓存
-		"redis_index_jwt":     1, // JWT
-		"redis_index_storage": 2, // 存储
-		"redis_index_queue":   3, // 消息队列
-
 		/************ 配置 END ******************/
 	} {
 		configure[env][k] = v

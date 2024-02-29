@@ -10,6 +10,7 @@ import (
 	"github.com/hibiken/asynq"
 )
 
+/******************** 消息队列 client ********************/
 var (
 	queueClient     *asynq.Client
 	queueClientOnce sync.Once
@@ -31,6 +32,7 @@ func QueueClient() *asynq.Client {
 	return queueClient
 }
 
+/******************** 消息队列 server ********************/
 var (
 	queueServer     *asynq.Server
 	queueServerOnce sync.Once
