@@ -89,10 +89,16 @@
   `viper`提供了运行时修改配置的功能, 而且无法限制, 这个是不可接受的.
 
 - 多环境配置
-  
-  `common.go`公共配置, `<RUNTIME_ENV>.go`环境配置, 环境配置为可选, 同键名环境配置覆盖公共配置.
 
-  可以按分类将配置文件拆分为多个`<RUNTIME_ENV>_<TYPE>.go`, 比如`testing_db.go`, `testing_app.go`
+  local 配置, 可选, 功能类似`.env`, 优先级最高, local 配置文件不参与 git 管理;
+
+  环境配置, 可选, 与环境定义相符的配置才会被使用, 优先级次之;
+
+  common 配置, 公共配置, 优先级最低;
+
+  同键名配置, 优先级高的覆盖优先级低的;
+
+  配置文件会按分类拆分为多个`<RUNTIME_ENV>_<TYPE>.go`, 比如`testing_db.go`, `testing_app.go`;
 
 - 使用
 

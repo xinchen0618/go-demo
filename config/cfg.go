@@ -24,6 +24,11 @@ func RuntimeEnv() string {
 func get(key string) any {
 	runtimeEnv := RuntimeEnv()
 
+	if localConfigure, ok := configure["local"]; ok { // local 配置
+		if value, ok := localConfigure[key]; ok {
+			return value
+		}
+	}
 	if envConfigure, ok := configure[runtimeEnv]; ok { // 环境配置
 		if value, ok := envConfigure[key]; ok {
 			return value
