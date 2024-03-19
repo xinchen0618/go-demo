@@ -13,7 +13,7 @@ func init() {
 		configure[env] = map[string]any{}
 	}
 	for k, v := range map[string]any{
-		/************ 配置 START **************/
+		/************ 配置项 START **************/
 
 		// DB DEMO
 		"mysql_host":           "127.0.0.1",
@@ -25,7 +25,7 @@ func init() {
 		"mysql_max_open_conns": 140,
 		"mysql_max_idle_conns": 30,
 
-		/************ 配置 END *****************/
+		/************ 配置项 END *****************/
 	} {
 		configure[env][k] = v
 	}

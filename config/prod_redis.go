@@ -13,7 +13,7 @@ func init() {
 		configure[env] = map[string]any{}
 	}
 	for k, v := range map[string]any{
-		/************ 配置 START **************/
+		/************ 配置项 START **************/
 
 		// Redis DEMO
 		"redis_host":          "127.0.0.1",
@@ -24,7 +24,7 @@ func init() {
 		"redis_index_storage": 2, // 存储
 		"redis_index_queue":   3, // 消息队列
 
-		/************ 配置 END *****************/
+		/************ 配置项 END *****************/
 	} {
 		configure[env][k] = v
 	}

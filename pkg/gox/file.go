@@ -17,11 +17,11 @@ func PutCSV(name string, data [][]string) error {
 		zap.L().Error(err.Error())
 		return err
 	}
-	defer func(f *os.File) {
+	defer func() {
 		if err := f.Close(); err != nil {
 			zap.L().Error(err.Error())
 		}
-	}(f)
+	}()
 
 	if _, err := f.WriteString("\xEF\xBB\xBF"); err != nil { // 写入 UTF-8 BOM
 		zap.L().Error(err.Error())
@@ -33,7 +33,6 @@ func PutCSV(name string, data [][]string) error {
 		zap.L().Error(err.Error())
 		return err
 	}
-	w.Flush()
 
 	return nil
 }

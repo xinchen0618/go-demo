@@ -13,7 +13,7 @@ func init() {
 		configure[env] = map[string]any{}
 	}
 	for k, v := range map[string]any{
-		/************ 配置 START **************/
+		/************ 配置项 START **************/
 
 		// 运行端口
 		"server_port": 8090,
@@ -24,7 +24,7 @@ func init() {
 		// 日志
 		"error_log_level": "Error",
 
-		/************ 配置 END ****************/
+		/************ 配置项 END ****************/
 	} {
 		configure[env][k] = v
 	}

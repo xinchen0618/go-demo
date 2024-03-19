@@ -13,7 +13,7 @@ func init() {
 		configure[env] = map[string]any{}
 	}
 	for k, v := range map[string]any{
-		/************ 配置 START ****************/
+		/************ 配置项 START ****************/
 
 		// ERROR 日志路径
 		"error_log": "/var/log/golang_app.log",
@@ -33,7 +33,7 @@ func init() {
 		// 超时控制, 秒
 		"timeout": 30,
 
-		/************ 配置 END ******************/
+		/************ 配置项 END ******************/
 	} {
 		configure[env][k] = v
 	}
