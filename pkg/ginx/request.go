@@ -35,6 +35,10 @@ func GetJSONBody(c *gin.Context, patterns []string) (map[string]any, error) {
 	for _, pattern := range patterns {
 		// pattern
 		patternAtoms := strings.Split(pattern, ":")
+		if len(patternAtoms) != 4 {
+			InternalError(c, errors.New("参数模式错误: "+pattern))
+			return nil, errors.New("ParamPatternError")
+		}
 		required := true
 		allowEmpty := false
 		if patternAtoms[3] == "+" {
@@ -78,6 +82,10 @@ func GetQueries(c *gin.Context, patterns []string) (map[string]any, error) {
 	var err error
 	for _, pattern := range patterns {
 		patternAtoms := strings.Split(pattern, ":")
+		if len(patternAtoms) != 4 {
+			InternalError(c, errors.New("参数模式错误: "+pattern))
+			return nil, errors.New("ParamPatternError")
+		}
 		// default
 		allowEmpty := false
 		if patternAtoms[3] == `""` { // 默认值""表示空字符串
@@ -200,7 +208,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		if precStr != "" {
 			prec, err = cast.ToIntE(precStr)
 			if err != nil {
-				Error(c, 400, "ParamTypeError", "数据类型错误: "+paramName)
+				InternalError(c, errors.New("数据类型错误: "+paramName))
 				return nil, errors.New("ParamTypeError")
 			}
 		}
@@ -219,7 +227,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 			var err error
 			prec, err = cast.ToIntE(precStr)
 			if err != nil {
-				Error(c, 400, "ParamTypeError", "数据类型错误: "+paramName)
+				InternalError(c, errors.New("数据类型错误: "+paramName))
 				return nil, errors.New("ParamTypeError")
 			}
 		}
@@ -317,7 +325,7 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		return stringSlice, nil
 	}
 
-	Error(c, 400, "ParamTypeUndefined", "未知数据类型: %s"+paramName)
+	InternalError(c, errors.New("未知数据类型: "+paramName))
 	return nil, errors.New("ParamTypeUndefined")
 }
 
