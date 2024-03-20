@@ -37,6 +37,9 @@ func PasswordHash(password string) string {
 
 // PasswordVerify 验证密码与散列是否匹配
 func PasswordVerify(password, passwordHash string) bool {
+	if len(passwordHash) != 38 {
+		return false
+	}
 	salt := passwordHash[0:6]
 	return passwordHash == salt+MD5(password+MD5(password+salt)+salt)
 }

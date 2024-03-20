@@ -80,7 +80,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	if err := client.Conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
 		di.Logger().Error(err.Error())
 	}
-	gox.Go(func() {
+	gox.SafeGo(func() {
 		ticker := time.NewTicker(pingPeriod)
 		defer ticker.Stop()
 		for range ticker.C {
@@ -116,7 +116,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	// 创建一个通道来接收订阅的消息
 	msgCh := pubsub.Channel()
 	// 启动一个 goroutine 来处理订阅的消息
-	gox.Go(func() {
+	gox.SafeGo(func() {
 		for msg := range msgCh {
 			// 读取订阅消息并格式化
 			submsg := types.SubMsg{}

@@ -18,7 +18,7 @@ func main() {
 		di.Logger().Error(err.Error())
 		return
 	}
-	defer gox.Go(func() {
+	defer gox.SafeGo(func() {
 		// when you're done, shut it down
 		if err := s.Shutdown(); err != nil {
 			di.Logger().Error(err.Error())
