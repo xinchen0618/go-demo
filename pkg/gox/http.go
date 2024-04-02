@@ -16,13 +16,13 @@ import (
 
 // RESTful 发起 RESTful 请求
 //
-//	params GET/DELETE 请求为 url 参数, 并会进行 url 转义, 其他请求为 entity 参数.
+//	params GET/DELETE 请求为 url 参数, 并会进行 url 转义, 其他请求为 body 参数.
 //	返回 body 是 json.Unmarshal 的数据.
 func RESTful(method, rawUrl string, params map[string]any, headers map[string]string) (body map[string]any, httpCode int, err error) {
 	method = strings.ToUpper(method)
 
 	// 参数
-	var entityParams io.Reader
+	var requestBody io.Reader
 	if len(params) > 0 {
 		if lo.Contains([]string{"GET", "DELETE"}, method) { // url 参数
 			urlParams := url.Values{}
@@ -37,17 +37,17 @@ func RESTful(method, rawUrl string, params map[string]any, headers map[string]st
 			Url.RawQuery = urlParams.Encode()
 			rawUrl = Url.String()
 
-		} else { // entity 参数
+		} else { // body 参数
 			paramBytes, err := json.Marshal(params)
 			if err != nil {
 				zap.L().Error(err.Error())
 				return map[string]any{}, 0, err
 			}
-			entityParams = bytes.NewBuffer(paramBytes)
+			requestBody = bytes.NewBuffer(paramBytes)
 		}
 	}
 
-	req, err := http.NewRequest(method, rawUrl, entityParams)
+	req, err := http.NewRequest(method, rawUrl, requestBody)
 	if err != nil {
 		zap.L().Error(err.Error())
 		return map[string]any{}, 0, err
@@ -69,11 +69,11 @@ func RESTful(method, rawUrl string, params map[string]any, headers map[string]st
 		zap.L().Error(err.Error())
 		return map[string]any{}, 0, err
 	}
-	defer func(Body io.ReadCloser) {
-		if err := Body.Close(); err != nil {
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
 			zap.L().Error(err.Error())
 		}
-	}(resp.Body)
+	}()
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
