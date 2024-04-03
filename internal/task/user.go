@@ -34,7 +34,7 @@ func (user) AddUser(ctx context.Context, t *asynq.Task) error {
 
 	// 业务处理
 	userData := map[string]any{}
-	if err := gox.Copy(user, &userData); err != nil {
+	if err := gox.CopyViaJSON(user, &userData); err != nil {
 		return err
 	}
 	if err := di.DemoDB().Model(&model.TUsers{}).Create(userData).Error; err != nil {
