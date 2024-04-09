@@ -26,13 +26,8 @@ func main() {
 
 	// add a job to the scheduler
 	if _, err := s.NewJob(
-		gocron.DurationJob(
-			10*time.Second,
-		),
-		gocron.NewTask(
-			cron.User.DeleteUsers,
-			10,
-		),
+		gocron.DurationJob(10*time.Second),
+		gocron.NewTask(cron.User.DeleteUsers, 10),
 	); err != nil {
 		di.Logger().Error(err.Error())
 	}
