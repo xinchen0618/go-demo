@@ -6,7 +6,6 @@ import (
 
 	"go-demo/config/di"
 	"go-demo/internal/cron"
-	"go-demo/pkg/gox"
 
 	"github.com/go-co-op/gocron/v2"
 )
@@ -18,12 +17,12 @@ func main() {
 		di.Logger().Error(err.Error())
 		return
 	}
-	defer gox.SafeGo(func() {
+	defer func() {
 		// when you're done, shut it down
 		if err := s.Shutdown(); err != nil {
 			di.Logger().Error(err.Error())
 		}
-	})
+	}()
 
 	// add a job to the scheduler
 	if _, err := s.NewJob(
