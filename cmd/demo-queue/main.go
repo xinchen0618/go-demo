@@ -32,9 +32,10 @@ func main() {
 	mux := asynq.NewServeMux()
 	mux.Use(loggingMiddleware)
 
-	// 注册队列任务 DEMO
+	// register handler DEMO
 	mux.HandleFunc("User:AddUser", task.User.AddUser)
 
+	// run queue server
 	if err := di.QueueServer().Run(mux); err != nil {
 		di.Logger().Error(err.Error())
 		return

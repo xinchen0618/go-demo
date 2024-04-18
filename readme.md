@@ -276,7 +276,7 @@ Cron 的停止并非优雅停止, 尤其要注意数据完整性的问题.
 ```
 cd cmd/demo-cron
 go build -ldflags="-s -w"
-(RUNTIME_ENV=testing ./demo-cron &> /dev/nul &)
+(RUNTIME_ENV=testing ./demo-cron &> /dev/null &)
 ```
 
 ## Queue
@@ -295,13 +295,13 @@ go build -ldflags="-s -w"
   ```
   cd cmd/demo-queue
   go build -ldflags="-s -w"
-  (RUNTIME_ENV=testing ./demo-queue &> /dev/nul &)
+  (RUNTIME_ENV=testing ./demo-queue &> /dev/null &)
   ```
 
 - 优雅停止 Worker
 
   ```
-  pkill -TERM -f "demo-queue"
+  pkill -TSTP -f "demo-queue" && pkill -TERM -f "demo-queue"
   ```
 
 - 发送 Job
