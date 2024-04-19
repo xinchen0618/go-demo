@@ -1,14 +1,12 @@
 // Package config 配置实现
 package config
 
-import "github.com/samber/lo"
-
 func init() {
 	const env = "prod" // 生产环境配置
-
-	if !lo.Contains([]string{RuntimeEnv(), "common", "local"}, env) {
+	if !EnvCheck(env) {
 		return
 	}
+
 	if _, ok := configure[env]; !ok {
 		configure[env] = map[string]any{}
 	}

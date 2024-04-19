@@ -4,6 +4,7 @@ package config
 import (
 	"os"
 
+	"github.com/samber/lo"
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
 )
@@ -19,6 +20,11 @@ func RuntimeEnv() string {
 	}
 
 	return runtimeEnv
+}
+
+// EnvCheck 环境校验
+func EnvCheck(env string) bool {
+	return lo.Contains([]string{RuntimeEnv(), "common", "local"}, env)
 }
 
 func get(key string) any {
