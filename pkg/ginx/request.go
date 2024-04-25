@@ -350,11 +350,11 @@ type Paging struct {
 }
 
 // Paginate 获取分页数据
-func Paginate(c *gin.Context, items any, pageQuery PageQuery) (Paging, error) {
+func Paginate(c *gin.Context, items any, pageQuery PageQuery) (*Paging, error) {
 	// 页码
 	queries, err := GetQueries(c, []string{"page:页码:+integer:1", "per_page:页大小:+integer:12"})
 	if err != nil {
-		return Paging{}, err
+		return nil, err
 	}
 	page := queries["page"].(int64)
 	perPage := queries["per_page"].(int64)
@@ -381,10 +381,10 @@ func Paginate(c *gin.Context, items any, pageQuery PageQuery) (Paging, error) {
 	var totalResults int64 // 计算总记录数
 	if err := tx.Count(&totalResults).Error; err != nil {
 		InternalError(c, nil)
-		return Paging{}, errors.New("InternalError")
+		return nil, errors.New("InternalError")
 	}
 	if totalResults == 0 { // 没有数据
-		result := Paging{
+		result := &Paging{
 			Page:         page,
 			PerPage:      perPage,
 			TotalPages:   0,
@@ -400,9 +400,9 @@ func Paginate(c *gin.Context, items any, pageQuery PageQuery) (Paging, error) {
 	offset := (page - 1) * perPage
 	if err := tx.Offset(int(offset)).Limit(int(perPage)).Find(items).Error; err != nil {
 		InternalError(c, nil)
-		return Paging{}, errors.New("InternalError")
+		return nil, errors.New("InternalError")
 	}
-	result := Paging{
+	result := &Paging{
 		Page:         page,
 		PerPage:      perPage,
 		TotalPages:   int64(math.Ceil(float64(totalResults) / float64(perPage))),

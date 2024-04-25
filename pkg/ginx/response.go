@@ -21,7 +21,7 @@ func Success(c *gin.Context, httpCode int, body any) {
 // PageSuccess 输出分页结果
 //
 //	items 列表数据
-func PageSuccess(c *gin.Context, items any, paging Paging) {
+func PageSuccess(c *gin.Context, items any, paging *Paging) {
 	body := struct {
 		Page         int64 `json:"page"`          // 页码
 		PerPage      int64 `json:"per_page"`      // 页大小

@@ -7,7 +7,7 @@ require (
 	github.com/asjdf/gorm-cache v1.2.3
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-co-op/gocron/v2 v2.2.9
+	github.com/go-co-op/gocron/v2 v2.2.10
 	github.com/goccy/go-json v0.10.2
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/golang-module/carbon/v2 v2.3.12
@@ -18,7 +18,7 @@ require (
 	github.com/samber/lo v1.39.0
 	github.com/spf13/cast v1.6.0
 	github.com/urfave/cli/v2 v2.27.1
-	github.com/vearne/gin-timeout v0.1.7
+	github.com/vearne/gin-timeout v0.1.8
 	go.uber.org/zap v1.27.0
 	golang.org/x/sync v0.7.0
 	gorm.io/driver/mysql v1.5.6
@@ -28,10 +28,10 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
-	github.com/bytedance/sonic v1.11.5 // indirect
+	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/cloudwego/base64x v0.1.3 // indirect
+	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
