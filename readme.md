@@ -345,7 +345,7 @@ go build -ldflags="-s -w"
 
 ### 消息推送
 
-服务端主动向客户端推送消息, 通过 Redis 订阅来实现, 服务端监听名为`wsMessageChannel`的 Redis 频道.
+服务端主动向客户端推送消息, 通过 Redis 订阅来实现, 服务端监听名为`WSMessageChannel`的 Redis 频道.
 
 向频道发送消息的格式为 json 字符串 `{"user_id": int, "type": string, data: {}}`
 

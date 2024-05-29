@@ -100,10 +100,10 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	/************************* 服务端主动向客户端推送消息 **************************/
-	// 这里通过 redis 订阅来实现, 服务端监听名为 wsMessageChannel 的 redis 频道
+	// 这里通过 redis 订阅来实现, 服务端监听名为 WSMessageChannel 的 redis 频道
 	// 向频道发送消息的格式为 json 字符串 `{"user_id": int, "type": string, data: {}}`
 	// user_id 为 0 表示向所有用户推送消息, 否则为向指定用户推送消息
-	pubsub := di.StorageRedis().Subscribe(context.Background(), "wsMessageChannel") // 订阅一个或多个频道
+	pubsub := di.StorageRedis().Subscribe(context.Background(), "WSMessageChannel") // 订阅一个或多个频道
 	// 检查订阅是否成功
 	if _, err := pubsub.Receive(context.Background()); err != nil {
 		di.Logger().Error(err.Error())
