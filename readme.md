@@ -193,7 +193,7 @@ SQL 日志会记录到 zap.
 - `internal/router/` 路由, API 版本在此控制
 - `internal/middleware/` 中间件, 可选
 - `internal/controller/` 业务处理
-- `internal/service/` 原子级服务, 可选, 业务应优先考虑是否可以封装为原子级操作以提高代码复用性. 比如, "添加用户"为一个原子级操作, "删除用户"也为一个原子级操作
+- `internal/service/` 原子级服务, 可选, 业务应优先考虑是否可以封装为原子级操作以提高代码复用性. 
   
 ### 登录
 
