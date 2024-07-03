@@ -15,7 +15,7 @@ require (
 	github.com/hibiken/asynq v0.24.1
 	github.com/juju/ratelimit v1.0.2
 	github.com/redis/go-redis/v9 v9.5.3
-	github.com/samber/lo v1.39.0
+	github.com/samber/lo v1.44.0
 	github.com/spf13/cast v1.6.0
 	github.com/urfave/cli/v2 v2.27.2
 	github.com/vearne/gin-timeout v0.2.0

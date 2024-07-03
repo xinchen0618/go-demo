@@ -250,8 +250,11 @@ func FilterParam(c *gin.Context, paramName string, paramValue any, paramType str
 		for _, value := range enum { // 用户输入与候选值逐个比较
 			enumType := reflect.TypeOf(value).String() // 候选值类型
 			// 用户输入类型与候选类型一致
-			if enumType == valueType && paramValue == value {
-				return value, nil
+			if enumType == valueType {
+				if paramValue == value {
+					return value, nil
+				}
+				continue
 			}
 			// 用户输入类型与候选类型不一致
 			if valueType == "float64" {
