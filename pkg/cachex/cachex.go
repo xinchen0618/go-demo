@@ -1,6 +1,6 @@
-// Package xcache 自定义缓存操作函数
+// Package cachex 自定义缓存操作函数
 // 缓存使用 JSON 编码.
-package xcache
+package cachex
 
 import (
 	"context"

@@ -3,26 +3,26 @@ module go-demo
 go 1.22
 
 require (
-	github.com/alitto/pond v1.9.0
+	github.com/alitto/pond v1.9.1
 	github.com/asjdf/gorm-cache v1.2.3
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-gonic/gin v1.10.0
-	github.com/go-co-op/gocron/v2 v2.7.0
+	github.com/go-co-op/gocron/v2 v2.10.1
 	github.com/goccy/go-json v0.10.3
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/golang-module/carbon/v2 v2.3.12
 	github.com/gorilla/websocket v1.5.3
 	github.com/hibiken/asynq v0.24.1
 	github.com/juju/ratelimit v1.0.2
-	github.com/redis/go-redis/v9 v9.5.3
-	github.com/samber/lo v1.44.0
+	github.com/redis/go-redis/v9 v9.5.4
+	github.com/samber/lo v1.46.0
 	github.com/spf13/cast v1.6.0
 	github.com/urfave/cli/v2 v2.27.2
 	github.com/vearne/gin-timeout v0.2.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/sync v0.7.0
 	gorm.io/driver/mysql v1.5.7
-	gorm.io/gorm v1.25.10
+	gorm.io/gorm v1.25.11
 )
 
 require (
@@ -63,9 +63,9 @@ require (
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.24.0 // indirect
-	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
-	golang.org/x/net v0.26.0 // indirect
+	golang.org/x/crypto v0.25.0 // indirect
+	golang.org/x/exp v0.0.0-20240716175740-e3f259677ff7 // indirect
+	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/time v0.5.0 // indirect

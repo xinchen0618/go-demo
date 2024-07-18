@@ -67,7 +67,7 @@
   - ginx/               Gin 增强函数. 此包中出现 error 会向客户端输出 4xx/500 错误, 调用时捕获到 error 直接结束业务逻辑即可
   - gox/                Golang 增强函数
   - queuex/             消息队列操作函数
-  - xcache/             自定义缓存操作函数
+  - cachex/             缓存操作函数
 - go.mod                包管理  
 ```
 

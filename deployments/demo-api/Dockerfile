@@ -1,4 +1,4 @@
-FROM golang:1.22.2-alpine3.19 AS build
+FROM golang:1.22.5-alpine3.20 AS build
 
 ENV GOPROXY=https://goproxy.cn,direct
 ENV CGO_ENABLED=0
@@ -17,11 +17,11 @@ WORKDIR /go-demo/cmd/demo-api
 RUN go build -ldflags="-s -w"
 
 
-FROM alpine:3.19
+FROM alpine:3.20
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk add --update --no-cache tzdata
-ENV TZ Asia/Shanghai
+ENV TZ=Asia/Shanghai
 
 COPY --from=build /go-demo/cmd/demo-api/demo-api /
 
