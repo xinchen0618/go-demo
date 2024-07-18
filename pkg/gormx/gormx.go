@@ -18,7 +18,7 @@ type NewDBReq struct {
 	Host         string
 	Port         int
 	DBName       string
-	CharSet      string
+	Charset      string
 	MaxIdleConns int
 	MaxOpenConns int
 }
@@ -47,7 +47,7 @@ func NewDB(req NewDBReq) (*gorm.DB, error) {
 		req.Host,
 		req.Port,
 		req.DBName,
-		req.CharSet,
+		req.Charset,
 	)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,

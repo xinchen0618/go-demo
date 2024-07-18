@@ -24,7 +24,7 @@ func DemoDB() *gorm.DB {
 			Host:         config.GetString("mysql_host"),
 			Port:         config.GetInt("mysql_port"),
 			DBName:       config.GetString("mysql_dbname"),
-			CharSet:      config.GetString("mysql_charset"),
+			Charset:      config.GetString("mysql_charset"),
 			MaxIdleConns: config.GetInt("mysql_max_idle_conns"),
 			MaxOpenConns: config.GetInt("mysql_max_open_conns"),
 		}); err != nil {
