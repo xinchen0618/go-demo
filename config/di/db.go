@@ -15,9 +15,8 @@ var (
 )
 
 func DemoDB() *gorm.DB {
-	_ = demoDBOnce.Do(func() error {
-		var err error
-		if demoDB, err = gormx.NewDB(gormx.NewDBReq{
+	_ = demoDBOnce.Do(func() (err error) {
+		demoDB, err = gormx.NewDB(gormx.NewDBReq{
 			LogLevel:     config.GetString("error_log_level"),
 			UserName:     config.GetString("mysql_username"),
 			Password:     config.GetString("mysql_password"),
@@ -27,11 +26,9 @@ func DemoDB() *gorm.DB {
 			Charset:      config.GetString("mysql_charset"),
 			MaxIdleConns: config.GetInt("mysql_max_idle_conns"),
 			MaxOpenConns: config.GetInt("mysql_max_open_conns"),
-		}); err != nil {
-			return err
-		}
+		})
 
-		return nil
+		return
 	})
 
 	return demoDB
