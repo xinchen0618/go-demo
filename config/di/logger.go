@@ -28,19 +28,9 @@ func init() { // 日志服务最为基础, 日志初始化失败, 程序不允�
 		syncers = append(syncers, consoleSyncer)
 	}
 	// 创建编码器
-	var encoder zapcore.Encoder
 	encoderConfig := zap.NewProductionEncoderConfig()
-	switch config.GetString("error_log_encoder") {
-	case "Console":
-		encoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("\r\n2006-01-02 15:04:05") // 自定义时间格式, 并在两行记录间加一行空行
-		if config.GetBool("error_log_colorful") {
-			encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder // 彩色输出
-		}
-		encoder = zapcore.NewConsoleEncoder(encoderConfig)
-	case "JSON":
-		encoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05") // 自定义时间格式
-		encoder = zapcore.NewJSONEncoder(encoderConfig)
-	}
+	encoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05") // 自定义时间格式
+	encoder := zapcore.NewJSONEncoder(encoderConfig)
 
 	// 创建 Core
 	logLevel := zapcore.DebugLevel
