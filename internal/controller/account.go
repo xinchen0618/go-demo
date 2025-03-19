@@ -12,8 +12,8 @@ import (
 	"go-demo/pkg/ginx"
 	"go-demo/pkg/gox"
 
+	"github.com/dromara/carbon/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-module/carbon/v2"
 	"github.com/spf13/cast"
 )
 
